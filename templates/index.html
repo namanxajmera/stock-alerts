@@ -7,6 +7,7 @@
     <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -25,8 +26,41 @@
                 <div id="error-message" class="error-message"></div>
             </div>
         </div>
-        <div id="main-chart" class="chart"></div>
-        <div id="sub-chart" class="chart"></div>
+
+        <!-- Stock info panel (initially hidden, will be populated by JS) -->
+        <div id="stock-info" class="stock-info" style="display: none;">
+            <div id="stock-name"></div>
+            <div class="stock-price" id="current-price">--</div>
+            <div class="price-change" id="price-change">
+                <span id="change-value">--</span>
+                <span id="change-percent">(--%)</span>
+            </div>
+        </div>
+
+        <!-- Main Chart Container -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div>
+                    <div class="chart-title">PRICE CHART</div>
+                    <div class="chart-subtitle">Closing Price and 200-Day Moving Average</div>
+                </div>
+            </div>
+            <div id="main-chart" class="chart"></div>
+        </div>
+        
+        <!-- Sub Chart Container -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <div>
+                    <div class="chart-title">RELATIVE STRENGTH</div>
+                    <div class="chart-subtitle">Percent Difference from Moving Average</div>
+                </div>
+            </div>
+            <div id="sub-chart" class="chart"></div>
+        </div>
+
+        <!-- Custom tooltip -->
+        <div id="custom-tooltip" class="custom-tooltip"></div>
     </div>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>

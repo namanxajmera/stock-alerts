@@ -5,13 +5,10 @@ if (typeof Plotly === 'undefined') {
 
 // Constants
 const PERIODS = {
-    '1D': { days: 1, interval: '5m' },
-    '1W': { days: 7, interval: '15m' },
-    '1M': { days: 30, interval: '1h' },
-    '3M': { days: 90, interval: '1d' },
-    '6M': { days: 180, interval: '1d' },
-    '1Y': { days: 365, interval: '1d' },
-    '5Y': { days: 1825, interval: '1d' }
+    '1y': { days: 365, interval: '1d' },
+    '3y': { days: 1095, interval: '1d' },
+    '5y': { days: 1825, interval: '1d' },
+    'max': { days: null, interval: '1d' }
 };
 
 // Chart configuration
@@ -39,23 +36,41 @@ const mainChart = document.getElementById('main-chart');
 const subChart = document.getElementById('sub-chart');
 const loadingIndicator = document.querySelector('.loading-indicator');
 const errorMessage = document.querySelector('.error-message');
+const stockInfoPanel = document.getElementById('stock-info');
+const stockNameEl = document.getElementById('stock-name');
+const currentPriceEl = document.getElementById('current-price');
+const priceChangeEl = document.getElementById('price-change');
+const changeValueEl = document.getElementById('change-value');
+const changePercentEl = document.getElementById('change-percent');
+const customTooltip = document.getElementById('custom-tooltip');
 
 // State
-let selectedPeriod = '1D';
+let selectedPeriod = '5y'; // Always use lowercase to match server requirements
 let currentTicker = '';
 let isLoading = false;
+let lastData = null;
 
 // Initialize the application
 function init() {
     initializeCharts();
     setDefaultPeriod();
     tickerInput.focus();
+    
+    // Event listeners
+    tickerInput.addEventListener('keyup', handleTickerInput);
+    periodButtons.forEach(btn => {
+        btn.addEventListener('click', handlePeriodChange);
+    });
+    
+    // Add mousemove event listeners for custom tooltips
+    mainChart.addEventListener('mousemove', handleChartMouseMove);
+    mainChart.addEventListener('mouseout', handleChartMouseOut);
 }
 
 function setDefaultPeriod() {
-    // Set 1Y as default period
-    selectedPeriod = '1Y';
-    const defaultBtn = document.querySelector(`[data-period="1y"]`);
+    // Set 5y as default period (lowercase to match server requirements)
+    selectedPeriod = '5y';
+    const defaultBtn = document.querySelector('[data-period="5y"]');
     if (defaultBtn) {
         defaultBtn.classList.add('selected');
     }
@@ -64,51 +79,72 @@ function setDefaultPeriod() {
 // Initialize charts with empty data
 function initializeCharts() {
     const mainChartLayout = {
-        height: 400,
-        margin: { t: 40, r: 10, l: 50, b: 0 },
+        height: 300,
+        margin: { t: 10, r: 40, l: 50, b: 40 }, // Increased bottom margin for labels
         showlegend: false,
         xaxis: {
             ...commonAxisStyle,
-            showticklabels: false
+            showticklabels: true,
+            tickangle: -45,
+            tickfont: {
+                family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
+                size: 10,
+                color: '#8E8E93'
+            },
+            automargin: true // Ensure labels are fully visible
         },
         yaxis: {
             ...commonAxisStyle,
             title: {
                 text: 'PRICE (USD)',
                 font: {
-                    family: 'Arial',
-                    size: 13,
+                    family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
+                    size: 12,
                     weight: 'bold'
-                }
-            }
-        },
-        title: {
-            text: '',
-            font: {
-                family: 'Arial',
-                size: 13,
-                weight: 'bold'
+                },
+                standoff: 10
             },
-            y: 0.95
-        }
+            automargin: true,
+            range: [null, null], // Auto range
+            rangemode: 'normal', // Normal range mode
+            autorange: true // Enable autorange
+        },
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        hovermode: 'x unified'
     };
 
     const subChartLayout = {
-        height: 250,
-        margin: { t: 0, r: 10, l: 50, b: 30 },
+        height: 200,
+        margin: { t: 10, r: 40, l: 50, b: 40 }, // Increased bottom margin for labels
         showlegend: false,
-        xaxis: commonAxisStyle,
+        xaxis: {
+            ...commonAxisStyle,
+            showticklabels: true,
+            tickangle: -45,
+            tickfont: {
+                family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
+                size: 10,
+                color: '#8E8E93'
+            },
+            automargin: true // Ensure labels are fully visible
+        },
         yaxis: {
             ...commonAxisStyle,
             title: {
                 text: '% DIFFERENCE',
                 font: {
-                    family: 'Arial',
-                    size: 13,
+                    family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
+                    size: 12,
                     weight: 'bold'
-                }
-            }
-        }
+                },
+                standoff: 10
+            },
+            automargin: true
+        },
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        hovermode: 'x unified'
     };
 
     try {
@@ -135,6 +171,9 @@ function filterNullValues(dates, values) {
 // Update charts with new data
 function updateCharts(data, ticker) {
     try {
+        // Store data for tooltip use
+        lastData = data;
+        
         // Filter out null values
         const [priceDates, priceValues] = filterNullValues(data.dates, data.prices);
         const [maDates, maValues] = filterNullValues(data.dates, data.ma_200);
@@ -144,6 +183,9 @@ function updateCharts(data, ticker) {
             throw new Error('No valid price data available');
         }
 
+        // Update stock info panel with the latest data
+        updateStockInfo(ticker, priceValues[priceValues.length - 1], priceValues[0]);
+
         // Main chart traces
         const mainTraces = [
             {
@@ -151,16 +193,24 @@ function updateCharts(data, ticker) {
                 y: priceValues,
                 type: 'scatter',
                 mode: 'lines',
-                line: { color: 'blue', width: 1 }
+                line: { color: '#00C805', width: 2 },
+                name: 'Price'
             },
             {
                 x: maDates,
                 y: maValues,
                 type: 'scatter',
                 mode: 'lines',
-                line: { color: 'black', width: 2 }
+                line: { color: '#8E8E93', width: 2, dash: 'dot' },
+                name: '200-Day MA'
             }
         ];
+
+        // Determine color for percent difference line
+        let diffColor = '#00C805'; // green by default
+        if (diffValues.length > 0 && diffValues[diffValues.length - 1] < 0) {
+            diffColor = '#FF5000'; // red if negative
+        }
 
         // Sub chart traces
         const subTraces = [
@@ -169,14 +219,18 @@ function updateCharts(data, ticker) {
                 y: diffValues,
                 type: 'scatter',
                 mode: 'lines',
-                line: { color: 'lightblue', width: 1 }
+                fill: 'tozeroy',
+                fillcolor: diffValues[diffValues.length - 1] >= 0 ? 'rgba(0, 200, 5, 0.1)' : 'rgba(255, 80, 0, 0.1)',
+                line: { color: diffColor, width: 2 },
+                name: '% Difference'
             },
             {
                 x: [data.dates[0], data.dates[data.dates.length - 1]],
                 y: [0, 0],
                 type: 'scatter',
                 mode: 'lines',
-                line: { color: 'gray', width: 1, dash: 'dash' }
+                line: { color: '#8E8E93', width: 1, dash: 'dash' },
+                name: 'Baseline'
             }
         ];
 
@@ -188,19 +242,21 @@ function updateCharts(data, ticker) {
                     y: [data.percentiles.p5, data.percentiles.p5],
                     type: 'scatter',
                     mode: 'lines',
-                    line: { color: 'purple', width: 2 }
+                    line: { color: '#007AFF', width: 1, dash: 'dash' },
+                    name: '5th Percentile'
                 },
                 {
                     x: [data.dates[0], data.dates[data.dates.length - 1]],
                     y: [data.percentiles.p95, data.percentiles.p95],
                     type: 'scatter',
                     mode: 'lines',
-                    line: { color: 'orange', width: 2 }
+                    line: { color: '#5856D6', width: 1, dash: 'dash' },
+                    name: '95th Percentile'
                 }
             );
         }
 
-        // Add percentile labels if we have valid percentiles
+        // Add percentile labels with improved styling
         const annotations = [];
         if (data.percentiles && data.percentiles.p5 !== null && data.percentiles.p95 !== null) {
             const lastDate = data.dates[data.dates.length - 1];
@@ -208,76 +264,129 @@ function updateCharts(data, ticker) {
                 {
                     x: lastDate,
                     y: data.percentiles.p5,
-                    text: ' 5TH',
+                    text: '5TH',
                     showarrow: false,
                     font: {
-                        family: 'Arial',
-                        size: 13,
-                        weight: 'bold'
+                        family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
+                        size: 12,
+                        color: '#007AFF'
                     },
                     xanchor: 'left',
-                    yanchor: 'top'
+                    yanchor: 'middle'
                 },
                 {
                     x: lastDate,
                     y: data.percentiles.p95,
-                    text: ' 95TH',
+                    text: '95TH',
                     showarrow: false,
                     font: {
-                        family: 'Arial',
-                        size: 13,
-                        weight: 'bold'
+                        family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
+                        size: 12,
+                        color: '#5856D6'
                     },
                     xanchor: 'left',
-                    yanchor: 'bottom'
+                    yanchor: 'middle'
                 }
             );
         }
 
-        // Update main chart
-        Plotly.react('main-chart', mainTraces, {
-            ...document.getElementById('main-chart').layout,
-            title: {
-                text: `${ticker} CLOSING PRICE AND 200-DAY MOVING AVERAGE`,
-                font: {
-                    family: 'Arial',
-                    size: 13,
-                    weight: 'bold'
-                }
-            }
-        }, chartConfig);
+        // Calculate y-axis range with padding
+        const prices = priceValues.filter(p => p !== null);
+        const minPrice = Math.min(...prices);
+        const maxPrice = Math.max(...prices);
+        const priceRange = maxPrice - minPrice;
+        const padding = priceRange * 0.1; // 10% padding
 
-        // Update sub chart
+        // Update main chart layout with calculated range
+        const mainChartUpdate = {
+            ...document.getElementById('main-chart').layout,
+            yaxis: {
+                ...document.getElementById('main-chart').layout.yaxis,
+                range: [minPrice - padding, maxPrice + padding]
+            }
+        };
+
+        // Update charts
+        Plotly.react('main-chart', mainTraces, mainChartUpdate, chartConfig);
         Plotly.react('sub-chart', subTraces, {
             ...document.getElementById('sub-chart').layout,
-            annotations
+            annotations: annotations
         }, chartConfig);
 
-        return true;
     } catch (error) {
         console.error('Error updating charts:', error);
-        showError('Failed to update charts');
-        return false;
+        showError('Failed to update charts: ' + error.message);
     }
 }
 
-// Event Listeners
-tickerInput.addEventListener('keypress', handleTickerInput);
-periodButtons.forEach(btn => btn.addEventListener('click', handlePeriodChange));
+// Function to update stock info panel
+function updateStockInfo(ticker, currentPrice, firstPrice) {
+    stockNameEl.textContent = ticker;
+    currentPriceEl.textContent = `$${currentPrice.toFixed(2)}`;
+    
+    // Calculate price change
+    const priceChange = currentPrice - firstPrice;
+    const percentChange = (priceChange / firstPrice) * 100;
+    
+    // Update change elements
+    changeValueEl.textContent = `$${priceChange.toFixed(2)}`;
+    changePercentEl.textContent = `(${percentChange.toFixed(2)}%)`;
+    
+    // Set color based on change
+    if (priceChange >= 0) {
+        priceChangeEl.classList.remove('negative');
+        priceChangeEl.classList.add('positive');
+    } else {
+        priceChangeEl.classList.remove('positive');
+        priceChangeEl.classList.add('negative');
+    }
+    
+    // Show the panel
+    stockInfoPanel.style.display = 'flex';
+}
 
-// Event Handlers
+// Handle mouse movement over chart for custom tooltip
+function handleChartMouseMove(event) {
+    if (!lastData || !lastData.prices || !lastData.dates) return;
+    
+    const chartRect = mainChart.getBoundingClientRect();
+    const xPos = event.clientX - chartRect.left;
+    const yPos = event.clientY - chartRect.top;
+    
+    // Get data from Plotly
+    const plotlyElement = mainChart.querySelector('.plot-container');
+    if (!plotlyElement) return;
+    
+    // Position tooltip
+    customTooltip.style.left = `${event.clientX + 10}px`;
+    customTooltip.style.top = `${event.clientY + 10}px`;
+    
+    // For a simple implementation, we'll just show the tooltip
+    // In a more complex implementation, we'd extract the exact data point
+    customTooltip.style.display = 'block';
+}
+
+// Hide tooltip when mouse leaves chart
+function handleChartMouseOut() {
+    customTooltip.style.display = 'none';
+}
+
+// Handle ticker input
 function handleTickerInput(event) {
-    if (event.key === 'Enter') {
-        const newTicker = tickerInput.value.trim().toUpperCase();
-        if (newTicker && newTicker !== currentTicker) {
-            currentTicker = newTicker;
+    if (event.key === 'Enter' && !isLoading) {
+        const ticker = tickerInput.value.trim().toUpperCase();
+        if (ticker && ticker !== currentTicker) {
+            currentTicker = ticker;
             fetchData();
         }
     }
 }
 
+// Handle period change
 function handlePeriodChange(event) {
-    const newPeriod = event.target.dataset.period;
+    if (isLoading) return;
+    
+    const newPeriod = event.target.dataset.period.toLowerCase(); // Ensure lowercase
     if (newPeriod && newPeriod !== selectedPeriod) {
         updateSelectedPeriod(newPeriod);
         if (currentTicker) {
@@ -286,63 +395,71 @@ function handlePeriodChange(event) {
     }
 }
 
+// Update UI for selected period
 function updateSelectedPeriod(newPeriod) {
     selectedPeriod = newPeriod;
     periodButtons.forEach(btn => {
-        btn.classList.toggle('selected', btn.dataset.period === newPeriod);
+        if (btn.dataset.period === newPeriod) {
+            btn.classList.add('selected');
+        } else {
+            btn.classList.remove('selected');
+        }
     });
 }
 
-// UI State Management
+// Set loading state
 function setLoading(loading) {
     isLoading = loading;
-    tickerInput.disabled = loading;
-    periodButtons.forEach(btn => btn.disabled = loading);
-    loadingIndicator.classList.toggle('show', loading);
-    
     if (loading) {
-        errorMessage.textContent = '';
+        loadingIndicator.classList.add('show');
+        tickerInput.disabled = true;
+        periodButtons.forEach(btn => btn.disabled = true);
+    } else {
+        loadingIndicator.classList.remove('show');
+        tickerInput.disabled = false;
+        periodButtons.forEach(btn => btn.disabled = false);
     }
 }
 
+// Show error message
 function showError(message) {
     errorMessage.textContent = message;
+    setTimeout(() => {
+        errorMessage.textContent = '';
+    }, 5000);
 }
 
-// Data Fetching and Chart Updates
+// Fetch data from the server
 async function fetchData() {
     if (isLoading) return;
     
     setLoading(true);
+    errorMessage.textContent = '';
     
     try {
-        const response = await fetch(`/data/${currentTicker}/${selectedPeriod.toLowerCase()}`);
+        const response = await fetch(`/data/${currentTicker}/${selectedPeriod}`);
+        const result = await response.json();
         
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        if (response.ok) {
+            updateCharts(result, currentTicker);
+        } else {
+            throw new Error(result.error || 'Failed to fetch data');
         }
-        
-        const data = await response.json();
-        
-        if (data.error) {
-            throw new Error(data.error);
-        }
-        
-        updateCharts(data, currentTicker);
-        showError('');
     } catch (error) {
         console.error('Error fetching data:', error);
-        showError(error.message || 'An error occurred while fetching data');
+        showError(`Error: ${error.message}`);
         clearCharts();
     } finally {
         setLoading(false);
     }
 }
 
+// Clear charts
 function clearCharts() {
-    Plotly.purge(mainChart);
-    Plotly.purge(subChart);
+    Plotly.react('main-chart', [], document.getElementById('main-chart').layout, chartConfig);
+    Plotly.react('sub-chart', [], document.getElementById('sub-chart').layout, chartConfig);
+    stockInfoPanel.style.display = 'none';
 }
 
-// Initialize the app
-init(); 
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', init); 
