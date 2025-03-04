@@ -7,7 +7,9 @@
 - Required data points:
   - Daily closing prices
   - Trading volume (optional display)
-- Fetch complete history for the stock
+- Support multiple time periods (1y, 3y, 5y, max)
+- Fetch complete history for calculations
+- Filter data based on selected period
 
 ### 1.2 Calculations
 Sequence of calculations:
@@ -17,6 +19,7 @@ Sequence of calculations:
 4. Calculate percentile bands:
    - 5th percentile of percent differences
    - 95th percentile of percent differences
+5. Handle NaN/Infinity values in calculations
 
 ## 2. Frontend Requirements
 
@@ -24,6 +27,7 @@ Sequence of calculations:
 - Single page web application
 - Clean, minimal design
 - Stock ticker input field
+- Period selection dropdown (1y, 3y, 5y, max)
 - Two charts stacked vertically
 
 ### 2.2 Charts
@@ -41,7 +45,10 @@ Sequence of calculations:
 ### 3.1 Backend (app.py)
 - Flask server with two routes:
   - GET /: Serves the main page
-  - GET /data/<ticker>: Returns JSON stock data
+  - GET /data/<ticker>/<period>: Returns JSON stock data
+- CORS support for cross-origin requests
+- Custom JSON encoder for handling NaN/Infinity values
+- Colored console logging for debugging
 
 ### 3.2 Frontend (HTML/CSS/JS)
 - index.html: Basic structure and Plotly.js integration
@@ -49,7 +56,7 @@ Sequence of calculations:
 - main.js: Handle user input and chart rendering
 
 ### 3.3 Data Flow
-1. User enters stock ticker
+1. User enters stock ticker and selects period
 2. JavaScript makes API call to Flask backend
 3. Backend fetches and processes stock data
 4. Frontend renders both charts
@@ -58,12 +65,18 @@ Sequence of calculations:
 
 ### 4.1 Basic Error Cases
 - Invalid ticker symbols
+- Invalid period selection
 - No data available
 - Network errors
+- NaN/Infinity value handling
 
 ## 5. Future Improvements
 (To be considered after basic implementation)
 - Additional technical indicators
 - More interactive features
 - Enhanced styling
-- Mobile responsiveness 
+- Mobile responsiveness
+- Redis caching for performance
+- Request queue for multiple connections
+- Multi-stock comparison
+- Ticker symbol search 
