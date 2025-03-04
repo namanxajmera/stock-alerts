@@ -43,9 +43,12 @@ Sequence of calculations:
 ## 3. Technical Implementation
 
 ### 3.1 Backend (app.py)
-- Flask server with two routes:
+- Flask server with routes:
   - GET /: Serves the main page
   - GET /data/<ticker>/<period>: Returns JSON stock data
+  - POST /watchlist/add: Add stock to watchlist
+  - POST /watchlist/remove: Remove from watchlist
+  - GET /watchlist: Get watchlist items
 - CORS support for cross-origin requests
 - Custom JSON encoder for handling NaN/Infinity values
 - Colored console logging for debugging
@@ -60,6 +63,47 @@ Sequence of calculations:
 2. JavaScript makes API call to Flask backend
 3. Backend fetches and processes stock data
 4. Frontend renders both charts
+5. Periodic checker runs hourly for watchlist alerts
+
+### 3.4 Implementation Steps
+
+#### Step 1: Database Setup (1-2 hours)
+1. Create Supabase account and project
+2. Set up database connection
+3. Create watchlist table
+4. Test connection from Flask
+
+#### Step 2: Watchlist API (2-3 hours)
+1. Create WatchlistDB class
+2. Implement CRUD operations
+3. Add API endpoints
+4. Test with Postman/curl
+
+#### Step 3: Email Integration (1-2 hours)
+1. Create Resend.com account
+2. Set up AlertEmailer class
+3. Create email template
+4. Test email sending
+
+#### Step 4: Alert Checker (2-3 hours)
+1. Create check_watchlist function
+2. Set up periodic task scheduler
+3. Implement alert logic
+4. Test full alert flow
+
+#### Step 5: UI Integration (2-3 hours)
+1. Add watchlist section to UI
+2. Create add/remove forms
+3. Display current watchlist
+4. Add loading states
+
+#### Step 6: Testing & Deploy (1-2 hours)
+1. Test all components
+2. Add error handling
+3. Deploy updates
+4. Monitor initial alerts
+
+Total Estimated Time: 9-15 hours
 
 ## 4. Error Handling
 

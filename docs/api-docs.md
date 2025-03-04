@@ -40,7 +40,71 @@ Retrieves stock data and analysis for a ticker symbol and specified time period
 }
 ```
 
-**Error Responses**:
+### 3. Watchlist Management
+
+#### Add to Watchlist
+```
+POST /watchlist/add
+```
+Add a stock to the watchlist for email alerts
+
+**Request Body**:
+```json
+{
+  "symbol": "AAPL",
+  "email": "user@example.com"
+}
+```
+
+**Response**:
+```json
+{
+  "status": "added"
+}
+```
+
+#### Remove from Watchlist
+```
+POST /watchlist/remove
+```
+Remove a stock from the watchlist
+
+**Request Body**:
+```json
+{
+  "symbol": "AAPL",
+  "email": "user@example.com"
+}
+```
+
+**Response**:
+```json
+{
+  "status": "removed"
+}
+```
+
+#### Get Watchlist
+```
+GET /watchlist
+```
+Get all stocks in the watchlist
+
+**Response**:
+```json
+{
+  "watchlist": [
+    {
+      "symbol": "AAPL",
+      "last_check_time": "2024-03-04T21:00:00Z",
+      "last_price": 172.34,
+      "last_percentile": 92.5
+    }
+  ]
+}
+```
+
+## Error Responses
 
 ```json
 { "error": "Invalid period. Must be one of: 1y, 3y, 5y, max", "code": 400 }
@@ -51,16 +115,15 @@ Retrieves stock data and analysis for a ticker symbol and specified time period
 ## Implementation Notes
 
 **Processing Steps**:
-1. Validate ticker symbol and period
-2. Fetch complete historical data
-3. Calculate 200-day MA and metrics
-4. Filter data for requested period
-5. Return JSON response
+1. Validate inputs (ticker/period/email)
+2. Process request
+3. Return JSON response
 
 **Data Limitations**:
 - First 200 days will have null MA values
 - Historical data limited by Yahoo Finance availability
-- NaN and Infinity values are converted to null in JSON response
+- NaN and Infinity values are converted to null
+- Email alerts limited to 100/day
 
 **Future Endpoints**:
 - `/data/<ticker>/indicators` - Additional technical indicators
