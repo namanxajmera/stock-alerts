@@ -243,6 +243,28 @@ body {
     color: var(--text-secondary);
 }
 
+.percentile-info {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.percentile {
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background-color: var(--hover-color);
+}
+
+.percentile.p95 {
+    color: #5856D6;
+}
+
+.percentile.p5 {
+    color: #007AFF;
+}
+
 .stock-info {
     background-color: var(--card-background);
     border-radius: 16px;

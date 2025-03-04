@@ -79,21 +79,20 @@ function initializeCharts() {
     const commonLayout = {
         showlegend: false,
         margin: { t: 10, r: 40, l: 50, b: 40 },
-        xaxis: {
-            ...commonAxisStyle,
-            showticklabels: true,
-            tickangle: -45,
-            tickfont: {
-                family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
-                size: 10,
-                color: '#8E8E93'
-            },
-            automargin: true
-        },
         plot_bgcolor: 'rgba(0,0,0,0)',
         paper_bgcolor: 'rgba(0,0,0,0)',
         hovermode: 'x unified',
-        hoverlabel: { bgcolor: 'transparent', font: { size: 0 } },
+        hoverdistance: 50,
+        hoverlabel: { 
+            bgcolor: 'rgba(255, 255, 255, 0.9)',
+            bordercolor: 'rgba(0, 0, 0, 0.1)',
+            font: { 
+                family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
+                size: 12,
+                color: '#1D1D1F'
+            },
+            padding: 8
+        },
         xaxis: {
             ...commonAxisStyle,
             showspikes: true,
@@ -102,7 +101,17 @@ function initializeCharts() {
             showline: true,
             showgrid: true,
             spikecolor: '#8E8E93',
-            spikethickness: 1
+            spikethickness: 1,
+            showticklabels: true,
+            tickangle: -45,
+            tickfont: {
+                family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
+                size: 10,
+                color: '#8E8E93'
+            },
+            fixedrange: true,  // Prevent zooming on x-axis
+            automargin: true,
+            rangeslider: { visible: false }  // Disable range slider if present
         }
     };
 
@@ -123,7 +132,8 @@ function initializeCharts() {
             automargin: true,
             range: [null, null],
             rangemode: 'normal',
-            autorange: true
+            autorange: true,
+            fixedrange: true  // Prevent zooming on y-axis
         }
     };
 
@@ -141,7 +151,8 @@ function initializeCharts() {
                 },
                 standoff: 10
             },
-            automargin: true
+            automargin: true,
+            fixedrange: true  // Prevent zooming on y-axis
         }
     };
 
@@ -227,7 +238,7 @@ function updateCharts(data, ticker) {
                 mode: 'lines',
                 line: { color: '#00C805', width: 2 },
                 name: 'Price',
-                hoverinfo: 'none'
+                hovertemplate: '$%{y:.2f}<extra></extra>'
             },
             {
                 x: maDates,
@@ -236,7 +247,7 @@ function updateCharts(data, ticker) {
                 mode: 'lines',
                 line: { color: '#8E8E93', width: 2, dash: 'dot' },
                 name: '200-Day MA',
-                hoverinfo: 'none'
+                hovertemplate: '$%{y:.2f}<extra></extra>'
             }
         ];
 
@@ -257,7 +268,7 @@ function updateCharts(data, ticker) {
                 fillcolor: diffValues[diffValues.length - 1] >= 0 ? 'rgba(0, 200, 5, 0.1)' : 'rgba(255, 80, 0, 0.1)',
                 line: { color: diffColor, width: 2 },
                 name: '% Difference',
-                hoverinfo: 'none'
+                hovertemplate: '%{y:.1f}%<extra></extra>'
             },
             {
                 x: [data.dates[0], data.dates[data.dates.length - 1]],
@@ -266,7 +277,7 @@ function updateCharts(data, ticker) {
                 mode: 'lines',
                 line: { color: '#8E8E93', width: 1, dash: 'dash' },
                 name: 'Baseline',
-                hoverinfo: 'none'
+                hoverinfo: 'skip'
             }
         ];
 
@@ -280,7 +291,8 @@ function updateCharts(data, ticker) {
                     mode: 'lines',
                     line: { color: '#007AFF', width: 1, dash: 'dash' },
                     name: '5th Percentile',
-                    hoverinfo: 'none'
+                    hoverinfo: 'skip',
+                    showlegend: false
                 },
                 {
                     x: [data.dates[0], data.dates[data.dates.length - 1]],
@@ -289,41 +301,8 @@ function updateCharts(data, ticker) {
                     mode: 'lines',
                     line: { color: '#5856D6', width: 1, dash: 'dash' },
                     name: '95th Percentile',
-                    hoverinfo: 'none'
-                }
-            );
-        }
-
-        // Add percentile labels with improved styling
-        const annotations = [];
-        if (data.percentiles && data.percentiles.p5 !== null && data.percentiles.p95 !== null) {
-            const lastDate = data.dates[data.dates.length - 1];
-            annotations.push(
-                {
-                    x: lastDate,
-                    y: data.percentiles.p5,
-                    text: '5TH',
-                    showarrow: false,
-                    font: {
-                        family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
-                        size: 12,
-                        color: '#007AFF'
-                    },
-                    xanchor: 'left',
-                    yanchor: 'middle'
-                },
-                {
-                    x: lastDate,
-                    y: data.percentiles.p95,
-                    text: '95TH',
-                    showarrow: false,
-                    font: {
-                        family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
-                        size: 12,
-                        color: '#5856D6'
-                    },
-                    xanchor: 'left',
-                    yanchor: 'middle'
+                    hoverinfo: 'skip',
+                    showlegend: false
                 }
             );
         }
@@ -335,21 +314,32 @@ function updateCharts(data, ticker) {
         const priceRange = maxPrice - minPrice;
         const padding = priceRange * 0.1; // 10% padding
 
-        // Update main chart layout with calculated range
+        // Update charts with synchronized ranges
+        const xRange = [priceDates[0], priceDates[priceDates.length - 1]];
+        
         const mainChartUpdate = {
             ...document.getElementById('main-chart').layout,
+            xaxis: {
+                ...document.getElementById('main-chart').layout.xaxis,
+                range: xRange
+            },
             yaxis: {
                 ...document.getElementById('main-chart').layout.yaxis,
                 range: [minPrice - padding, maxPrice + padding]
             }
         };
 
+        const subChartUpdate = {
+            ...document.getElementById('sub-chart').layout,
+            xaxis: {
+                ...document.getElementById('sub-chart').layout.xaxis,
+                range: xRange
+            }
+        };
+
         // Update charts
         Plotly.react('main-chart', mainTraces, mainChartUpdate, chartConfig);
-        Plotly.react('sub-chart', subTraces, {
-            ...document.getElementById('sub-chart').layout,
-            annotations: annotations
-        }, chartConfig);
+        Plotly.react('sub-chart', subTraces, subChartUpdate, chartConfig);
 
     } catch (error) {
         console.error('Error updating charts:', error);
