@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Analytics Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="controls">
+            <div class="input-group">
+                <input type="text" id="ticker-input" placeholder="Enter stock ticker (e.g., AAPL)" />
+                <div class="period-selector">
+                    <button class="period-btn" data-period="1y">1Y</button>
+                    <button class="period-btn" data-period="3y">3Y</button>
+                    <button class="period-btn selected" data-period="5y">5Y</button>
+                    <button class="period-btn" data-period="max">MAX</button>
+                </div>
+            </div>
+            <div class="status-container">
+                <div id="loading-indicator" class="loading-indicator"></div>
+                <div id="error-message" class="error-message"></div>
+            </div>
+        </div>
+        <div id="main-chart" class="chart"></div>
+        <div id="sub-chart" class="chart"></div>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html> 

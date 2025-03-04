@@ -1,7 +1,11 @@
+flask
 yfinance
 pandas
 numpy
 termcolor
-flask
+requests>=2.31.0  # Required by yfinance
+multitasking>=0.0.11  # Required by yfinance
+beautifulsoup4>=4.12.2  # Required by yfinance
+html5lib>=1.1  # Required by yfinance
 Werkzeug
 Jinja2 
