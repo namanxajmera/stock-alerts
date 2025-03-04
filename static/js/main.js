@@ -15,7 +15,8 @@ const PERIODS = {
 const chartConfig = {
     displayModeBar: false,
     responsive: true,
-    staticPlot: true  // Disable all interactivity as per requirements
+    staticPlot: false,  // Enable interactivity
+    showTips: false     // Disable default tooltips
 };
 
 // Common layout properties
@@ -43,6 +44,7 @@ const priceChangeEl = document.getElementById('price-change');
 const changeValueEl = document.getElementById('change-value');
 const changePercentEl = document.getElementById('change-percent');
 const customTooltip = document.getElementById('custom-tooltip');
+const dashboard = document.querySelector('.dashboard');
 
 // State
 let selectedPeriod = '5y'; // Always use lowercase to match server requirements
@@ -61,10 +63,6 @@ function init() {
     periodButtons.forEach(btn => {
         btn.addEventListener('click', handlePeriodChange);
     });
-    
-    // Add mousemove event listeners for custom tooltips
-    mainChart.addEventListener('mousemove', handleChartMouseMove);
-    mainChart.addEventListener('mouseout', handleChartMouseOut);
 }
 
 function setDefaultPeriod() {
@@ -78,10 +76,9 @@ function setDefaultPeriod() {
 
 // Initialize charts with empty data
 function initializeCharts() {
-    const mainChartLayout = {
-        height: 300,
-        margin: { t: 10, r: 40, l: 50, b: 40 }, // Increased bottom margin for labels
+    const commonLayout = {
         showlegend: false,
+        margin: { t: 10, r: 40, l: 50, b: 40 },
         xaxis: {
             ...commonAxisStyle,
             showticklabels: true,
@@ -91,8 +88,27 @@ function initializeCharts() {
                 size: 10,
                 color: '#8E8E93'
             },
-            automargin: true // Ensure labels are fully visible
+            automargin: true
         },
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        hovermode: 'x unified',
+        hoverlabel: { bgcolor: 'transparent', font: { size: 0 } },
+        xaxis: {
+            ...commonAxisStyle,
+            showspikes: true,
+            spikemode: 'across',
+            spikesnap: 'cursor',
+            showline: true,
+            showgrid: true,
+            spikecolor: '#8E8E93',
+            spikethickness: 1
+        }
+    };
+
+    const mainChartLayout = {
+        ...commonLayout,
+        height: 300,
         yaxis: {
             ...commonAxisStyle,
             title: {
@@ -105,30 +121,15 @@ function initializeCharts() {
                 standoff: 10
             },
             automargin: true,
-            range: [null, null], // Auto range
-            rangemode: 'normal', // Normal range mode
-            autorange: true // Enable autorange
-        },
-        plot_bgcolor: 'rgba(0,0,0,0)',
-        paper_bgcolor: 'rgba(0,0,0,0)',
-        hovermode: 'x unified'
+            range: [null, null],
+            rangemode: 'normal',
+            autorange: true
+        }
     };
 
     const subChartLayout = {
+        ...commonLayout,
         height: 200,
-        margin: { t: 10, r: 40, l: 50, b: 40 }, // Increased bottom margin for labels
-        showlegend: false,
-        xaxis: {
-            ...commonAxisStyle,
-            showticklabels: true,
-            tickangle: -45,
-            tickfont: {
-                family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
-                size: 10,
-                color: '#8E8E93'
-            },
-            automargin: true // Ensure labels are fully visible
-        },
         yaxis: {
             ...commonAxisStyle,
             title: {
@@ -141,15 +142,43 @@ function initializeCharts() {
                 standoff: 10
             },
             automargin: true
-        },
-        plot_bgcolor: 'rgba(0,0,0,0)',
-        paper_bgcolor: 'rgba(0,0,0,0)',
-        hovermode: 'x unified'
+        }
     };
 
     try {
         Plotly.newPlot('main-chart', [], mainChartLayout, chartConfig);
         Plotly.newPlot('sub-chart', [], subChartLayout, chartConfig);
+
+        // Add event listeners for synchronized hover
+        const mainChartEl = document.getElementById('main-chart');
+        const subChartEl = document.getElementById('sub-chart');
+
+        mainChartEl.on('plotly_hover', (data) => {
+            if (!data.points || !data.points[0]) return;
+            Plotly.Fx.hover(subChartEl, [
+                { curveNumber: 0, pointNumber: data.points[0].pointNumber }
+            ]);
+            updateTooltip(data.points[0]);
+        });
+
+        subChartEl.on('plotly_hover', (data) => {
+            if (!data.points || !data.points[0]) return;
+            Plotly.Fx.hover(mainChartEl, [
+                { curveNumber: 0, pointNumber: data.points[0].pointNumber }
+            ]);
+            updateTooltip(data.points[0]);
+        });
+
+        mainChartEl.on('plotly_unhover', () => {
+            Plotly.Fx.unhover(subChartEl);
+            hideTooltip();
+        });
+
+        subChartEl.on('plotly_unhover', () => {
+            Plotly.Fx.unhover(mainChartEl);
+            hideTooltip();
+        });
+
     } catch (error) {
         console.error('Error initializing charts:', error);
         showError('Failed to initialize charts');
@@ -183,6 +212,9 @@ function updateCharts(data, ticker) {
             throw new Error('No valid price data available');
         }
 
+        // Show dashboard
+        dashboard.style.display = 'block';
+
         // Update stock info panel with the latest data
         updateStockInfo(ticker, priceValues[priceValues.length - 1], priceValues[0]);
 
@@ -194,7 +226,8 @@ function updateCharts(data, ticker) {
                 type: 'scatter',
                 mode: 'lines',
                 line: { color: '#00C805', width: 2 },
-                name: 'Price'
+                name: 'Price',
+                hoverinfo: 'none'
             },
             {
                 x: maDates,
@@ -202,7 +235,8 @@ function updateCharts(data, ticker) {
                 type: 'scatter',
                 mode: 'lines',
                 line: { color: '#8E8E93', width: 2, dash: 'dot' },
-                name: '200-Day MA'
+                name: '200-Day MA',
+                hoverinfo: 'none'
             }
         ];
 
@@ -222,7 +256,8 @@ function updateCharts(data, ticker) {
                 fill: 'tozeroy',
                 fillcolor: diffValues[diffValues.length - 1] >= 0 ? 'rgba(0, 200, 5, 0.1)' : 'rgba(255, 80, 0, 0.1)',
                 line: { color: diffColor, width: 2 },
-                name: '% Difference'
+                name: '% Difference',
+                hoverinfo: 'none'
             },
             {
                 x: [data.dates[0], data.dates[data.dates.length - 1]],
@@ -230,7 +265,8 @@ function updateCharts(data, ticker) {
                 type: 'scatter',
                 mode: 'lines',
                 line: { color: '#8E8E93', width: 1, dash: 'dash' },
-                name: 'Baseline'
+                name: 'Baseline',
+                hoverinfo: 'none'
             }
         ];
 
@@ -243,7 +279,8 @@ function updateCharts(data, ticker) {
                     type: 'scatter',
                     mode: 'lines',
                     line: { color: '#007AFF', width: 1, dash: 'dash' },
-                    name: '5th Percentile'
+                    name: '5th Percentile',
+                    hoverinfo: 'none'
                 },
                 {
                     x: [data.dates[0], data.dates[data.dates.length - 1]],
@@ -251,7 +288,8 @@ function updateCharts(data, ticker) {
                     type: 'scatter',
                     mode: 'lines',
                     line: { color: '#5856D6', width: 1, dash: 'dash' },
-                    name: '95th Percentile'
+                    name: '95th Percentile',
+                    hoverinfo: 'none'
                 }
             );
         }
@@ -345,29 +383,35 @@ function updateStockInfo(ticker, currentPrice, firstPrice) {
     stockInfoPanel.style.display = 'flex';
 }
 
-// Handle mouse movement over chart for custom tooltip
-function handleChartMouseMove(event) {
-    if (!lastData || !lastData.prices || !lastData.dates) return;
+// Update tooltip content and position
+function updateTooltip(point) {
+    if (!point || !lastData || !point.event) return;
     
-    const chartRect = mainChart.getBoundingClientRect();
-    const xPos = event.clientX - chartRect.left;
-    const yPos = event.clientY - chartRect.top;
+    const date = new Date(point.x).toLocaleDateString();
+    let tooltipContent = '';
     
-    // Get data from Plotly
-    const plotlyElement = mainChart.querySelector('.plot-container');
-    if (!plotlyElement) return;
+    // Different content based on which chart is being hovered
+    if (point.data.name === 'Price' || point.data.name === '200-Day MA') {
+        // Main chart (price)
+        tooltipContent = `<div>${date} · $${point.y.toFixed(2)}</div>`;
+    } else if (point.data.name === '% Difference') {
+        // Sub chart (percentile)
+        tooltipContent = `<div>${date} · ${point.y.toFixed(1)}%</div>`;
+    } else {
+        return; // Don't show tooltip for other traces
+    }
     
-    // Position tooltip
-    customTooltip.style.left = `${event.clientX + 10}px`;
-    customTooltip.style.top = `${event.clientY + 10}px`;
-    
-    // For a simple implementation, we'll just show the tooltip
-    // In a more complex implementation, we'd extract the exact data point
+    customTooltip.innerHTML = tooltipContent;
     customTooltip.style.display = 'block';
+    
+    // Position tooltip using the mouse event coordinates
+    const evt = point.event;
+    customTooltip.style.left = `${evt.pageX + 10}px`;
+    customTooltip.style.top = `${evt.pageY - 20}px`;
 }
 
-// Hide tooltip when mouse leaves chart
-function handleChartMouseOut() {
+// Hide tooltip
+function hideTooltip() {
     customTooltip.style.display = 'none';
 }
 
@@ -459,6 +503,7 @@ function clearCharts() {
     Plotly.react('main-chart', [], document.getElementById('main-chart').layout, chartConfig);
     Plotly.react('sub-chart', [], document.getElementById('sub-chart').layout, chartConfig);
     stockInfoPanel.style.display = 'none';
+    dashboard.style.display = 'none';
 }
 
 // Initialize on page load

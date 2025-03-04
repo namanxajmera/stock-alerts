@@ -3,65 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Analytics Dashboard</title>
+    <title>StockViz · Simple Stock Analytics</title>
     <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <div class="controls">
-            <div class="input-group">
-                <input type="text" id="ticker-input" placeholder="Enter stock ticker (e.g., AAPL)" />
-                <div class="period-selector">
-                    <button class="period-btn" data-period="1y">1Y</button>
-                    <button class="period-btn" data-period="3y">3Y</button>
-                    <button class="period-btn selected" data-period="5y">5Y</button>
-                    <button class="period-btn" data-period="max">MAX</button>
+    <header class="site-header">
+        <div class="header-content">
+            <h1>StockViz</h1>
+            <p class="tagline">Visualize · Analyze · Decide</p>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Intelligent Stock Analytics</h2>
+                <p>Enter any stock symbol to reveal market patterns and trends</p>
+                <div class="search-container">
+                    <input type="text" id="ticker-input" placeholder="Try AAPL, TSLA, or NVDA" />
+                    <div class="period-selector">
+                        <button class="period-btn" data-period="1y">1Y</button>
+                        <button class="period-btn" data-period="3y">3Y</button>
+                        <button class="period-btn selected" data-period="5y">5Y</button>
+                        <button class="period-btn" data-period="max">MAX</button>
+                    </div>
+                </div>
+                <div class="status-container">
+                    <div id="loading-indicator" class="loading-indicator"></div>
+                    <div id="error-message" class="error-message"></div>
                 </div>
             </div>
-            <div class="status-container">
-                <div id="loading-indicator" class="loading-indicator"></div>
-                <div id="error-message" class="error-message"></div>
-            </div>
-        </div>
+        </section>
 
-        <!-- Stock info panel (initially hidden, will be populated by JS) -->
-        <div id="stock-info" class="stock-info" style="display: none;">
-            <div id="stock-name"></div>
-            <div class="stock-price" id="current-price">--</div>
-            <div class="price-change" id="price-change">
-                <span id="change-value">--</span>
-                <span id="change-percent">(--%)</span>
-            </div>
-        </div>
-
-        <!-- Main Chart Container -->
-        <div class="chart-container">
-            <div class="chart-header">
-                <div>
-                    <div class="chart-title">PRICE CHART</div>
-                    <div class="chart-subtitle">Closing Price and 200-Day Moving Average</div>
+        <section class="dashboard" style="display: none;">
+            <div id="stock-info" class="stock-info">
+                <div id="stock-name"></div>
+                <div class="stock-price" id="current-price">--</div>
+                <div class="price-change" id="price-change">
+                    <span id="change-value">--</span>
+                    <span id="change-percent">(--%)</span>
                 </div>
             </div>
-            <div id="main-chart" class="chart"></div>
-        </div>
-        
-        <!-- Sub Chart Container -->
-        <div class="chart-container">
-            <div class="chart-header">
-                <div>
-                    <div class="chart-title">RELATIVE STRENGTH</div>
-                    <div class="chart-subtitle">Percent Difference from Moving Average</div>
-                </div>
-            </div>
-            <div id="sub-chart" class="chart"></div>
-        </div>
 
-        <!-- Custom tooltip -->
-        <div id="custom-tooltip" class="custom-tooltip"></div>
-    </div>
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Price Analysis</div>
+                        <div class="chart-subtitle">Stock price with 200-day moving average</div>
+                    </div>
+                </div>
+                <div id="main-chart" class="chart"></div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Momentum</div>
+                        <div class="chart-subtitle">Deviation from moving average</div>
+                    </div>
+                </div>
+                <div id="sub-chart" class="chart"></div>
+            </div>
+
+            <!-- Custom tooltip -->
+            <div id="custom-tooltip" class="custom-tooltip"></div>
+        </section>
+    </main>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html> 

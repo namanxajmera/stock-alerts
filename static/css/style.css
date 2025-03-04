@@ -8,208 +8,277 @@
 :root {
     --robinhood-green: #00C805;
     --robinhood-red: #FF5000;
-    --background-color: #FFFFFF;
+    --background-color: #FAFAFA;
     --card-background: #FFFFFF;
-    --text-primary: #000000;
-    --text-secondary: #8E8E93;
+    --text-primary: #1D1D1F;
+    --text-secondary: #86868B;
     --border-color: #F2F2F7;
     --hover-color: #F5F8FA;
-    --selected-color: #E9F7F0;
+    --selected-color: rgba(0, 200, 5, 0.08);
 }
 
 body {
     background-color: var(--background-color);
     color: var(--text-primary);
-    padding: 20px;
     line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-.container {
+.site-header {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 0.75rem 0;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.header-content {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    background-color: var(--card-background);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-.controls {
-    margin-bottom: 16px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.input-group {
+    padding: 0 2rem;
+    text-align: center;
     display: flex;
     align-items: center;
-    gap: 20px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
+.header-content h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--robinhood-green), #1ED760);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0;
+}
+
+.tagline {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    position: relative;
+    padding-left: 12px;
+}
+
+.tagline::before {
+    content: "·";
+    position: absolute;
+    left: 0;
+    color: var(--text-secondary);
+}
+
+.hero {
+    background-color: var(--background-color);
+    padding: 6rem 0 2rem;
+    text-align: center;
+}
+
+.hero-content {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.hero h2 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.hero p {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.search-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 #ticker-input {
-    padding: 12px 16px;
-    font-size: 16px;
-    font-weight: 600;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    width: 200px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 16px 24px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 12px;
+    width: 320px;
+    background-color: var(--card-background);
+    color: var(--text-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05),
+                0 8px 24px rgba(0, 0, 0, 0.05);
     transition: all 0.2s ease;
+}
+
+#ticker-input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
 }
 
 #ticker-input:focus {
     outline: none;
-    border-color: var(--robinhood-green);
-    box-shadow: 0 0 0 2px rgba(0, 200, 5, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 200, 5, 0.1),
+                0 8px 24px rgba(0, 200, 5, 0.15);
+    transform: translateY(-1px);
 }
 
 .period-selector {
     display: flex;
     gap: 8px;
-    flex-wrap: wrap;
+    justify-content: center;
+    background-color: var(--card-background);
+    padding: 4px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .period-btn {
-    padding: 10px 16px;
-    font-size: 14px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
     font-weight: 600;
-    border: 1px solid var(--border-color);
-    background-color: var(--background-color);
-    border-radius: 20px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
     color: var(--text-secondary);
 }
 
 .period-btn:hover {
+    color: var(--text-primary);
     background-color: var(--hover-color);
 }
 
 .period-btn.selected {
     background-color: var(--selected-color);
     color: var(--robinhood-green);
-    border-color: var(--robinhood-green);
 }
 
-.period-btn:disabled,
-#ticker-input:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+.dashboard {
+    max-width: 1200px;
+    margin: 0 auto 4rem;
+    padding: 0 1rem;
 }
 
-.status-container {
-    min-height: 24px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.chart {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
-.loading-indicator {
-    display: none;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #E9F7F0;
-    border-top: 2px solid var(--robinhood-green);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+#main-chart {
+    min-height: 240px;
 }
 
-.loading-indicator.show {
-    display: inline-block;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.error-message {
-    color: var(--robinhood-red);
-    font-size: 14px;
-    font-weight: 500;
+#sub-chart {
+    min-height: 160px;
 }
 
 .chart-container {
     position: relative;
-    border-radius: 8px;
+    border-radius: 16px;
     overflow: hidden;
-    margin-bottom: 24px;
-    background-color: #FFFFFF;
+    margin-bottom: 16px;
+    background-color: var(--card-background);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.chart-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08),
+                0 12px 32px rgba(0, 0, 0, 0.08);
 }
 
 .chart-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
+    padding: 12px 24px;
     border-bottom: 1px solid var(--border-color);
 }
 
+.chart-header > div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .chart-title {
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.2px;
     color: var(--text-primary);
 }
 
 .chart-subtitle {
-    font-size: 14px;
+    font-size: 0.9rem;
     color: var(--text-secondary);
-    margin-top: 4px;
+    position: relative;
+    padding-left: 8px;
 }
 
-.chart {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-}
-
-#main-chart {
-    flex: 1;
-    min-height: 300px;
-}
-
-#sub-chart {
-    min-height: 200px;
-}
-
-/* Custom tooltip */
-.custom-tooltip {
+.chart-subtitle::before {
+    content: "·";
     position: absolute;
-    background-color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    pointer-events: none;
-    z-index: 1000;
-    display: none;
+    left: 0;
+    color: var(--text-secondary);
 }
 
-/* Stock info panel */
 .stock-info {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border-color);
+    background-color: var(--card-background);
+    border-radius: 16px;
+    padding: 16px 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 16px;
+}
+
+.stock-info #stock-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 0;
 }
 
 .stock-price {
-    font-size: 28px;
-    font-weight: 700;
+    font-size: 1.75rem;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    margin: 0;
+    line-height: 1;
+    text-align: right;
 }
 
 .price-change {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 14px;
+    gap: 4px;
+    font-size: 0.9rem;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .price-change.positive {
@@ -220,37 +289,103 @@ body {
     color: var(--robinhood-red);
 }
 
+.price-change #change-value,
+.price-change #change-percent {
+    display: inline-block;
+}
+
+.custom-tooltip {
+    position: fixed;
+    background-color: var(--card-background);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 1;
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    z-index: 1000;
+    display: none;
+    border: 1px solid var(--border-color);
+}
+
+.custom-tooltip > div {
+    white-space: nowrap;
+    color: var(--text-primary);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .container {
-        padding: 12px;
+    .hero {
+        padding: 6rem 0 1.5rem;
     }
     
-    .input-group {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
+    .hero h2 {
+        font-size: 2rem;
     }
     
     #ticker-input {
         width: 100%;
+        max-width: 320px;
     }
     
     .period-selector {
-        justify-content: space-between;
+        width: 100%;
+        max-width: 320px;
     }
     
     .period-btn {
         flex: 1;
         text-align: center;
-        padding: 8px 0;
     }
     
-    #main-chart {
-        min-height: 250px;
+    .chart-header {
+        padding: 12px 16px;
     }
     
-    #sub-chart {
-        min-height: 150px;
+    .chart-header > div {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .chart-subtitle {
+        padding-left: 0;
+    }
+    
+    .chart-subtitle::before {
+        display: none;
+    }
+    
+    .stock-info {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 8px;
+        padding: 12px 16px;
+    }
+
+    .stock-price {
+        text-align: center;
+    }
+
+    .price-change {
+        justify-content: center;
+    }
+
+    .hero p {
+        margin-bottom: 1.5rem;
+    }
+
+    .search-container {
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .dashboard {
+        padding: 0 0.5rem;
+    }
+    
+    .chart-container {
+        border-radius: 12px;
     }
 } 
