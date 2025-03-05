@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, send_from_directory
 from flask_cors import CORS  # Add CORS support
 import yfinance as yf
 import pandas as pd
@@ -8,6 +8,10 @@ import traceback
 import json
 from datetime import datetime, timedelta
 import pytz
+import mimetypes
+
+# Add proper MIME type for JavaScript modules
+mimetypes.add_type('application/javascript', '.js')
 
 class CustomJSONEncoder(json.JSONEncoder):
     """Custom JSON encoder to handle NaN/Infinity values."""
@@ -21,6 +25,13 @@ class CustomJSONEncoder(json.JSONEncoder):
 app = Flask(__name__)
 app.json_encoder = CustomJSONEncoder  # Use custom JSON encoder
 CORS(app)  # Enable CORS for all routes
+
+# Add route to serve JavaScript files with correct MIME type
+@app.route('/static/js/<path:filename>')
+def serve_js(filename):
+    response = send_from_directory('static/js', filename)
+    response.headers['Content-Type'] = 'application/javascript'
+    return response
 
 def calculate_metrics(ticker_symbol, period="5y"):
     """Calculate stock metrics including MA and percentiles."""

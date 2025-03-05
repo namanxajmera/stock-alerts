@@ -24,20 +24,18 @@ A simple, single-page web application for visualizing stock price history and te
 
 ```
 stock-alerts/
+├── app.py                  # Flask backend
+├── requirements.txt        # Python dependencies
+├── package.json           # Node.js dependencies (for TypeScript)
+├── tsconfig.json         # TypeScript configuration
 ├── static/
 │   ├── css/
 │   │   └── style.css
-│   └── js/
-│       └── main.js
-├── templates/
-│   └── index.html
-├── app.py
-├── README.md
-├── requirements.txt
-└── docs/
-    ├── api-docs.md
-    ├── architecture.md
-    └── requirements.md
+│   ├── ts/
+│   │   └── main.ts       # TypeScript frontend code
+│   └── js/               # Compiled JavaScript (generated)
+└── templates/
+    └── index.html        # Flask template
 ```
 
 ## Setup & Installation
@@ -59,12 +57,18 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Run the application:
+4. Install Node.js dependencies and build TypeScript:
+```bash
+npm install
+npm run build
+```
+
+5. Run the application:
 ```bash
 python app.py
 ```
 
-5. Open your browser and navigate to `http://localhost:5001`
+6. Open your browser and navigate to `http://localhost:5001`
 
 ## Development
 
