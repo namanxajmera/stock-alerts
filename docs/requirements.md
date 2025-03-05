@@ -135,7 +135,7 @@ Sequence of calculations:
 3. Set up webhook
 4. Test basic interactions
 
-#### Step 4: Backend Integration (3-4 hours)
+#### [X] Step 4: Backend Integration (3-4 hours)
 1. Implement Flask routes and request handling
 2. Integrate Telegram bot with the backend
 3. Implement database access layer

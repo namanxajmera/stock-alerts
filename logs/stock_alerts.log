@@ -1,0 +1,397 @@
+2025-03-05 00:55:19,479 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 00:55:19,479 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 00:55:19,480 - StockAlerts.DB - INFO - Applying migration: 000_migrations_table.sql
+2025-03-05 00:55:19,481 - StockAlerts.DB - INFO - Successfully applied migration: 000_migrations_table.sql
+2025-03-05 00:55:19,481 - StockAlerts.DB - INFO - Applying migration: 001_initial.sql
+2025-03-05 00:55:19,481 - StockAlerts.DB - ERROR - Error initializing database: cannot rollback - no transaction is active
+2025-03-05 00:55:19,482 - StockAlerts.DB - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/db_manager.py", line 70, in initialize_database
+    cursor.executescript(migration_sql)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.OperationalError: table users already exists
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/db_manager.py", line 81, in initialize_database
+    cursor.execute("ROLLBACK")
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^
+sqlite3.OperationalError: cannot rollback - no transaction is active
+
+2025-03-05 00:55:19,482 - StockAlerts.App - ERROR - Error during initialization: cannot rollback - no transaction is active
+2025-03-05 00:55:19,482 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/db_manager.py", line 70, in initialize_database
+    cursor.executescript(migration_sql)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.OperationalError: table users already exists
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 57, in <module>
+    db_manager = DatabaseManager()
+  File "/Users/naman/Desktop/projects/stock-alerts/db_manager.py", line 15, in __init__
+    self.initialize_database()
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/naman/Desktop/projects/stock-alerts/db_manager.py", line 81, in initialize_database
+    cursor.execute("ROLLBACK")
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^
+sqlite3.OperationalError: cannot rollback - no transaction is active
+
+2025-03-05 00:58:18,693 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 00:58:18,693 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 00:58:18,694 - StockAlerts.DB - INFO - Applying migration: 000_migrations_table.sql
+2025-03-05 00:58:18,695 - StockAlerts.DB - INFO - Successfully applied migration: 000_migrations_table.sql
+2025-03-05 00:58:18,695 - StockAlerts.DB - INFO - Applying migration: 001_initial.sql
+2025-03-05 00:58:18,703 - StockAlerts.DB - INFO - Successfully applied migration: 001_initial.sql
+2025-03-05 00:58:18,703 - StockAlerts.DB - INFO - Database initialization complete
+2025-03-05 00:58:18,703 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 00:58:18,703 - StockAlerts.WebhookHandler - ERROR - TELEGRAM_BOT_TOKEN environment variable not set
+2025-03-05 00:58:18,703 - StockAlerts.App - ERROR - Error during initialization: TELEGRAM_BOT_TOKEN environment variable not set
+2025-03-05 00:58:18,704 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 60, in <module>
+    webhook_handler = WebhookHandler(db_manager)
+  File "/Users/naman/Desktop/projects/stock-alerts/webhook_handler.py", line 19, in __init__
+    raise ValueError("TELEGRAM_BOT_TOKEN environment variable not set")
+ValueError: TELEGRAM_BOT_TOKEN environment variable not set
+
+2025-03-05 00:59:32,725 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 00:59:32,726 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 00:59:32,726 - StockAlerts.DB - INFO - Database initialization complete
+2025-03-05 00:59:32,726 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 00:59:32,726 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 00:59:32,727 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 00:59:32,729 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 00:59:32,729 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 00:59:32,764 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-03-05 00:59:32,764 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-03-05 00:59:32,766 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 00:59:33,283 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 00:59:33,283 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 00:59:33,284 - StockAlerts.DB - INFO - Database initialization complete
+2025-03-05 00:59:33,284 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 00:59:33,284 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 00:59:33,285 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 00:59:33,286 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 00:59:33,286 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 00:59:33,301 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 00:59:33,310 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-03-05 00:59:45,509 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 00:59:45] "GET / HTTP/1.1" 200 -
+2025-03-05 00:59:45,733 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 00:59:45] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-03-05 00:59:45,734 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 00:59:45] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-03-05 00:59:49,157 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 00:59:49] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-03-05 00:59:49,218 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 00:59:49] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-03-05 00:59:53,295 - StockAlerts.App - INFO - Received request for ticker: ZM, period: 5y
+2025-03-05 00:59:53,295 - StockAlerts.App - INFO - Fetching data for ZM with period 5y
+2025-03-05 00:59:53,296 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 00:59:53,624 - StockAlerts.App - INFO - Retrieved 1477 total data points
+2025-03-05 00:59:53,627 - StockAlerts.App - INFO - Filtered to 1254 data points for requested period
+2025-03-05 00:59:53,635 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 00:59:53,637 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 00:59:53] "GET /data/ZM/5y HTTP/1.1" 200 -
+2025-03-05 01:00:13,987 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/app.py', reloading
+2025-03-05 01:00:14,101 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 01:00:14,710 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 01:00:14,711 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 01:00:14,712 - StockAlerts.DB - INFO - Database initialization complete
+2025-03-05 01:00:14,712 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 01:00:14,712 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 01:00:14,713 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 01:00:14,714 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 01:00:14,714 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 01:00:14,732 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 01:00:14,741 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-03-05 01:05:10,383 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/test_db.py', reloading
+2025-03-05 01:05:10,472 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 01:05:10,936 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 01:05:10,936 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 01:05:10,936 - StockAlerts.DB - INFO - Database initialization complete
+2025-03-05 01:05:10,937 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 01:05:10,937 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 01:05:10,937 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 01:05:10,939 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 01:05:10,939 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 01:05:10,952 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 01:05:10,959 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-03-05 01:05:13,075 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/test_db.py', reloading
+2025-03-05 01:05:13,187 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 01:05:13,648 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 01:05:13,649 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 01:05:13,650 - StockAlerts.DB - INFO - Database initialization complete
+2025-03-05 01:05:13,650 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 01:05:13,650 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 01:05:13,651 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 01:05:13,652 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 01:05:13,652 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 01:05:13,669 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 01:05:13,677 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-03-05 01:05:17,876 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/test_db.py', reloading
+2025-03-05 01:05:17,959 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 01:05:18,415 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 01:05:18,416 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 01:05:18,416 - StockAlerts.DB - INFO - Database initialization complete
+2025-03-05 01:05:18,416 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 01:05:18,416 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 01:05:18,417 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 01:05:18,419 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 01:05:18,419 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 01:05:18,436 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 01:05:18,443 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-03-05 01:09:18,797 - StockAlerts.App - INFO - Received request for ticker: ZM, period: 1y
+2025-03-05 01:09:18,797 - StockAlerts.App - INFO - Fetching data for ZM with period 1y
+2025-03-05 01:09:18,798 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 01:09:19,109 - StockAlerts.App - INFO - Retrieved 1477 total data points
+2025-03-05 01:09:19,111 - StockAlerts.App - INFO - Filtered to 249 data points for requested period
+2025-03-05 01:09:19,112 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 01:09:19,113 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 01:09:19] "GET /data/ZM/1y HTTP/1.1" 200 -
+2025-03-05 01:09:25,160 - StockAlerts.App - INFO - Received request for ticker: SQ, period: 1y
+2025-03-05 01:09:25,160 - StockAlerts.App - INFO - Fetching data for SQ with period 1y
+2025-03-05 01:09:25,160 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 01:09:25,379 - StockAlerts.App - INFO - Retrieved 2334 total data points
+2025-03-05 01:09:25,381 - StockAlerts.App - INFO - Filtered to 249 data points for requested period
+2025-03-05 01:09:25,382 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 01:09:25,383 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 01:09:25] "GET /data/SQ/1y HTTP/1.1" 200 -
+2025-03-05 01:09:30,183 - StockAlerts.App - INFO - Received request for ticker: SQ, period: 3y
+2025-03-05 01:09:30,184 - StockAlerts.App - INFO - Fetching data for SQ with period 3y
+2025-03-05 01:09:30,184 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 01:09:30,316 - StockAlerts.App - INFO - Retrieved 2334 total data points
+2025-03-05 01:09:30,317 - StockAlerts.App - INFO - Filtered to 751 data points for requested period
+2025-03-05 01:09:30,322 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 01:09:30,324 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 01:09:30] "GET /data/SQ/3y HTTP/1.1" 200 -
+2025-03-05 01:09:33,000 - StockAlerts.App - INFO - Received request for ticker: SQ, period: 5y
+2025-03-05 01:09:33,000 - StockAlerts.App - INFO - Fetching data for SQ with period 5y
+2025-03-05 01:09:33,000 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 01:09:33,141 - StockAlerts.App - INFO - Retrieved 2334 total data points
+2025-03-05 01:09:33,143 - StockAlerts.App - INFO - Filtered to 1254 data points for requested period
+2025-03-05 01:09:33,150 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 01:09:33,153 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 01:09:33] "GET /data/SQ/5y HTTP/1.1" 200 -
+2025-03-05 01:09:35,481 - StockAlerts.App - INFO - Received request for ticker: SQ, period: max
+2025-03-05 01:09:35,481 - StockAlerts.App - INFO - Fetching data for SQ with period max
+2025-03-05 01:09:35,481 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 01:09:35,598 - StockAlerts.App - INFO - Retrieved 2334 total data points
+2025-03-05 01:09:35,599 - StockAlerts.App - INFO - Filtered to 2334 data points for requested period
+2025-03-05 01:09:35,613 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 01:09:35,618 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 01:09:35] "GET /data/SQ/max HTTP/1.1" 200 -
+2025-03-05 01:09:50,545 - StockAlerts.App - INFO - Received request for ticker: SQ, period: 1y
+2025-03-05 01:09:50,545 - StockAlerts.App - INFO - Fetching data for SQ with period 1y
+2025-03-05 01:09:50,545 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 01:09:50,806 - StockAlerts.App - INFO - Retrieved 2334 total data points
+2025-03-05 01:09:50,807 - StockAlerts.App - INFO - Filtered to 249 data points for requested period
+2025-03-05 01:09:50,809 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 01:09:50,810 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 01:09:50] "GET /data/SQ/1y HTTP/1.1" 200 -
+2025-03-05 01:09:51,696 - StockAlerts.App - INFO - Received request for ticker: SQ, period: 3y
+2025-03-05 01:09:51,697 - StockAlerts.App - INFO - Fetching data for SQ with period 3y
+2025-03-05 01:09:51,697 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 01:09:51,861 - StockAlerts.App - INFO - Retrieved 2334 total data points
+2025-03-05 01:09:51,862 - StockAlerts.App - INFO - Filtered to 751 data points for requested period
+2025-03-05 01:09:51,867 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 01:09:51,868 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 01:09:51] "GET /data/SQ/3y HTTP/1.1" 200 -
+2025-03-05 01:09:54,292 - StockAlerts.App - INFO - Received request for ticker: SQ, period: 5y
+2025-03-05 01:09:54,292 - StockAlerts.App - INFO - Fetching data for SQ with period 5y
+2025-03-05 01:09:54,292 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 01:09:54,462 - StockAlerts.App - INFO - Retrieved 2334 total data points
+2025-03-05 01:09:54,463 - StockAlerts.App - INFO - Filtered to 1254 data points for requested period
+2025-03-05 01:09:54,471 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 01:09:54,473 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 01:09:54] "GET /data/SQ/5y HTTP/1.1" 200 -
+2025-03-05 01:09:55,695 - StockAlerts.App - INFO - Received request for ticker: SQ, period: 1y
+2025-03-05 01:09:55,696 - StockAlerts.App - INFO - Fetching data for SQ with period 1y
+2025-03-05 01:09:55,696 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 01:09:55,840 - StockAlerts.App - INFO - Retrieved 2334 total data points
+2025-03-05 01:09:55,841 - StockAlerts.App - INFO - Filtered to 249 data points for requested period
+2025-03-05 01:09:55,843 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 01:09:55,844 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 01:09:55] "GET /data/SQ/1y HTTP/1.1" 200 -
+2025-03-05 01:10:02,674 - StockAlerts.App - INFO - Received request for ticker: QS, period: 1y
+2025-03-05 01:10:02,674 - StockAlerts.App - INFO - Fetching data for QS with period 1y
+2025-03-05 01:10:02,674 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 01:10:02,766 - StockAlerts.App - INFO - Retrieved 1142 total data points
+2025-03-05 01:10:02,767 - StockAlerts.App - INFO - Filtered to 249 data points for requested period
+2025-03-05 01:10:02,769 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 01:10:02,770 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 01:10:02] "GET /data/QS/1y HTTP/1.1" 200 -
+2025-03-05 01:10:09,730 - StockAlerts.App - INFO - Received request for ticker: QS, period: 3y
+2025-03-05 01:10:09,731 - StockAlerts.App - INFO - Fetching data for QS with period 3y
+2025-03-05 01:10:09,731 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 01:10:09,856 - StockAlerts.App - INFO - Retrieved 1142 total data points
+2025-03-05 01:10:09,858 - StockAlerts.App - INFO - Filtered to 751 data points for requested period
+2025-03-05 01:10:09,863 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 01:10:09,865 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 01:10:09] "GET /data/QS/3y HTTP/1.1" 200 -
+2025-03-05 01:10:12,364 - StockAlerts.App - INFO - Received request for ticker: QS, period: 5y
+2025-03-05 01:10:12,364 - StockAlerts.App - INFO - Fetching data for QS with period 5y
+2025-03-05 01:10:12,364 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 01:10:12,493 - StockAlerts.App - INFO - Retrieved 1142 total data points
+2025-03-05 01:10:12,495 - StockAlerts.App - INFO - Filtered to 1142 data points for requested period
+2025-03-05 01:10:12,502 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 01:10:12,504 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 01:10:12] "GET /data/QS/5y HTTP/1.1" 200 -
+2025-03-05 01:10:14,181 - StockAlerts.App - INFO - Received request for ticker: QS, period: max
+2025-03-05 01:10:14,181 - StockAlerts.App - INFO - Fetching data for QS with period max
+2025-03-05 01:10:14,181 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 01:10:14,366 - StockAlerts.App - INFO - Retrieved 1142 total data points
+2025-03-05 01:10:14,367 - StockAlerts.App - INFO - Filtered to 1142 data points for requested period
+2025-03-05 01:10:14,374 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 01:10:14,376 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 01:10:14] "GET /data/QS/max HTTP/1.1" 200 -
+2025-03-05 01:11:08,932 - StockAlerts.App - INFO - Received request for ticker: AFRM, period: max
+2025-03-05 01:11:08,933 - StockAlerts.App - INFO - Fetching data for AFRM with period max
+2025-03-05 01:11:08,933 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 01:11:09,123 - StockAlerts.App - INFO - Retrieved 1039 total data points
+2025-03-05 01:11:09,125 - StockAlerts.App - INFO - Filtered to 1039 data points for requested period
+2025-03-05 01:11:09,131 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 01:11:09,133 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 01:11:09] "GET /data/AFRM/max HTTP/1.1" 200 -
+2025-03-05 01:11:18,857 - StockAlerts.App - INFO - Received request for ticker: BABA, period: max
+2025-03-05 01:11:18,858 - StockAlerts.App - INFO - Fetching data for BABA with period max
+2025-03-05 01:11:18,858 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 01:11:19,035 - StockAlerts.App - INFO - Retrieved 2629 total data points
+2025-03-05 01:11:19,036 - StockAlerts.App - INFO - Filtered to 2629 data points for requested period
+2025-03-05 01:11:19,052 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 01:11:19,056 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 01:11:19] "GET /data/BABA/max HTTP/1.1" 200 -
+2025-03-05 01:13:19,080 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/periodic_checker.py', reloading
+2025-03-05 01:13:19,203 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 01:13:19,802 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 01:13:19,802 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 01:13:19,802 - StockAlerts.DB - INFO - Database initialization complete
+2025-03-05 01:13:19,802 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 01:13:19,803 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 01:13:19,803 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 01:13:19,805 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 01:13:19,805 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 01:13:19,822 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 01:13:19,831 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-03-05 01:13:24,007 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/periodic_checker.py', reloading
+2025-03-05 01:13:24,148 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 01:13:24,801 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 01:13:24,801 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 01:13:24,803 - StockAlerts.DB - INFO - Database initialization complete
+2025-03-05 01:13:24,803 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 01:13:24,803 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 01:13:24,804 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 01:13:24,805 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 01:13:24,806 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 01:13:24,820 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 01:13:24,828 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-03-05 01:13:39,319 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/periodic_checker.py', reloading
+2025-03-05 01:13:39,416 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 01:13:39,878 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 01:13:39,879 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 01:13:39,879 - StockAlerts.DB - INFO - Database initialization complete
+2025-03-05 01:13:39,879 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 01:13:39,880 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 01:13:39,880 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 01:13:39,882 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 01:13:39,882 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 01:13:39,899 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 01:13:39,907 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-03-05 01:13:42,020 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/periodic_checker.py', reloading
+2025-03-05 01:13:42,101 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 01:13:42,563 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 01:13:42,563 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 01:13:42,563 - StockAlerts.DB - INFO - Database initialization complete
+2025-03-05 01:13:42,564 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 01:13:42,564 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 01:13:42,565 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 01:13:42,566 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 01:13:42,566 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 01:13:42,581 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 01:13:42,589 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-03-05 01:15:51,144 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/db_manager.py', reloading
+2025-03-05 01:15:51,236 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 01:15:51,709 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 01:15:51,709 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 01:15:51,709 - StockAlerts.DB - INFO - Database initialization complete
+2025-03-05 01:15:51,709 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 01:15:51,709 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 01:15:51,710 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 01:15:51,712 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 01:15:51,712 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 01:15:51,728 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 01:15:51,736 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-03-05 01:21:34,552 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/db_manager.py', reloading
+2025-03-05 01:21:34,644 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 01:21:35,122 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 01:21:35,122 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 01:21:35,123 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-03-05 01:21:35,123 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 01:21:35,123 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 01:21:35,124 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 01:21:35,125 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 01:21:35,125 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 01:21:35,143 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 01:21:35,152 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-03-05 01:28:29,956 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/periodic_checker.py', reloading
+2025-03-05 01:28:30,057 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 01:28:30,661 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 01:28:30,661 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 01:28:30,661 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-03-05 01:28:30,661 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 01:28:30,662 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 01:28:30,662 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 01:28:30,664 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 01:28:30,664 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 01:28:30,684 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 01:28:30,692 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-03-05 01:28:53,529 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/webhook_handler.py', reloading
+2025-03-05 01:28:53,616 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 01:28:54,077 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 01:28:54,077 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 01:28:54,077 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-03-05 01:28:54,077 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 01:28:54,077 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 01:28:54,078 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 01:28:54,080 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 01:28:54,080 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 01:28:54,095 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 01:28:54,102 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-03-05 01:29:45,983 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/periodic_checker.py', reloading
+2025-03-05 01:29:46,074 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 01:29:46,666 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 01:29:46,667 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 01:29:46,667 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-03-05 01:29:46,667 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 01:29:46,667 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 01:29:46,668 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 01:29:46,669 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 01:29:46,669 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 01:29:46,687 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 01:29:46,697 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-03-05 01:30:49,507 - StockAlerts.App - INFO - Received request for ticker: PLTR, period: max
+2025-03-05 01:30:49,507 - StockAlerts.App - INFO - Fetching data for PLTR with period max
+2025-03-05 01:30:49,508 - StockAlerts.App - INFO - Downloading historical data...
+2025-03-05 01:30:49,802 - StockAlerts.App - INFO - Retrieved 1111 total data points
+2025-03-05 01:30:49,803 - StockAlerts.App - INFO - Filtered to 1111 data points for requested period
+2025-03-05 01:30:49,810 - StockAlerts.App - INFO - Data processing completed successfully
+2025-03-05 01:30:49,813 - werkzeug - INFO - 127.0.0.1 - - [05/Mar/2025 01:30:49] "GET /data/PLTR/max HTTP/1.1" 200 -
+2025-03-05 01:32:41,103 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/periodic_checker.py', reloading
+2025-03-05 01:32:41,191 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 01:32:41,784 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 01:32:41,785 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 01:32:41,785 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-03-05 01:32:41,785 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 01:32:41,785 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 01:32:41,786 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 01:32:41,787 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 01:32:41,787 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 01:32:41,807 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 01:32:41,815 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-03-05 01:32:45,995 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/periodic_checker.py', reloading
+2025-03-05 01:32:46,089 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 01:32:46,559 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 01:32:46,559 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 01:32:46,559 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-03-05 01:32:46,559 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 01:32:46,559 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 01:32:46,560 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 01:32:46,561 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 01:32:46,562 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 01:32:46,576 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 01:32:46,583 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-03-05 01:33:00,049 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/webhook_handler.py', reloading
+2025-03-05 01:33:00,154 - werkzeug - INFO -  * Restarting with stat
+2025-03-05 01:33:00,615 - StockAlerts.App - INFO - Initializing database manager...
+2025-03-05 01:33:00,616 - StockAlerts.DB - INFO - Initializing database...
+2025-03-05 01:33:00,616 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-03-05 01:33:00,616 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-03-05 01:33:00,616 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-03-05 01:33:00,617 - StockAlerts.App - INFO - CORS configured successfully
+2025-03-05 01:33:00,619 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-03-05 01:33:00,619 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-03-05 01:33:00,634 - werkzeug - WARNING -  * Debugger is active!
+2025-03-05 01:33:00,640 - werkzeug - INFO -  * Debugger PIN: 615-058-113

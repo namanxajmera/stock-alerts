@@ -1,9 +1,12 @@
 flask
+flask-cors
 yfinance
 pandas
 numpy
 termcolor
-requests>=2.31.0  # Required by yfinance
+requests
+python-dotenv
+pytz
 multitasking>=0.0.11  # Required by yfinance
 beautifulsoup4>=4.12.2  # Required by yfinance
 html5lib>=1.1  # Required by yfinance
