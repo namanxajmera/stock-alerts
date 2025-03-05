@@ -1,6 +1,6 @@
 # Stock Analytics Dashboard
 
-A simple, single-page web application for visualizing stock price history and technical analysis.
+A simple, single-page web application for visualizing stock price history and technical analysis, with a Telegram bot for personalized stock alerts.
 
 ## Features
 
@@ -9,6 +9,8 @@ A simple, single-page web application for visualizing stock price history and te
 - 📊 Two-chart visualization:
   - Main chart: Daily closing prices with 200-day moving average
   - Sub-chart: Percent difference from 200-day MA with percentile bands
+- 🤖 Telegram bot for managing watchlists and receiving alerts
+- 💾 SQLite database for storing user preferences, watchlists, and alert history
 - 🔄 CORS support for cross-origin requests
 - 🎨 Custom JSON handling for NaN/Infinity values
 - 📝 Detailed console logging with color coding
@@ -17,6 +19,8 @@ A simple, single-page web application for visualizing stock price history and te
 
 - Frontend: HTML, CSS, JavaScript with Plotly.js
 - Backend: Python (Flask) with yfinance
+- Database: SQLite
+- Bot: Telegram Bot API
 - Data: Yahoo Finance API
 - Utils: termcolor for console logging, CustomJSONEncoder for JSON handling
 
@@ -25,9 +29,17 @@ A simple, single-page web application for visualizing stock price history and te
 ```
 stock-alerts/
 ├── app.py                  # Flask backend
+├── db_manager.py           # Database access layer
+├── bot_handler.py          # Telegram bot integration
+├── weekly_checker.py       # Periodic stock analysis and alerts
 ├── requirements.txt        # Python dependencies
 ├── package.json           # Node.js dependencies (for TypeScript)
 ├── tsconfig.json         # TypeScript configuration
+├── db/
+│   └── stockalerts.db     # SQLite database file
+├── migrations/            # Database migration scripts
+│   ├── 001_initial.sql
+│   └── 002_add_indexes.sql
 ├── static/
 │   ├── css/
 │   │   └── style.css
@@ -57,23 +69,34 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Install Node.js dependencies and build TypeScript:
+4. Set up the SQLite database:
+```bash
+sqlite3 db/stockalerts.db < migrations/001_initial.sql
+sqlite3 db/stockalerts.db < migrations/002_add_indexes.sql
+```
+
+5. Install Node.js dependencies and build TypeScript:
 ```bash
 npm install
 npm run build
 ```
 
-5. Run the application:
+6. Run the application:
 ```bash
 python app.py
 ```
 
-6. Open your browser and navigate to `http://localhost:5001`
+7. Open your browser and navigate to `http://localhost:5001`
+
+8. Create a new Telegram bot using BotFather and set the webhook to your server's `/webhook` endpoint
 
 ## Development
 
-The application uses a simple architecture:
+The application uses a modular architecture:
 - Flask backend serves the webpage and provides API endpoints
+- SQLite database stores user preferences, watchlists, and alert history
+- Telegram bot handles user interactions and sends alerts
+- Periodic checker analyzes stocks and triggers alerts
 - Frontend makes API calls to fetch stock data
 - Plotly.js handles all chart rendering
 - All styling is done with plain CSS

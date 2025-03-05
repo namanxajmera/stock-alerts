@@ -49,15 +49,24 @@ Sequence of calculations:
   - /add <ticker> - Add stock to watchlist
   - /remove <ticker> - Remove stock from watchlist
   - /list - Show current watchlist
-  - /help - Display available commands
+  - /settings - View and update alert preferences
+  - /thresholds <ticker> <low> <high> - Set custom thresholds for a stock
 - Clear, user-friendly responses
 - Error handling with informative messages
 
-### 3.2 Weekly Analysis
-- Run every Sunday
+### 3.2 Periodic Analysis
+- Run based on user preferences (default: every Sunday)
 - Check each stock in users' watchlists
-- Analyze if stock hit 5th or 95th percentile in the last week
+- Analyze if stock hit user-defined percentile thresholds
 - Send alerts for significant movements via Telegram
+- Update user's last notification time and alert history
+
+### 3.3 Data Storage
+- Use SQLite database for data persistence
+- Store user preferences, watchlists, and alert history
+- Implement proper indexing for common queries
+- Handle data validation and consistency with constraints
+- Provide a robust data access layer
 
 ## 4. Technical Implementation
 
@@ -65,9 +74,6 @@ Sequence of calculations:
 - Flask server with routes:
   - GET /: Serves the main page
   - GET /data/<ticker>/<period>: Returns JSON stock data
-  - POST /watchlist/add: Add stock to watchlist
-  - POST /watchlist/remove: Remove from watchlist
-  - GET /watchlist: Get watchlist items
   - POST /webhook: Telegram webhook endpoint
 - Telegram bot integration
 - CORS support for cross-origin requests
@@ -79,13 +85,25 @@ Sequence of calculations:
 - style.css: Minimal styling for modern look
 - main.js: Handle user input and chart rendering
 
-### 4.3 Bot Handler
+### 4.3 Bot Handler (bot_handler.py)
 - Implement command handlers
 - Process incoming messages
-- Manage user watchlists
+- Interact with the database to manage user preferences and watchlists
 - Send notifications
 
-### 4.4 Data Flow
+### 4.4 Database Manager (db_manager.py)
+- Define database schema and migrations
+- Provide methods for CRUD operations on users, watchlists, and alerts
+- Handle database connection and error cases
+- Implement efficient querying with indexing
+
+### 4.5 Periodic Checker (weekly_checker.py)
+- Query the database for active users and their watchlists
+- Fetch and analyze stock data based on user preferences
+- Send alerts via the Telegram bot for significant movements
+- Update user's last notification time and alert history
+
+### 4.6 Data Flow
 1. Website:
    - User enters stock ticker and selects period
    - JavaScript makes API call to Flask backend
@@ -93,17 +111,17 @@ Sequence of calculations:
    - Frontend renders both charts
 2. Alert System:
    - User interacts with bot via commands
-   - Backend processes commands and updates watchlist
-   - Weekly scheduler triggers analysis
-   - Bot sends alerts for significant movements
+   - Bot handler updates user preferences and watchlists in the database
+   - Periodic checker analyzes stocks and sends alerts
+   - Bot sends notifications for significant movements
 
-### 4.5 Implementation Steps
+### 4.7 Implementation Steps
 
 #### Step 1: Database Setup (1-2 hours)
-1. Create Supabase account and project
-2. Set up database connection
-3. Create watchlist table with user_id field
-4. Test connection from Flask
+1. Design the database schema
+2. Create SQLite database and tables
+3. Implement database migration scripts
+4. Test database connectivity and queries
 
 #### Step 2: Frontend Implementation (2-3 hours)
 1. Set up basic UI structure
@@ -117,25 +135,25 @@ Sequence of calculations:
 3. Set up webhook
 4. Test basic interactions
 
-#### Step 4: Watchlist Management (2-3 hours)
-1. Create WatchlistDB class
-2. Implement CRUD operations
-3. Add API endpoints and command handlers
-4. Test with real users
+#### Step 4: Backend Integration (3-4 hours)
+1. Implement Flask routes and request handling
+2. Integrate Telegram bot with the backend
+3. Implement database access layer
+4. Test end-to-end flow
 
-#### Step 5: Weekly Analysis (2-3 hours)
-1. Create analysis function
-2. Set up weekly scheduler
-3. Implement alert logic
-4. Test notification flow
+#### Step 5: Periodic Checker (2-3 hours)
+1. Implement the periodic checker logic
+2. Query the database for active users and watchlists
+3. Analyze stock data and send alerts
+4. Update user notification history
 
-#### Step 6: Testing & Deploy (1-2 hours)
-1. Test all components
-2. Add error handling
-3. Deploy updates
-4. Monitor initial alerts
+#### Step 6: Testing & Deployment (2-3 hours)
+1. Perform comprehensive testing of all components
+2. Handle edge cases and error scenarios
+3. Optimize database queries and indexing
+4. Deploy the application to a production environment
 
-Total Estimated Time: 10-16 hours
+Total Estimated Time: 12-18 hours
 
 ## 5. Error Handling
 
@@ -148,6 +166,9 @@ Total Estimated Time: 10-16 hours
 - NaN/Infinity value handling
 - Rate limiting
 - Database connection issues
+- SQL query errors
+- Constraint violations
+- Migration failures
 
 ## 6. Future Improvements
 (To be considered after basic implementation)
@@ -155,7 +176,6 @@ Total Estimated Time: 10-16 hours
 - More interactive features
 - Enhanced styling
 - Mobile responsiveness
-- Custom alert thresholds
 - Multiple watchlists per user
 - Advanced analytics commands
 - Inline keyboard menus
@@ -164,4 +184,5 @@ Total Estimated Time: 10-16 hours
 - Redis caching for performance
 - Request queue for multiple connections
 - Multi-stock comparison
-- Ticker symbol search 
+- Ticker symbol search
+- Web interface for watchlist management 
