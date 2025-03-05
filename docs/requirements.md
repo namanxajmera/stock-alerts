@@ -117,19 +117,19 @@ Sequence of calculations:
 
 ### 4.7 Implementation Steps
 
-#### Step 1: Database Setup (1-2 hours)
+#### [X] Step 1: Database Setup (1-2 hours)
 1. Design the database schema
 2. Create SQLite database and tables
 3. Implement database migration scripts
 4. Test database connectivity and queries
 
-#### Step 2: Frontend Implementation (2-3 hours)
+#### [X] Step 2: Frontend Implementation (2-3 hours)
 1. Set up basic UI structure
 2. Implement chart rendering
 3. Add user interactions
 4. Style components
 
-#### Step 3: Telegram Bot Setup (2-3 hours)
+#### [X] Step 3: Telegram Bot Setup (2-3 hours)
 1. Create bot via BotFather
 2. Implement command handlers
 3. Set up webhook
