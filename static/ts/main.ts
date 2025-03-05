@@ -143,7 +143,8 @@ const chartConfig = {
     displayModeBar: false,
     responsive: true,
     staticPlot: false,  // Enable interactivity
-    showTips: false     // Disable default tooltips
+    showTips: false,    // Disable default tooltips
+    autosize: true      // Enable autosize
 };
 
 // Common layout properties
@@ -222,11 +223,12 @@ function setDefaultPeriod() {
 function initializeCharts() {
     const commonLayout = {
         showlegend: false,
-        margin: { t: 10, r: 40, l: 50, b: 40 },
+        margin: { t: 10, r: 10, l: 50, b: 40 }, // Reduced right margin
         plot_bgcolor: 'rgba(0,0,0,0)',
         paper_bgcolor: 'rgba(0,0,0,0)',
         hovermode: 'x unified',
         hoverdistance: 50,
+        autosize: true, // Enable autosize
         hoverlabel: { 
             bgcolor: 'rgba(255, 255, 255, 0.9)',
             bordercolor: 'rgba(0, 0, 0, 0.1)',
@@ -404,7 +406,7 @@ function updateCharts(data: ChartData, ticker: string): void {
         const [diffDates, diffValues] = filterNullValues(data.dates, data.pct_diff);
 
         if (!priceDates.length || !priceValues.length) {
-            throw new Error('No valid price data available');
+            throw new Error('No data available');
         }
 
         // Show dashboard
@@ -498,54 +500,51 @@ function updateCharts(data: ChartData, ticker: string): void {
         const priceRange = maxPrice - minPrice;
         const padding = priceRange * 0.1; // 10% padding
 
-        // Update charts with synchronized ranges
-        const xRange = [priceDates[0], priceDates[priceDates.length - 1]];
-        
-        const mainChartEl = document.getElementById('main-chart') as PlotlyHTMLElement;
-        const subChartEl = document.getElementById('sub-chart') as PlotlyHTMLElement;
-
-        const mainChartUpdate = {
-            ...(mainChartEl?.layout || {}),
-            xaxis: {
-                ...(mainChartEl?.layout?.xaxis || {}),
-                range: xRange
-            },
+        // Update main chart layout
+        const mainChartLayout = {
+            autosize: true,
+            margin: { t: 10, r: 10, l: 50, b: 40 },
             yaxis: {
-                ...(mainChartEl?.layout?.yaxis || {}),
-                range: [minPrice - padding, maxPrice + padding]
-            }
-        } as Partial<PlotlyLayout>;
-
-        const subChartUpdate = {
-            ...(subChartEl?.layout || {}),
+                range: [minPrice - padding, maxPrice + padding],
+                automargin: true,
+                fixedrange: true
+            },
             xaxis: {
-                ...(subChartEl?.layout?.xaxis || {}),
-                range: xRange
+                automargin: true,
+                fixedrange: true
             }
-        } as Partial<PlotlyLayout>;
+        };
 
-        // Update charts with proper type assertions
-        window.Plotly.react('main-chart', mainTraces as PlotlyData[], mainChartUpdate, chartConfig);
-        window.Plotly.react('sub-chart', subTraces as PlotlyData[], subChartUpdate, chartConfig);
+        // Sub chart traces with proper layout
+        const subChartLayout = {
+            autosize: true,
+            margin: { t: 10, r: 10, l: 50, b: 40 },
+            yaxis: {
+                automargin: true,
+                fixedrange: true
+            },
+            xaxis: {
+                automargin: true,
+                fixedrange: true
+            }
+        };
 
-        // Update layouts
-        if (mainChartEl) {
-            const layout = {
-                yaxis: {
-                    range: [Math.min(...priceValues) * 0.95, Math.max(...priceValues) * 1.05]
-                }
-            };
-            window.Plotly.relayout(mainChartEl, layout);
-        }
+        // Update charts with proper config
+        window.Plotly.react('main-chart', mainTraces, mainChartLayout, chartConfig);
+        window.Plotly.react('sub-chart', subTraces, subChartLayout, chartConfig);
 
-        if (subChartEl) {
-            const layout = {
-                yaxis: {
-                    range: [Math.min(...diffValues) * 0.95, Math.max(...diffValues) * 1.05]
-                }
-            };
-            window.Plotly.relayout(subChartEl, layout);
-        }
+        // Add window resize handler
+        const updateSize = () => {
+            window.Plotly.Plots.resize('main-chart');
+            window.Plotly.Plots.resize('sub-chart');
+        };
+
+        // Debounce resize handler
+        let resizeTimeout: number;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = window.setTimeout(updateSize, 100);
+        });
 
     } catch (error) {
         console.error('Error updating charts:', error);

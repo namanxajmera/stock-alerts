@@ -181,14 +181,17 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
+    position: relative;
 }
 
 #main-chart {
-    min-height: 240px;
+    min-height: 300px;
+    width: 100% !important;
 }
 
 #sub-chart {
-    min-height: 160px;
+    min-height: 200px;
+    width: 100% !important;
 }
 
 .chart-container {
@@ -200,6 +203,7 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
     width: 100%;
+    height: auto;
 }
 
 .chart-container:hover {
@@ -405,9 +409,19 @@ body {
 
     .dashboard {
         padding: 0 0.5rem;
+        margin-bottom: 2rem;
     }
     
     .chart-container {
         border-radius: 12px;
+        margin-bottom: 12px;
+    }
+
+    #main-chart {
+        min-height: 240px;
+    }
+    
+    #sub-chart {
+        min-height: 160px;
     }
 } 
