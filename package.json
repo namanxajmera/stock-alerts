@@ -13,9 +13,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "plotly.js": "^2.29.1"
-  },
   "devDependencies": {
     "@types/plotly.js": "^2.29.1",
     "typescript": "^5.3.3"
