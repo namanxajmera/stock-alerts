@@ -4,7 +4,7 @@ const sqlite3 = require("sqlite3");
 const yahooFinance = require("yahoo-finance2").default;
 
 // Load environment variables
-dotenv.config({ path: ".env.local" });
+dotenv.config({ path: ".env" });
 
 // Constants
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;

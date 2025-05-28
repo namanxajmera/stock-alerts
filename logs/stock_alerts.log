@@ -395,3 +395,776 @@ ValueError: TELEGRAM_BOT_TOKEN environment variable not set
 2025-03-05 01:33:00,619 - StockAlerts.App - INFO - Available at http://localhost:5001
 2025-03-05 01:33:00,634 - werkzeug - WARNING -  * Debugger is active!
 2025-03-05 01:33:00,640 - werkzeug - INFO -  * Debugger PIN: 615-058-113
+2025-05-27 17:24:46,492 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 17:24:46,492 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 17:24:46,492 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 17:24:46,492 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 17:24:46,492 - StockAlerts.WebhookHandler - ERROR - TELEGRAM_BOT_TOKEN environment variable not set
+2025-05-27 17:24:46,492 - StockAlerts.App - ERROR - Error during initialization: TELEGRAM_BOT_TOKEN environment variable not set
+2025-05-27 17:24:46,493 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 64, in <module>
+    webhook_handler = WebhookHandler(db_manager)
+  File "/Users/naman/Desktop/projects/stock-alerts/webhook_handler.py", line 19, in __init__
+    raise ValueError("TELEGRAM_BOT_TOKEN environment variable not set")
+ValueError: TELEGRAM_BOT_TOKEN environment variable not set
+
+2025-05-27 17:25:01,102 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 17:25:01,102 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 17:25:01,103 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 17:25:01,103 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 17:25:01,103 - StockAlerts.WebhookHandler - ERROR - TELEGRAM_BOT_TOKEN environment variable not set
+2025-05-27 17:25:01,103 - StockAlerts.App - ERROR - Error during initialization: TELEGRAM_BOT_TOKEN environment variable not set
+2025-05-27 17:25:01,104 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 64, in <module>
+    webhook_handler = WebhookHandler(db_manager)
+  File "/Users/naman/Desktop/projects/stock-alerts/webhook_handler.py", line 19, in __init__
+    raise ValueError("TELEGRAM_BOT_TOKEN environment variable not set")
+ValueError: TELEGRAM_BOT_TOKEN environment variable not set
+
+2025-05-27 17:25:34,269 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 17:25:34,269 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 17:25:34,272 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 17:25:34,272 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 17:25:34,272 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-05-27 17:25:34,273 - StockAlerts.App - INFO - CORS configured successfully
+2025-05-27 17:25:34,274 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-05-27 17:25:34,274 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-05-27 17:25:36,299 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.251:5001
+2025-05-27 17:25:36,299 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-27 17:25:36,300 - werkzeug - INFO -  * Restarting with stat
+2025-05-27 17:25:37,041 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 17:25:37,041 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 17:25:37,042 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 17:25:37,042 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 17:25:37,042 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-05-27 17:25:37,043 - StockAlerts.App - INFO - CORS configured successfully
+2025-05-27 17:25:37,044 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-05-27 17:25:37,044 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-05-27 17:25:37,061 - werkzeug - WARNING -  * Debugger is active!
+2025-05-27 17:25:37,069 - werkzeug - INFO -  * Debugger PIN: 785-378-908
+2025-05-27 17:25:41,239 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:25:41] "GET / HTTP/1.1" 200 -
+2025-05-27 17:25:46,720 - StockAlerts.App - INFO - Received request for ticker: AAPL, period: 1y
+2025-05-27 17:25:46,720 - StockAlerts.App - INFO - Fetching data for AAPL with period 1y
+2025-05-27 17:25:46,721 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:25:48,302 - StockAlerts.App - ERROR - Error processing data: Too Many Requests. Rate limited. Try after a while.
+2025-05-27 17:25:48,312 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 97, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+
+2025-05-27 17:25:48,314 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:25:48] "[35m[1mGET /data/AAPL/1y HTTP/1.1[0m" 500 -
+2025-05-27 17:25:52,897 - StockAlerts.App - INFO - Health check passed
+2025-05-27 17:25:52,897 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:25:52] "GET /health HTTP/1.1" 200 -
+2025-05-27 17:26:35,018 - StockAlerts.App - INFO - Health check passed
+2025-05-27 17:26:35,018 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:26:35] "GET /health HTTP/1.1" 200 -
+2025-05-27 17:26:54,889 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/test_setup.py', reloading
+2025-05-27 17:26:54,986 - werkzeug - INFO -  * Restarting with stat
+2025-05-27 17:26:55,893 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 17:26:55,893 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 17:26:55,895 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 17:26:55,895 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 17:26:55,896 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-05-27 17:26:55,898 - StockAlerts.App - INFO - CORS configured successfully
+2025-05-27 17:26:55,901 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-05-27 17:26:55,901 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-05-27 17:26:55,938 - werkzeug - WARNING -  * Debugger is active!
+2025-05-27 17:26:55,955 - werkzeug - INFO -  * Debugger PIN: 785-378-908
+2025-05-27 17:26:56,015 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:26:56] "GET / HTTP/1.1" 200 -
+2025-05-27 17:26:56,071 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:26:56] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-05-27 17:26:56,072 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:26:56] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-05-27 17:26:57,412 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:26:57] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-05-27 17:26:57,484 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:26:57] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-05-27 17:26:59,788 - StockAlerts.App - INFO - Received request for ticker: TSLA, period: 5y
+2025-05-27 17:26:59,789 - StockAlerts.App - INFO - Fetching data for TSLA with period 5y
+2025-05-27 17:26:59,789 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:27:00,544 - StockAlerts.App - INFO - Health check passed
+2025-05-27 17:27:00,545 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:27:00] "GET /health HTTP/1.1" 200 -
+2025-05-27 17:27:01,019 - StockAlerts.App - ERROR - Error processing data: Too Many Requests. Rate limited. Try after a while.
+2025-05-27 17:27:01,024 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 97, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+
+2025-05-27 17:27:01,025 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:27:01] "[35m[1mGET /data/TSLA/5y HTTP/1.1[0m" 500 -
+2025-05-27 17:27:01,550 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:27:01] "GET / HTTP/1.1" 200 -
+2025-05-27 17:27:02,557 - StockAlerts.App - INFO - Received request for ticker: MSFT, period: 1y
+2025-05-27 17:27:02,557 - StockAlerts.App - INFO - Fetching data for MSFT with period 1y
+2025-05-27 17:27:02,557 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:27:03,337 - StockAlerts.App - ERROR - Error processing data: Too Many Requests. Rate limited. Try after a while.
+2025-05-27 17:27:03,340 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 97, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+
+2025-05-27 17:27:03,341 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:27:03] "[35m[1mGET /data/MSFT/1y HTTP/1.1[0m" 500 -
+2025-05-27 17:27:33,857 - StockAlerts.App - INFO - Received request for ticker: TSLA, period: 3y
+2025-05-27 17:27:33,857 - StockAlerts.App - INFO - Fetching data for TSLA with period 3y
+2025-05-27 17:27:33,857 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:27:34,675 - StockAlerts.App - ERROR - Error processing data: Too Many Requests. Rate limited. Try after a while.
+2025-05-27 17:27:34,678 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 97, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+
+2025-05-27 17:27:34,679 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:27:34] "[35m[1mGET /data/TSLA/3y HTTP/1.1[0m" 500 -
+2025-05-27 17:27:38,929 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:27:38] "GET / HTTP/1.1" 200 -
+2025-05-27 17:27:38,976 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:27:38] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-05-27 17:27:38,976 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:27:38] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-05-27 17:27:39,204 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:27:39] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-05-27 17:27:39,227 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:27:39] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-05-27 17:27:44,884 - StockAlerts.App - INFO - Received request for ticker: AAPL, period: 5y
+2025-05-27 17:27:44,884 - StockAlerts.App - INFO - Fetching data for AAPL with period 5y
+2025-05-27 17:27:44,884 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:27:45,771 - StockAlerts.App - ERROR - Error processing data: Too Many Requests. Rate limited. Try after a while.
+2025-05-27 17:27:45,773 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 97, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+
+2025-05-27 17:27:45,774 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:27:45] "[35m[1mGET /data/AAPL/5y HTTP/1.1[0m" 500 -
+2025-05-27 17:27:50,440 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:27:50] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-27 17:27:50,447 - StockAlerts.App - WARNING - 404 error: http://127.0.0.1:5001/.well-known/appspecific/com.chrome.devtools.json
+2025-05-27 17:27:50,448 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:27:50] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-05-27 17:27:51,198 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:27:51] "GET /static/js/main.js.map HTTP/1.1" 200 -
+2025-05-27 17:28:26,874 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 17:28:26,874 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 17:28:26,874 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 17:28:26,874 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 17:28:26,874 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-05-27 17:28:26,875 - StockAlerts.App - INFO - CORS configured successfully
+2025-05-27 17:28:26,876 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-05-27 17:28:26,876 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-05-27 17:28:36,452 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 17:28:36,453 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 17:28:36,453 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 17:28:36,453 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 17:28:36,453 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-05-27 17:28:36,454 - StockAlerts.App - INFO - CORS configured successfully
+2025-05-27 17:28:36,455 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-05-27 17:28:36,455 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-05-27 17:28:36,496 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.251:5001
+2025-05-27 17:28:36,496 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-27 17:28:36,497 - werkzeug - INFO -  * Restarting with stat
+2025-05-27 17:28:37,004 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 17:28:37,005 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 17:28:37,005 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 17:28:37,005 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 17:28:37,005 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-05-27 17:28:37,006 - StockAlerts.App - INFO - CORS configured successfully
+2025-05-27 17:28:37,007 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-05-27 17:28:37,007 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-05-27 17:28:37,026 - werkzeug - WARNING -  * Debugger is active!
+2025-05-27 17:28:37,033 - werkzeug - INFO -  * Debugger PIN: 785-378-908
+2025-05-27 17:28:57,344 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 17:28:57,344 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 17:28:57,344 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 17:28:57,345 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 17:28:57,345 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-05-27 17:28:57,345 - StockAlerts.App - INFO - CORS configured successfully
+2025-05-27 17:28:57,347 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-05-27 17:28:57,347 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-05-27 17:28:57,388 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.251:5001
+2025-05-27 17:28:57,388 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-27 17:28:57,389 - werkzeug - INFO -  * Restarting with stat
+2025-05-27 17:28:57,880 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 17:28:57,881 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 17:28:57,881 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 17:28:57,881 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 17:28:57,881 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-05-27 17:28:57,882 - StockAlerts.App - INFO - CORS configured successfully
+2025-05-27 17:28:57,883 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-05-27 17:28:57,883 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-05-27 17:28:57,902 - werkzeug - WARNING -  * Debugger is active!
+2025-05-27 17:28:57,908 - werkzeug - INFO -  * Debugger PIN: 785-378-908
+2025-05-27 17:28:59,124 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:28:59] "GET / HTTP/1.1" 200 -
+2025-05-27 17:28:59,153 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:28:59] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-05-27 17:28:59,155 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:28:59] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-27 17:28:59,983 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:28:59] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-05-27 17:29:00,043 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:29:00] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-05-27 17:29:03,992 - StockAlerts.App - INFO - Received request for ticker: AAPL, period: 5y
+2025-05-27 17:29:03,992 - StockAlerts.App - INFO - Fetching data for AAPL with period 5y
+2025-05-27 17:29:03,992 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:29:04,799 - StockAlerts.App - INFO - Retrieved 11204 total data points
+2025-05-27 17:29:04,801 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:29:04,810 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:29:04,812 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:29:04] "GET /data/AAPL/5y HTTP/1.1" 200 -
+2025-05-27 17:29:12,825 - StockAlerts.App - INFO - Received request for ticker: TSLA, period: 5y
+2025-05-27 17:29:12,825 - StockAlerts.App - INFO - Fetching data for TSLA with period 5y
+2025-05-27 17:29:12,825 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:29:13,106 - StockAlerts.App - INFO - Retrieved 3751 total data points
+2025-05-27 17:29:13,107 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:29:13,115 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:29:13,117 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:29:13] "GET /data/TSLA/5y HTTP/1.1" 200 -
+2025-05-27 17:29:25,168 - StockAlerts.App - INFO - Received request for ticker: SOFI, period: 5y
+2025-05-27 17:29:25,169 - StockAlerts.App - INFO - Fetching data for SOFI with period 5y
+2025-05-27 17:29:25,169 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:29:25,305 - StockAlerts.App - INFO - Retrieved 1104 total data points
+2025-05-27 17:29:25,307 - StockAlerts.App - INFO - Filtered to 1104 data points for requested period
+2025-05-27 17:29:25,317 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:29:25,319 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:29:25] "GET /data/SOFI/5y HTTP/1.1" 200 -
+2025-05-27 17:29:42,762 - StockAlerts.App - INFO - Received request for ticker: SOFI, period: max
+2025-05-27 17:29:42,763 - StockAlerts.App - INFO - Fetching data for SOFI with period max
+2025-05-27 17:29:42,763 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:29:42,951 - StockAlerts.App - INFO - Retrieved 1104 total data points
+2025-05-27 17:29:42,953 - StockAlerts.App - INFO - Filtered to 1104 data points for requested period
+2025-05-27 17:29:42,963 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:29:42,965 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:29:42] "GET /data/SOFI/max HTTP/1.1" 200 -
+2025-05-27 17:29:43,725 - StockAlerts.App - INFO - Received request for ticker: SOFI, period: 3y
+2025-05-27 17:29:43,725 - StockAlerts.App - INFO - Fetching data for SOFI with period 3y
+2025-05-27 17:29:43,725 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:29:43,838 - StockAlerts.App - INFO - Retrieved 1104 total data points
+2025-05-27 17:29:43,839 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:29:43,843 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:29:43,845 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:29:43] "GET /data/SOFI/3y HTTP/1.1" 200 -
+2025-05-27 17:29:44,322 - StockAlerts.App - INFO - Received request for ticker: SOFI, period: 1y
+2025-05-27 17:29:44,322 - StockAlerts.App - INFO - Fetching data for SOFI with period 1y
+2025-05-27 17:29:44,322 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:29:44,520 - StockAlerts.App - INFO - Retrieved 1104 total data points
+2025-05-27 17:29:44,522 - StockAlerts.App - INFO - Filtered to 250 data points for requested period
+2025-05-27 17:29:44,525 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:29:44,526 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:29:44] "GET /data/SOFI/1y HTTP/1.1" 200 -
+2025-05-27 17:29:45,108 - StockAlerts.App - INFO - Received request for ticker: SOFI, period: 5y
+2025-05-27 17:29:45,109 - StockAlerts.App - INFO - Fetching data for SOFI with period 5y
+2025-05-27 17:29:45,109 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:29:50,533 - StockAlerts.App - INFO - Retrieved 1104 total data points
+2025-05-27 17:29:50,535 - StockAlerts.App - INFO - Filtered to 1104 data points for requested period
+2025-05-27 17:29:50,545 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:29:50,547 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:29:50] "GET /data/SOFI/5y HTTP/1.1" 200 -
+2025-05-27 17:29:52,458 - StockAlerts.App - INFO - Received request for ticker: SOFI, period: max
+2025-05-27 17:29:52,458 - StockAlerts.App - INFO - Fetching data for SOFI with period max
+2025-05-27 17:29:52,458 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:29:52,577 - StockAlerts.App - INFO - Retrieved 1104 total data points
+2025-05-27 17:29:52,578 - StockAlerts.App - INFO - Filtered to 1104 data points for requested period
+2025-05-27 17:29:52,589 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:29:52,591 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:29:52] "GET /data/SOFI/max HTTP/1.1" 200 -
+2025-05-27 17:29:55,824 - StockAlerts.App - INFO - Received request for ticker: SOFI, period: 5y
+2025-05-27 17:29:55,824 - StockAlerts.App - INFO - Fetching data for SOFI with period 5y
+2025-05-27 17:29:55,824 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:29:55,975 - StockAlerts.App - INFO - Retrieved 1104 total data points
+2025-05-27 17:29:55,977 - StockAlerts.App - INFO - Filtered to 1104 data points for requested period
+2025-05-27 17:29:55,987 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:29:55,990 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:29:55] "GET /data/SOFI/5y HTTP/1.1" 200 -
+2025-05-27 17:29:56,525 - StockAlerts.App - INFO - Received request for ticker: SOFI, period: max
+2025-05-27 17:29:56,525 - StockAlerts.App - INFO - Fetching data for SOFI with period max
+2025-05-27 17:29:56,525 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:29:56,634 - StockAlerts.App - INFO - Retrieved 1104 total data points
+2025-05-27 17:29:56,636 - StockAlerts.App - INFO - Filtered to 1104 data points for requested period
+2025-05-27 17:29:56,645 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:29:56,647 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:29:56] "GET /data/SOFI/max HTTP/1.1" 200 -
+2025-05-27 17:30:17,476 - StockAlerts.App - INFO - Received request for ticker: ARKK, period: max
+2025-05-27 17:30:17,476 - StockAlerts.App - INFO - Fetching data for ARKK with period max
+2025-05-27 17:30:17,476 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:30:17,635 - StockAlerts.App - INFO - Retrieved 2657 total data points
+2025-05-27 17:30:17,637 - StockAlerts.App - INFO - Filtered to 2657 data points for requested period
+2025-05-27 17:30:17,653 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:30:17,657 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:30:17] "GET /data/ARKK/max HTTP/1.1" 200 -
+2025-05-27 17:30:29,875 - StockAlerts.App - INFO - Received request for ticker: ARKK, period: 5y
+2025-05-27 17:30:29,875 - StockAlerts.App - INFO - Fetching data for ARKK with period 5y
+2025-05-27 17:30:29,875 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:30:30,069 - StockAlerts.App - INFO - Retrieved 2657 total data points
+2025-05-27 17:30:30,071 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:30:30,079 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:30:30,081 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:30:30] "GET /data/ARKK/5y HTTP/1.1" 200 -
+2025-05-27 17:30:33,874 - StockAlerts.App - INFO - Received request for ticker: ARKK, period: 3y
+2025-05-27 17:30:33,874 - StockAlerts.App - INFO - Fetching data for ARKK with period 3y
+2025-05-27 17:30:33,874 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:30:34,100 - StockAlerts.App - INFO - Retrieved 2657 total data points
+2025-05-27 17:30:34,102 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:30:34,107 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:30:34,109 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:30:34] "GET /data/ARKK/3y HTTP/1.1" 200 -
+2025-05-27 17:30:36,770 - StockAlerts.App - INFO - Received request for ticker: ARKK, period: 1y
+2025-05-27 17:30:36,771 - StockAlerts.App - INFO - Fetching data for ARKK with period 1y
+2025-05-27 17:30:36,771 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:30:36,932 - StockAlerts.App - INFO - Retrieved 2657 total data points
+2025-05-27 17:30:36,933 - StockAlerts.App - INFO - Filtered to 250 data points for requested period
+2025-05-27 17:30:36,935 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:30:36,936 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:30:36] "GET /data/ARKK/1y HTTP/1.1" 200 -
+2025-05-27 17:30:40,873 - StockAlerts.App - INFO - Received request for ticker: ARKK, period: 3y
+2025-05-27 17:30:40,874 - StockAlerts.App - INFO - Fetching data for ARKK with period 3y
+2025-05-27 17:30:40,874 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:30:41,045 - StockAlerts.App - INFO - Retrieved 2657 total data points
+2025-05-27 17:30:41,046 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:30:41,051 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:30:41,053 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:30:41] "GET /data/ARKK/3y HTTP/1.1" 200 -
+2025-05-27 17:30:42,958 - StockAlerts.App - INFO - Received request for ticker: ARKK, period: 5y
+2025-05-27 17:30:42,958 - StockAlerts.App - INFO - Fetching data for ARKK with period 5y
+2025-05-27 17:30:42,959 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:30:43,186 - StockAlerts.App - INFO - Retrieved 2657 total data points
+2025-05-27 17:30:43,187 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:30:43,195 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:30:43,198 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:30:43] "GET /data/ARKK/5y HTTP/1.1" 200 -
+2025-05-27 17:30:46,874 - StockAlerts.App - INFO - Received request for ticker: ARKK, period: max
+2025-05-27 17:30:46,874 - StockAlerts.App - INFO - Fetching data for ARKK with period max
+2025-05-27 17:30:46,875 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:30:47,058 - StockAlerts.App - INFO - Retrieved 2657 total data points
+2025-05-27 17:30:47,058 - StockAlerts.App - INFO - Filtered to 2657 data points for requested period
+2025-05-27 17:30:47,075 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:30:47,079 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:30:47] "GET /data/ARKK/max HTTP/1.1" 200 -
+2025-05-27 17:30:48,259 - StockAlerts.App - INFO - Received request for ticker: ARKK, period: 3y
+2025-05-27 17:30:48,260 - StockAlerts.App - INFO - Fetching data for ARKK with period 3y
+2025-05-27 17:30:48,260 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:30:48,423 - StockAlerts.App - INFO - Retrieved 2657 total data points
+2025-05-27 17:30:48,424 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:30:48,429 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:30:48,431 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:30:48] "GET /data/ARKK/3y HTTP/1.1" 200 -
+2025-05-27 17:30:48,892 - StockAlerts.App - INFO - Received request for ticker: ARKK, period: 5y
+2025-05-27 17:30:48,892 - StockAlerts.App - INFO - Fetching data for ARKK with period 5y
+2025-05-27 17:30:48,892 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:30:48,974 - StockAlerts.App - INFO - Retrieved 2657 total data points
+2025-05-27 17:30:48,976 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:30:48,984 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:30:48,986 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:30:48] "GET /data/ARKK/5y HTTP/1.1" 200 -
+2025-05-27 17:30:50,707 - StockAlerts.App - INFO - Received request for ticker: ARKK, period: 3y
+2025-05-27 17:30:50,708 - StockAlerts.App - INFO - Fetching data for ARKK with period 3y
+2025-05-27 17:30:50,708 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:30:50,873 - StockAlerts.App - INFO - Retrieved 2657 total data points
+2025-05-27 17:30:50,874 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:30:50,879 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:30:50,881 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:30:50] "GET /data/ARKK/3y HTTP/1.1" 200 -
+2025-05-27 17:30:57,716 - StockAlerts.App - INFO - Received request for ticker: RBLX, period: 3y
+2025-05-27 17:30:57,716 - StockAlerts.App - INFO - Fetching data for RBLX with period 3y
+2025-05-27 17:30:57,716 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:30:57,843 - StockAlerts.App - INFO - Retrieved 1059 total data points
+2025-05-27 17:30:57,844 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:30:57,851 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:30:57,853 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:30:57] "GET /data/RBLX/3y HTTP/1.1" 200 -
+2025-05-27 17:31:06,052 - StockAlerts.App - INFO - Received request for ticker: RBLX, period: 5y
+2025-05-27 17:31:06,052 - StockAlerts.App - INFO - Fetching data for RBLX with period 5y
+2025-05-27 17:31:06,052 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:31:06,170 - StockAlerts.App - INFO - Retrieved 1059 total data points
+2025-05-27 17:31:06,171 - StockAlerts.App - INFO - Filtered to 1059 data points for requested period
+2025-05-27 17:31:06,178 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:31:06,180 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:31:06] "GET /data/RBLX/5y HTTP/1.1" 200 -
+2025-05-27 17:31:06,836 - StockAlerts.App - INFO - Received request for ticker: RBLX, period: max
+2025-05-27 17:31:06,836 - StockAlerts.App - INFO - Fetching data for RBLX with period max
+2025-05-27 17:31:06,836 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:31:06,890 - StockAlerts.App - INFO - Retrieved 1059 total data points
+2025-05-27 17:31:06,892 - StockAlerts.App - INFO - Filtered to 1059 data points for requested period
+2025-05-27 17:31:06,901 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:31:06,903 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:31:06] "GET /data/RBLX/max HTTP/1.1" 200 -
+2025-05-27 17:31:13,600 - StockAlerts.App - INFO - Received request for ticker: RIVN, period: max
+2025-05-27 17:31:13,601 - StockAlerts.App - INFO - Fetching data for RIVN with period max
+2025-05-27 17:31:13,601 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:31:13,747 - StockAlerts.App - INFO - Retrieved 888 total data points
+2025-05-27 17:31:13,749 - StockAlerts.App - INFO - Filtered to 888 data points for requested period
+2025-05-27 17:31:13,757 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:31:13,758 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:31:13] "GET /data/RIVN/max HTTP/1.1" 200 -
+2025-05-27 17:31:17,807 - StockAlerts.App - INFO - Received request for ticker: RIVN, period: 5y
+2025-05-27 17:31:17,807 - StockAlerts.App - INFO - Fetching data for RIVN with period 5y
+2025-05-27 17:31:17,808 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:31:17,928 - StockAlerts.App - INFO - Retrieved 888 total data points
+2025-05-27 17:31:17,930 - StockAlerts.App - INFO - Filtered to 888 data points for requested period
+2025-05-27 17:31:17,938 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:31:17,940 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:31:17] "GET /data/RIVN/5y HTTP/1.1" 200 -
+2025-05-27 17:31:19,272 - StockAlerts.App - INFO - Received request for ticker: RIVN, period: 3y
+2025-05-27 17:31:19,273 - StockAlerts.App - INFO - Fetching data for RIVN with period 3y
+2025-05-27 17:31:19,273 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:31:19,405 - StockAlerts.App - INFO - Retrieved 888 total data points
+2025-05-27 17:31:19,407 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:31:19,414 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:31:19,416 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:31:19] "GET /data/RIVN/3y HTTP/1.1" 200 -
+2025-05-27 17:31:32,683 - StockAlerts.App - INFO - Received request for ticker: HIMS, period: 3y
+2025-05-27 17:31:32,684 - StockAlerts.App - INFO - Fetching data for HIMS with period 3y
+2025-05-27 17:31:32,684 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:31:32,821 - StockAlerts.App - INFO - Retrieved 1433 total data points
+2025-05-27 17:31:32,822 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:31:32,827 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:31:32,829 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:31:32] "GET /data/HIMS/3y HTTP/1.1" 200 -
+2025-05-27 17:31:42,365 - StockAlerts.App - INFO - Received request for ticker: OXY, period: 3y
+2025-05-27 17:31:42,365 - StockAlerts.App - INFO - Fetching data for OXY with period 3y
+2025-05-27 17:31:42,366 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:31:42,822 - StockAlerts.App - INFO - Retrieved 10939 total data points
+2025-05-27 17:31:42,824 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:31:42,828 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:31:42,830 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:31:42] "GET /data/OXY/3y HTTP/1.1" 200 -
+2025-05-27 17:31:45,293 - StockAlerts.App - INFO - Received request for ticker: OXY, period: 5y
+2025-05-27 17:31:45,293 - StockAlerts.App - INFO - Fetching data for OXY with period 5y
+2025-05-27 17:31:45,293 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:31:47,001 - StockAlerts.App - INFO - Retrieved 10939 total data points
+2025-05-27 17:31:47,002 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:31:47,010 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:31:47,012 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:31:47] "GET /data/OXY/5y HTTP/1.1" 200 -
+2025-05-27 17:32:49,631 - StockAlerts.App - INFO - Received request for ticker: ZM, period: 5y
+2025-05-27 17:32:49,631 - StockAlerts.App - INFO - Fetching data for ZM with period 5y
+2025-05-27 17:32:49,631 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:32:49,775 - StockAlerts.App - INFO - Retrieved 1535 total data points
+2025-05-27 17:32:49,777 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:32:49,787 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:32:49,789 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:32:49] "GET /data/ZM/5y HTTP/1.1" 200 -
+2025-05-27 17:32:52,626 - StockAlerts.App - INFO - Received request for ticker: ZM, period: 3y
+2025-05-27 17:32:52,627 - StockAlerts.App - INFO - Fetching data for ZM with period 3y
+2025-05-27 17:32:52,627 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:32:52,851 - StockAlerts.App - INFO - Retrieved 1535 total data points
+2025-05-27 17:32:52,853 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:32:52,859 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:32:52,861 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:32:52] "GET /data/ZM/3y HTTP/1.1" 200 -
+2025-05-27 17:32:56,145 - StockAlerts.App - INFO - Received request for ticker: ZM, period: 5y
+2025-05-27 17:32:56,146 - StockAlerts.App - INFO - Fetching data for ZM with period 5y
+2025-05-27 17:32:56,146 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:32:56,282 - StockAlerts.App - INFO - Retrieved 1535 total data points
+2025-05-27 17:32:56,285 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:32:56,295 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:32:56,298 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:32:56] "GET /data/ZM/5y HTTP/1.1" 200 -
+2025-05-27 17:33:02,563 - StockAlerts.App - INFO - Received request for ticker: ROKU, period: 5y
+2025-05-27 17:33:02,563 - StockAlerts.App - INFO - Fetching data for ROKU with period 5y
+2025-05-27 17:33:02,564 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:33:02,841 - StockAlerts.App - INFO - Retrieved 1925 total data points
+2025-05-27 17:33:02,842 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:33:02,852 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:33:02,854 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:33:02] "GET /data/ROKU/5y HTTP/1.1" 200 -
+2025-05-27 17:33:05,474 - StockAlerts.App - INFO - Received request for ticker: ROKU, period: 3y
+2025-05-27 17:33:05,474 - StockAlerts.App - INFO - Fetching data for ROKU with period 3y
+2025-05-27 17:33:05,475 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:33:05,675 - StockAlerts.App - INFO - Retrieved 1925 total data points
+2025-05-27 17:33:05,676 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:33:05,681 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:33:05,682 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:33:05] "GET /data/ROKU/3y HTTP/1.1" 200 -
+2025-05-27 17:33:10,705 - StockAlerts.App - INFO - Received request for ticker: SNAP, period: 3y
+2025-05-27 17:33:10,705 - StockAlerts.App - INFO - Fetching data for SNAP with period 3y
+2025-05-27 17:33:10,705 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:33:10,909 - StockAlerts.App - INFO - Retrieved 2071 total data points
+2025-05-27 17:33:10,910 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:33:10,916 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:33:10,918 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:33:10] "GET /data/SNAP/3y HTTP/1.1" 200 -
+2025-05-27 17:33:13,772 - StockAlerts.App - INFO - Received request for ticker: SNAP, period: 5y
+2025-05-27 17:33:13,773 - StockAlerts.App - INFO - Fetching data for SNAP with period 5y
+2025-05-27 17:33:13,773 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:33:13,941 - StockAlerts.App - INFO - Retrieved 2071 total data points
+2025-05-27 17:33:13,944 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:33:13,954 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:33:13,956 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:33:13] "GET /data/SNAP/5y HTTP/1.1" 200 -
+2025-05-27 17:33:14,408 - StockAlerts.App - INFO - Received request for ticker: SNAP, period: max
+2025-05-27 17:33:14,408 - StockAlerts.App - INFO - Fetching data for SNAP with period max
+2025-05-27 17:33:14,408 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:33:14,655 - StockAlerts.App - INFO - Retrieved 2071 total data points
+2025-05-27 17:33:14,656 - StockAlerts.App - INFO - Filtered to 2071 data points for requested period
+2025-05-27 17:33:14,670 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:33:14,673 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:33:14] "GET /data/SNAP/max HTTP/1.1" 200 -
+2025-05-27 17:33:25,761 - StockAlerts.App - INFO - Received request for ticker: QQQM, period: max
+2025-05-27 17:33:25,761 - StockAlerts.App - INFO - Fetching data for QQQM with period max
+2025-05-27 17:33:25,761 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:33:26,049 - StockAlerts.App - INFO - Retrieved 1160 total data points
+2025-05-27 17:33:26,050 - StockAlerts.App - INFO - Filtered to 1160 data points for requested period
+2025-05-27 17:33:26,057 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:33:26,059 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:33:26] "GET /data/QQQM/max HTTP/1.1" 200 -
+2025-05-27 17:33:34,107 - StockAlerts.App - INFO - Received request for ticker: QQQM, period: 5y
+2025-05-27 17:33:34,107 - StockAlerts.App - INFO - Fetching data for QQQM with period 5y
+2025-05-27 17:33:34,107 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:33:34,261 - StockAlerts.App - INFO - Retrieved 1160 total data points
+2025-05-27 17:33:34,263 - StockAlerts.App - INFO - Filtered to 1160 data points for requested period
+2025-05-27 17:33:34,272 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:33:34,274 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:33:34] "GET /data/QQQM/5y HTTP/1.1" 200 -
+2025-05-27 17:33:35,908 - StockAlerts.App - INFO - Received request for ticker: QQQM, period: 3y
+2025-05-27 17:33:35,908 - StockAlerts.App - INFO - Fetching data for QQQM with period 3y
+2025-05-27 17:33:35,909 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:33:36,053 - StockAlerts.App - INFO - Retrieved 1160 total data points
+2025-05-27 17:33:36,054 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:33:36,059 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:33:36,060 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:33:36] "GET /data/QQQM/3y HTTP/1.1" 200 -
+2025-05-27 17:33:43,878 - StockAlerts.App - INFO - Received request for ticker: SPLG, period: 3y
+2025-05-27 17:33:43,879 - StockAlerts.App - INFO - Fetching data for SPLG with period 3y
+2025-05-27 17:33:43,879 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:33:44,162 - StockAlerts.App - INFO - Retrieved 4912 total data points
+2025-05-27 17:33:44,163 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:33:44,168 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:33:44,169 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:33:44] "GET /data/SPLG/3y HTTP/1.1" 200 -
+2025-05-27 17:33:46,592 - StockAlerts.App - INFO - Received request for ticker: SPLG, period: 5y
+2025-05-27 17:33:46,592 - StockAlerts.App - INFO - Fetching data for SPLG with period 5y
+2025-05-27 17:33:46,593 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:33:46,828 - StockAlerts.App - INFO - Retrieved 4912 total data points
+2025-05-27 17:33:46,829 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:33:46,837 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:33:46,839 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:33:46] "GET /data/SPLG/5y HTTP/1.1" 200 -
+2025-05-27 17:33:48,225 - StockAlerts.App - INFO - Received request for ticker: SPLG, period: max
+2025-05-27 17:33:48,225 - StockAlerts.App - INFO - Fetching data for SPLG with period max
+2025-05-27 17:33:48,225 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:33:48,596 - StockAlerts.App - INFO - Retrieved 4912 total data points
+2025-05-27 17:33:48,597 - StockAlerts.App - INFO - Filtered to 4912 data points for requested period
+2025-05-27 17:33:48,627 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:33:48,634 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:33:48] "GET /data/SPLG/max HTTP/1.1" 200 -
+2025-05-27 17:34:23,630 - StockAlerts.App - INFO - Received request for ticker: IWM, period: max
+2025-05-27 17:34:23,630 - StockAlerts.App - INFO - Fetching data for IWM with period max
+2025-05-27 17:34:23,630 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:34:24,052 - StockAlerts.App - INFO - Retrieved 6287 total data points
+2025-05-27 17:34:24,053 - StockAlerts.App - INFO - Filtered to 6287 data points for requested period
+2025-05-27 17:34:24,092 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:34:24,102 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:34:24] "GET /data/IWM/max HTTP/1.1" 200 -
+2025-05-27 17:34:29,858 - StockAlerts.App - INFO - Received request for ticker: IWM, period: 5y
+2025-05-27 17:34:29,859 - StockAlerts.App - INFO - Fetching data for IWM with period 5y
+2025-05-27 17:34:29,859 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:34:30,172 - StockAlerts.App - INFO - Retrieved 6287 total data points
+2025-05-27 17:34:30,173 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:34:30,181 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:34:30,183 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:34:30] "GET /data/IWM/5y HTTP/1.1" 200 -
+2025-05-27 17:34:33,209 - StockAlerts.App - INFO - Received request for ticker: IWM, period: 3y
+2025-05-27 17:34:33,209 - StockAlerts.App - INFO - Fetching data for IWM with period 3y
+2025-05-27 17:34:33,209 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:34:33,514 - StockAlerts.App - INFO - Retrieved 6287 total data points
+2025-05-27 17:34:33,515 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:34:33,520 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:34:33,522 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:34:33] "GET /data/IWM/3y HTTP/1.1" 200 -
+2025-05-27 17:34:40,559 - StockAlerts.App - INFO - Received request for ticker: IWM, period: 5y
+2025-05-27 17:34:40,559 - StockAlerts.App - INFO - Fetching data for IWM with period 5y
+2025-05-27 17:34:40,559 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:34:41,034 - StockAlerts.App - INFO - Retrieved 6287 total data points
+2025-05-27 17:34:41,035 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:34:41,043 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:34:41,045 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:34:41] "GET /data/IWM/5y HTTP/1.1" 200 -
+2025-05-27 17:36:36,358 - StockAlerts.App - INFO - Received request for ticker: RICK, period: 5y
+2025-05-27 17:36:36,359 - StockAlerts.App - INFO - Fetching data for RICK with period 5y
+2025-05-27 17:36:36,359 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:36:36,669 - StockAlerts.App - INFO - Retrieved 7453 total data points
+2025-05-27 17:36:36,670 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:36:36,679 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:36:36,681 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:36:36] "GET /data/RICK/5y HTTP/1.1" 200 -
+2025-05-27 17:36:39,177 - StockAlerts.App - INFO - Received request for ticker: RICK, period: max
+2025-05-27 17:36:39,177 - StockAlerts.App - INFO - Fetching data for RICK with period max
+2025-05-27 17:36:39,177 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:36:39,517 - StockAlerts.App - INFO - Retrieved 7453 total data points
+2025-05-27 17:36:39,518 - StockAlerts.App - INFO - Filtered to 7453 data points for requested period
+2025-05-27 17:36:39,569 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:36:39,580 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:36:39] "GET /data/RICK/max HTTP/1.1" 200 -
+2025-05-27 17:36:42,506 - StockAlerts.App - INFO - Received request for ticker: RICK, period: 3y
+2025-05-27 17:36:42,506 - StockAlerts.App - INFO - Fetching data for RICK with period 3y
+2025-05-27 17:36:42,506 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:36:42,735 - StockAlerts.App - INFO - Retrieved 7453 total data points
+2025-05-27 17:36:42,736 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:36:42,741 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:36:42,742 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:36:42] "GET /data/RICK/3y HTTP/1.1" 200 -
+2025-05-27 17:36:45,541 - StockAlerts.App - INFO - Received request for ticker: RICK, period: 5y
+2025-05-27 17:36:45,541 - StockAlerts.App - INFO - Fetching data for RICK with period 5y
+2025-05-27 17:36:45,541 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:36:46,002 - StockAlerts.App - INFO - Retrieved 7453 total data points
+2025-05-27 17:36:46,003 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:36:46,011 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:36:46,013 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:36:46] "GET /data/RICK/5y HTTP/1.1" 200 -
+2025-05-27 17:36:53,639 - StockAlerts.App - INFO - Received request for ticker: RICK, period: max
+2025-05-27 17:36:53,639 - StockAlerts.App - INFO - Fetching data for RICK with period max
+2025-05-27 17:36:53,639 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:36:53,994 - StockAlerts.App - INFO - Retrieved 7453 total data points
+2025-05-27 17:36:53,995 - StockAlerts.App - INFO - Filtered to 7453 data points for requested period
+2025-05-27 17:36:54,040 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:36:54,051 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:36:54] "GET /data/RICK/max HTTP/1.1" 200 -
+2025-05-27 17:37:13,310 - StockAlerts.App - INFO - Received request for ticker: RICK, period: 5y
+2025-05-27 17:37:13,310 - StockAlerts.App - INFO - Fetching data for RICK with period 5y
+2025-05-27 17:37:13,311 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:37:13,574 - StockAlerts.App - INFO - Retrieved 7453 total data points
+2025-05-27 17:37:13,575 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:37:13,583 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:37:13,585 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:37:13] "GET /data/RICK/5y HTTP/1.1" 200 -
+2025-05-27 17:38:52,605 - StockAlerts.App - INFO - Received request for ticker: ETH, period: 5y
+2025-05-27 17:38:52,606 - StockAlerts.App - INFO - Fetching data for ETH with period 5y
+2025-05-27 17:38:52,606 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:38:52,906 - StockAlerts.App - INFO - Retrieved 212 total data points
+2025-05-27 17:38:52,907 - StockAlerts.App - INFO - Filtered to 212 data points for requested period
+2025-05-27 17:38:52,909 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:38:52,909 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:38:52] "GET /data/ETH/5y HTTP/1.1" 200 -
+2025-05-27 17:39:01,726 - StockAlerts.App - INFO - Received request for ticker: ETHUSD, period: 5y
+2025-05-27 17:39:01,726 - StockAlerts.App - INFO - Fetching data for ETHUSD with period 5y
+2025-05-27 17:39:01,726 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:39:02,871 - yfinance - ERROR - $ETHUSD: possibly delisted; no timezone found
+2025-05-27 17:39:02,872 - StockAlerts.App - WARNING - No data available for ticker ETHUSD
+2025-05-27 17:39:02,872 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:39:02] "[33mGET /data/ETHUSD/5y HTTP/1.1[0m" 404 -
+2025-05-27 17:39:06,978 - StockAlerts.App - INFO - Received request for ticker: ETH.USD, period: 5y
+2025-05-27 17:39:06,979 - StockAlerts.App - INFO - Fetching data for ETH.USD with period 5y
+2025-05-27 17:39:06,979 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:39:08,556 - yfinance - ERROR - $ETH.USD: possibly delisted; no timezone found
+2025-05-27 17:39:08,556 - StockAlerts.App - WARNING - No data available for ticker ETH.USD
+2025-05-27 17:39:08,557 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:39:08] "[33mGET /data/ETH.USD/5y HTTP/1.1[0m" 404 -
+2025-05-27 17:39:11,506 - StockAlerts.App - INFO - Received request for ticker: ETH, period: 5y
+2025-05-27 17:39:11,506 - StockAlerts.App - INFO - Fetching data for ETH with period 5y
+2025-05-27 17:39:11,506 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:39:11,599 - StockAlerts.App - INFO - Retrieved 212 total data points
+2025-05-27 17:39:11,601 - StockAlerts.App - INFO - Filtered to 212 data points for requested period
+2025-05-27 17:39:11,603 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:39:11,604 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:39:11] "GET /data/ETH/5y HTTP/1.1" 200 -
+2025-05-27 17:39:15,189 - StockAlerts.App - INFO - Received request for ticker: BTC, period: 5y
+2025-05-27 17:39:15,189 - StockAlerts.App - INFO - Fetching data for BTC with period 5y
+2025-05-27 17:39:15,189 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:39:15,370 - StockAlerts.App - INFO - Retrieved 206 total data points
+2025-05-27 17:39:15,371 - StockAlerts.App - INFO - Filtered to 206 data points for requested period
+2025-05-27 17:39:15,372 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:39:15,373 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:39:15] "GET /data/BTC/5y HTTP/1.1" 200 -
+2025-05-27 17:39:21,098 - StockAlerts.App - INFO - Received request for ticker: MSTR, period: 5y
+2025-05-27 17:39:21,099 - StockAlerts.App - INFO - Fetching data for MSTR with period 5y
+2025-05-27 17:39:21,099 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:39:21,515 - StockAlerts.App - INFO - Retrieved 6782 total data points
+2025-05-27 17:39:21,516 - StockAlerts.App - INFO - Filtered to 1255 data points for requested period
+2025-05-27 17:39:21,524 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:39:21,527 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:39:21] "GET /data/MSTR/5y HTTP/1.1" 200 -
+2025-05-27 17:39:31,376 - StockAlerts.App - INFO - Received request for ticker: MSTR, period: 3y
+2025-05-27 17:39:31,376 - StockAlerts.App - INFO - Fetching data for MSTR with period 3y
+2025-05-27 17:39:31,376 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:39:31,616 - StockAlerts.App - INFO - Retrieved 6782 total data points
+2025-05-27 17:39:31,617 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:39:31,622 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:39:31,623 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:39:31] "GET /data/MSTR/3y HTTP/1.1" 200 -
+2025-05-27 17:39:32,676 - StockAlerts.App - INFO - Received request for ticker: MSTR, period: 1y
+2025-05-27 17:39:32,676 - StockAlerts.App - INFO - Fetching data for MSTR with period 1y
+2025-05-27 17:39:32,676 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:39:32,928 - StockAlerts.App - INFO - Retrieved 6782 total data points
+2025-05-27 17:39:32,929 - StockAlerts.App - INFO - Filtered to 250 data points for requested period
+2025-05-27 17:39:32,930 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:39:32,931 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:39:32] "GET /data/MSTR/1y HTTP/1.1" 200 -
+2025-05-27 17:39:38,892 - StockAlerts.App - INFO - Received request for ticker: MSTR, period: 3y
+2025-05-27 17:39:38,893 - StockAlerts.App - INFO - Fetching data for MSTR with period 3y
+2025-05-27 17:39:38,893 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 17:39:39,147 - StockAlerts.App - INFO - Retrieved 6782 total data points
+2025-05-27 17:39:39,148 - StockAlerts.App - INFO - Filtered to 750 data points for requested period
+2025-05-27 17:39:39,153 - StockAlerts.App - INFO - Data processing completed successfully
+2025-05-27 17:39:39,154 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 17:39:39] "GET /data/MSTR/3y HTTP/1.1" 200 -
+2025-05-27 17:41:40,678 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/migrate_to_postgres.py', reloading
+2025-05-27 17:41:40,761 - werkzeug - INFO -  * Restarting with stat
+2025-05-27 17:41:41,414 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 17:41:41,414 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 17:41:41,414 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 17:41:41,414 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 17:41:41,415 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-05-27 17:41:41,415 - StockAlerts.App - INFO - CORS configured successfully
+2025-05-27 17:41:41,417 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-05-27 17:41:41,417 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-05-27 17:41:41,436 - werkzeug - WARNING -  * Debugger is active!
+2025-05-27 17:41:41,444 - werkzeug - INFO -  * Debugger PIN: 785-378-908
+2025-05-27 17:44:57,381 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 17:44:57,381 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 17:44:57,381 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 17:44:57,381 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 17:44:57,381 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-05-27 17:44:57,382 - StockAlerts.App - INFO - CORS configured successfully
+2025-05-27 17:44:57,383 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-05-27 17:44:57,383 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-05-27 17:44:57,424 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.251:5001
+2025-05-27 17:44:57,424 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-27 17:44:57,425 - werkzeug - INFO -  * Restarting with stat
+2025-05-27 17:44:57,910 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 17:44:57,910 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 17:44:57,910 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 17:44:57,910 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 17:44:57,910 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-05-27 17:44:57,911 - StockAlerts.App - INFO - CORS configured successfully
+2025-05-27 17:44:57,912 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-05-27 17:44:57,912 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-05-27 17:44:57,931 - werkzeug - WARNING -  * Debugger is active!
+2025-05-27 17:44:57,938 - werkzeug - INFO -  * Debugger PIN: 785-378-908
