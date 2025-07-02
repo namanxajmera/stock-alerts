@@ -1168,3 +1168,694 @@ yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after
 2025-05-27 17:44:57,912 - StockAlerts.App - INFO - Available at http://localhost:5001
 2025-05-27 17:44:57,931 - werkzeug - WARNING -  * Debugger is active!
 2025-05-27 17:44:57,938 - werkzeug - INFO -  * Debugger PIN: 785-378-908
+2025-05-27 18:07:16,559 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 18:07:16,559 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 18:07:16,562 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 18:07:16,562 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 18:07:16,562 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-05-27 18:07:16,563 - StockAlerts.App - INFO - CORS configured successfully
+2025-05-27 18:07:16,564 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-05-27 18:07:16,564 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-05-27 18:07:16,607 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.251:5001
+2025-05-27 18:07:16,608 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-27 18:07:16,608 - werkzeug - INFO -  * Restarting with stat
+2025-05-27 18:07:17,098 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 18:07:17,098 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 18:07:17,098 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 18:07:17,098 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 18:07:17,098 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-05-27 18:07:17,099 - StockAlerts.App - INFO - CORS configured successfully
+2025-05-27 18:07:17,100 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-05-27 18:07:17,100 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-05-27 18:07:17,119 - werkzeug - WARNING -  * Debugger is active!
+2025-05-27 18:07:17,127 - werkzeug - INFO -  * Debugger PIN: 785-378-908
+2025-05-27 18:07:29,171 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:07:29] "GET / HTTP/1.1" 200 -
+2025-05-27 18:07:29,197 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:07:29] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-05-27 18:07:29,203 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:07:29] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-05-27 18:07:29,745 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:07:29] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-05-27 18:07:29,816 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:07:29] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-05-27 18:07:47,619 - StockAlerts.App - INFO - Received request for ticker: ZM, period: 5y
+2025-05-27 18:07:47,620 - StockAlerts.App - INFO - Fetching data for ZM with period 5y
+2025-05-27 18:07:47,620 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 18:07:48,700 - StockAlerts.App - ERROR - Error processing data: Too Many Requests. Rate limited. Try after a while.
+2025-05-27 18:07:48,704 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 97, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+
+2025-05-27 18:07:48,705 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:07:48] "[35m[1mGET /data/ZM/5y HTTP/1.1[0m" 500 -
+2025-05-27 18:09:35,137 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 18:09:35,137 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 18:09:35,138 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 18:09:35,138 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 18:09:35,138 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-05-27 18:09:35,139 - StockAlerts.App - INFO - CORS configured successfully
+2025-05-27 18:09:35,140 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-05-27 18:09:35,140 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-05-27 18:09:35,180 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.251:5001
+2025-05-27 18:09:35,180 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-27 18:09:35,181 - werkzeug - INFO -  * Restarting with stat
+2025-05-27 18:09:35,672 - StockAlerts.App - INFO - Initializing database manager...
+2025-05-27 18:09:35,672 - StockAlerts.DB - INFO - Initializing database...
+2025-05-27 18:09:35,672 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-05-27 18:09:35,672 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-05-27 18:09:35,673 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-05-27 18:09:35,673 - StockAlerts.App - INFO - CORS configured successfully
+2025-05-27 18:09:35,675 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-05-27 18:09:35,675 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-05-27 18:09:35,692 - werkzeug - WARNING -  * Debugger is active!
+2025-05-27 18:09:35,700 - werkzeug - INFO -  * Debugger PIN: 785-378-908
+2025-05-27 18:09:43,763 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:09:43] "GET / HTTP/1.1" 200 -
+2025-05-27 18:09:43,804 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:09:43] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-05-27 18:09:43,808 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:09:43] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-05-27 18:09:44,394 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:09:44] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-05-27 18:09:44,465 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:09:44] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-05-27 18:09:49,109 - StockAlerts.App - INFO - Received request for ticker: ZM, period: 5y
+2025-05-27 18:09:49,109 - StockAlerts.App - INFO - Fetching data for ZM with period 5y
+2025-05-27 18:09:49,110 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 18:09:50,562 - StockAlerts.App - ERROR - Error processing data: Too Many Requests. Rate limited. Try after a while.
+2025-05-27 18:09:50,569 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 97, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+
+2025-05-27 18:09:50,571 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:09:50] "[35m[1mGET /data/ZM/5y HTTP/1.1[0m" 500 -
+2025-05-27 18:13:28,918 - StockAlerts.App - INFO - Received request for ticker: LCID, period: 5y
+2025-05-27 18:13:28,919 - StockAlerts.App - INFO - Fetching data for LCID with period 5y
+2025-05-27 18:13:28,919 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 18:13:32,962 - StockAlerts.App - ERROR - Error processing data: Too Many Requests. Rate limited. Try after a while.
+2025-05-27 18:13:32,965 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 97, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 86, in _lazy_load_price_history
+    self._price_history = PriceHistory(self._data, self.ticker, self._get_ticker_tz(self.proxy, timeout=10))
+                                                                ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 102, in _get_ticker_tz
+    tz = self._fetch_ticker_tz(proxy, timeout)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 125, in _fetch_ticker_tz
+    data = self._data.cache_get(url=url, params=params, proxy=proxy, timeout=timeout)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 32, in wrapped
+    return func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 416, in cache_get
+    return self.get(url, user_agent_headers, params, proxy, timeout)
+           ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+
+2025-05-27 18:13:32,968 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:13:32] "[35m[1mGET /data/LCID/5y HTTP/1.1[0m" 500 -
+2025-05-27 18:28:31,682 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:28:31] "GET / HTTP/1.1" 200 -
+2025-05-27 18:28:31,730 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:28:31] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-05-27 18:28:31,730 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:28:31] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-05-27 18:28:32,226 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:28:32] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-05-27 18:28:32,345 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:28:32] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-05-27 18:28:36,906 - StockAlerts.App - INFO - Received request for ticker: PLTR, period: 5y
+2025-05-27 18:28:36,906 - StockAlerts.App - INFO - Fetching data for PLTR with period 5y
+2025-05-27 18:28:36,907 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 18:28:38,588 - StockAlerts.App - ERROR - Error processing data: Too Many Requests. Rate limited. Try after a while.
+2025-05-27 18:28:38,592 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 97, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+
+2025-05-27 18:28:38,593 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:28:38] "[35m[1mGET /data/PLTR/5y HTTP/1.1[0m" 500 -
+2025-05-27 18:28:39,898 - StockAlerts.App - INFO - Received request for ticker: PLTR, period: 3y
+2025-05-27 18:28:39,898 - StockAlerts.App - INFO - Fetching data for PLTR with period 3y
+2025-05-27 18:28:39,898 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 18:28:40,733 - StockAlerts.App - ERROR - Error processing data: Too Many Requests. Rate limited. Try after a while.
+2025-05-27 18:28:40,736 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 97, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+
+2025-05-27 18:28:40,737 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:28:40] "[35m[1mGET /data/PLTR/3y HTTP/1.1[0m" 500 -
+2025-05-27 18:28:41,283 - StockAlerts.App - INFO - Received request for ticker: PLTR, period: 1y
+2025-05-27 18:28:41,284 - StockAlerts.App - INFO - Fetching data for PLTR with period 1y
+2025-05-27 18:28:41,284 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 18:28:42,001 - StockAlerts.App - ERROR - Error processing data: Too Many Requests. Rate limited. Try after a while.
+2025-05-27 18:28:42,003 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 97, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+
+2025-05-27 18:28:42,004 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:28:42] "[35m[1mGET /data/PLTR/1y HTTP/1.1[0m" 500 -
+2025-05-27 18:28:42,517 - StockAlerts.App - INFO - Received request for ticker: PLTR, period: max
+2025-05-27 18:28:42,517 - StockAlerts.App - INFO - Fetching data for PLTR with period max
+2025-05-27 18:28:42,517 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 18:28:43,524 - StockAlerts.App - ERROR - Error processing data: Too Many Requests. Rate limited. Try after a while.
+2025-05-27 18:28:43,527 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 97, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+
+2025-05-27 18:28:43,528 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:28:43] "[35m[1mGET /data/PLTR/max HTTP/1.1[0m" 500 -
+2025-05-27 18:28:43,854 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:28:43] "GET / HTTP/1.1" 200 -
+2025-05-27 18:28:43,877 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:28:43] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-05-27 18:28:43,877 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:28:43] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-05-27 18:28:44,071 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:28:44] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-05-27 18:28:44,132 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:28:44] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-05-27 18:48:51,311 - StockAlerts.App - INFO - Received request for ticker: WMT, period: 5y
+2025-05-27 18:48:51,311 - StockAlerts.App - INFO - Fetching data for WMT with period 5y
+2025-05-27 18:48:51,312 - StockAlerts.App - INFO - Downloading historical data...
+2025-05-27 18:48:52,376 - StockAlerts.App - ERROR - Error processing data: Too Many Requests. Rate limited. Try after a while.
+2025-05-27 18:48:52,377 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 97, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 86, in _lazy_load_price_history
+    self._price_history = PriceHistory(self._data, self.ticker, self._get_ticker_tz(self.proxy, timeout=10))
+                                                                ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 102, in _get_ticker_tz
+    tz = self._fetch_ticker_tz(proxy, timeout)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 125, in _fetch_ticker_tz
+    data = self._data.cache_get(url=url, params=params, proxy=proxy, timeout=timeout)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 32, in wrapped
+    return func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 416, in cache_get
+    return self.get(url, user_agent_headers, params, proxy, timeout)
+           ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+
+2025-05-27 18:48:52,378 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:48:52] "[35m[1mGET /data/WMT/5y HTTP/1.1[0m" 500 -
+2025-05-27 18:48:53,898 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:48:53] "GET / HTTP/1.1" 200 -
+2025-05-27 18:48:53,934 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:48:53] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-05-27 18:48:53,948 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:48:53] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-05-27 18:48:54,244 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:48:54] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-05-27 18:48:54,370 - werkzeug - INFO - 127.0.0.1 - - [27/May/2025 18:48:54] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-06-05 18:33:58,200 - StockAlerts.App - INFO - Initializing database manager...
+2025-06-05 18:33:58,200 - StockAlerts.DB - INFO - Initializing database...
+2025-06-05 18:33:58,201 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-06-05 18:33:58,201 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-06-05 18:33:58,201 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-06-05 18:33:58,202 - StockAlerts.App - INFO - CORS configured successfully
+2025-06-05 18:33:58,204 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-06-05 18:33:58,204 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-06-05 18:33:58,333 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-06-05 18:33:58,333 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-05 18:33:58,333 - werkzeug - INFO -  * Restarting with stat
+2025-06-05 18:33:58,836 - StockAlerts.App - INFO - Initializing database manager...
+2025-06-05 18:33:58,836 - StockAlerts.DB - INFO - Initializing database...
+2025-06-05 18:33:58,836 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-06-05 18:33:58,836 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-06-05 18:33:58,836 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-06-05 18:33:58,837 - StockAlerts.App - INFO - CORS configured successfully
+2025-06-05 18:33:58,839 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-06-05 18:33:58,839 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-06-05 18:33:58,860 - werkzeug - WARNING -  * Debugger is active!
+2025-06-05 18:33:58,867 - werkzeug - INFO -  * Debugger PIN: 785-378-908
+2025-06-05 18:34:06,962 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 18:34:06] "GET / HTTP/1.1" 200 -
+2025-06-05 18:34:06,994 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 18:34:06] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-06-05 18:34:06,995 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 18:34:06] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-06-05 18:34:08,642 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 18:34:08] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-06-05 18:34:09,622 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 18:34:09] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-06-05 18:34:14,573 - StockAlerts.App - INFO - Received request for ticker: SBUX, period: 5y
+2025-06-05 18:34:14,573 - StockAlerts.App - INFO - Fetching data for SBUX with period 5y
+2025-06-05 18:34:14,574 - StockAlerts.App - INFO - Downloading historical data...
+2025-06-05 18:34:19,818 - StockAlerts.App - ERROR - Error processing data: Too Many Requests. Rate limited. Try after a while.
+2025-06-05 18:34:19,821 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 97, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 86, in _lazy_load_price_history
+    self._price_history = PriceHistory(self._data, self.ticker, self._get_ticker_tz(self.proxy, timeout=10))
+                                                                ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 102, in _get_ticker_tz
+    tz = self._fetch_ticker_tz(proxy, timeout)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 125, in _fetch_ticker_tz
+    data = self._data.cache_get(url=url, params=params, proxy=proxy, timeout=timeout)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 32, in wrapped
+    return func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 416, in cache_get
+    return self.get(url, user_agent_headers, params, proxy, timeout)
+           ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+
+2025-06-05 18:34:19,822 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 18:34:19] "[35m[1mGET /data/SBUX/5y HTTP/1.1[0m" 500 -
+2025-06-05 19:10:27,597 - StockAlerts.App - INFO - Initializing database manager...
+2025-06-05 19:10:27,597 - StockAlerts.DB - INFO - Initializing database...
+2025-06-05 19:10:27,600 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-06-05 19:10:27,600 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-06-05 19:10:27,600 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-06-05 19:10:27,601 - StockAlerts.App - INFO - CORS configured successfully
+2025-06-05 19:10:27,602 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-06-05 19:10:27,602 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-06-05 19:10:27,663 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-06-05 19:10:27,663 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-05 19:10:27,664 - werkzeug - INFO -  * Restarting with stat
+2025-06-05 19:10:28,168 - StockAlerts.App - INFO - Initializing database manager...
+2025-06-05 19:10:28,168 - StockAlerts.DB - INFO - Initializing database...
+2025-06-05 19:10:28,168 - StockAlerts.DB - INFO - Database already initialized, skipping...
+2025-06-05 19:10:28,169 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-06-05 19:10:28,169 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-06-05 19:10:28,169 - StockAlerts.App - INFO - CORS configured successfully
+2025-06-05 19:10:28,171 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-06-05 19:10:28,171 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-06-05 19:10:28,188 - werkzeug - WARNING -  * Debugger is active!
+2025-06-05 19:10:28,196 - werkzeug - INFO -  * Debugger PIN: 785-378-908
+2025-06-05 19:10:41,422 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:10:41] "GET / HTTP/1.1" 200 -
+2025-06-05 19:10:41,474 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:10:41] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-06-05 19:10:41,475 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:10:41] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-06-05 19:10:43,809 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:10:43] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-06-05 19:10:44,447 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:10:44] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-06-05 19:10:47,836 - StockAlerts.App - INFO - Received request for ticker: SOFI, period: 5y
+2025-06-05 19:10:47,836 - StockAlerts.App - INFO - Fetching data for SOFI with period 5y
+2025-06-05 19:10:47,837 - StockAlerts.App - INFO - Downloading historical data...
+2025-06-05 19:10:52,706 - StockAlerts.App - ERROR - Error processing data: Too Many Requests. Rate limited. Try after a while.
+2025-06-05 19:10:52,714 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 97, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+
+2025-06-05 19:10:52,715 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:10:52] "[35m[1mGET /data/SOFI/5y HTTP/1.1[0m" 500 -
+2025-06-05 19:20:05,147 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/db_manager.py', reloading
+2025-06-05 19:20:05,250 - werkzeug - INFO -  * Restarting with stat
+2025-06-05 19:20:05,913 - StockAlerts.App - INFO - Initializing database manager...
+2025-06-05 19:20:05,914 - StockAlerts.DB - INFO - Initializing database...
+2025-06-05 19:20:05,914 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-06-05 19:20:05,914 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-06-05 19:20:05,914 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-06-05 19:20:05,915 - StockAlerts.App - INFO - CORS configured successfully
+2025-06-05 19:20:05,916 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server...
+2025-06-05 19:20:05,916 - StockAlerts.App - INFO - Available at http://localhost:5001
+2025-06-05 19:20:05,937 - werkzeug - WARNING -  * Debugger is active!
+2025-06-05 19:20:05,946 - werkzeug - INFO -  * Debugger PIN: 785-378-908
+2025-06-05 19:20:46,500 - werkzeug - INFO -  * Detected change in '/Users/naman/Desktop/projects/stock-alerts/webhook_handler.py', reloading
+2025-06-05 19:20:46,590 - werkzeug - INFO -  * Restarting with stat
+2025-06-05 19:20:47,238 - StockAlerts.App - INFO - Initializing database manager...
+2025-06-05 19:20:47,238 - StockAlerts.DB - INFO - Initializing database...
+2025-06-05 19:20:47,239 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-06-05 19:20:47,239 - StockAlerts.App - INFO - Initializing webhook handler...
+2025-06-05 19:20:47,239 - StockAlerts.App - ERROR - Error during initialization: WebhookHandler.__init__() missing 1 required positional argument: 'bot_token'
+2025-06-05 19:20:47,239 - StockAlerts.App - ERROR - Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 64, in <module>
+    webhook_handler = WebhookHandler(db_manager)
+TypeError: WebhookHandler.__init__() missing 1 required positional argument: 'bot_token'
+
+2025-06-05 19:29:58,017 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-06-05 19:29:58,017 - StockAlerts.DB - INFO - Initializing database...
+2025-06-05 19:29:58,019 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-06-05 19:29:58,019 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-06-05 19:29:58,020 - StockAlerts.App - INFO - Flask app initialized with CORS.
+2025-06-05 19:29:58,022 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-06-05 19:29:58,063 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-06-05 19:29:58,063 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-05 19:30:04,715 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:30:04] "GET / HTTP/1.1" 200 -
+2025-06-05 19:30:04,759 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:30:04] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-06-05 19:30:04,762 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:30:04] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-06-05 19:30:05,474 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:30:05] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-06-05 19:30:05,525 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:30:05] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-06-05 19:30:12,152 - StockAlerts.App - INFO - Request for ticker: SOFI, period: 5y
+2025-06-05 19:30:12,152 - StockAlerts.App - INFO - Fetching data for SOFI with period 5y
+2025-06-05 19:30:15,660 - StockAlerts.App - ERROR - Error processing data for SOFI: Too Many Requests. Rate limited. Try after a while.
+Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 83, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+2025-06-05 19:30:15,668 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:30:15] "[35m[1mGET /data/SOFI/5y HTTP/1.1[0m" 500 -
+2025-06-05 19:31:43,565 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-06-05 19:31:43,565 - StockAlerts.DB - INFO - Initializing database...
+2025-06-05 19:31:43,566 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-06-05 19:31:43,566 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-06-05 19:31:43,567 - StockAlerts.App - INFO - Flask app initialized with CORS.
+2025-06-05 19:31:43,568 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-06-05 19:31:43,612 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-06-05 19:31:43,612 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-05 19:31:47,921 - StockAlerts.App - INFO - Request for ticker: AAPL, period: 5y
+2025-06-05 19:31:47,922 - StockAlerts.App - INFO - Fetching data for AAPL with period 5y
+2025-06-05 19:31:51,165 - StockAlerts.App - ERROR - Error processing data for AAPL: Too Many Requests. Rate limited. Try after a while.
+Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 83, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+2025-06-05 19:31:51,174 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:31:51] "[35m[1mGET /data/AAPL/5y HTTP/1.1[0m" 500 -
+2025-06-05 19:31:53,738 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:31:53] "GET / HTTP/1.1" 200 -
+2025-06-05 19:31:53,801 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:31:53] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-06-05 19:31:53,804 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:31:53] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-06-05 19:31:58,388 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:31:58] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-06-05 19:31:58,986 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:31:58] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-06-05 19:32:08,798 - StockAlerts.App - INFO - Request for ticker: TSLA, period: 5y
+2025-06-05 19:32:08,798 - StockAlerts.App - INFO - Fetching data for TSLA with period 5y
+2025-06-05 19:32:10,517 - StockAlerts.App - ERROR - Error processing data for TSLA: Too Many Requests. Rate limited. Try after a while.
+Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 83, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+2025-06-05 19:32:10,521 - werkzeug - INFO - 127.0.0.1 - - [05/Jun/2025 19:32:10] "[35m[1mGET /data/TSLA/5y HTTP/1.1[0m" 500 -
+2025-07-02 00:19:37,537 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 00:19:37,537 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 00:19:37,538 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 00:19:37,538 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 00:19:37,539 - StockAlerts.App - INFO - Flask app initialized with CORS.
+2025-07-02 00:19:37,541 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 00:19:39,846 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 00:19:39,846 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 00:20:04,350 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 00:20:04] "GET / HTTP/1.1" 200 -
+2025-07-02 00:20:04,376 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 00:20:04] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-02 00:20:04,378 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 00:20:04] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-07-02 00:20:05,985 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 00:20:05] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 00:20:06,349 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 00:20:06] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-07-02 00:20:11,177 - StockAlerts.App - INFO - Request for ticker: SOFI, period: 5y
+2025-07-02 00:20:11,178 - StockAlerts.App - INFO - Fetching data for SOFI with period 5y
+2025-07-02 00:20:13,853 - StockAlerts.App - ERROR - Error processing data for SOFI: Too Many Requests. Rate limited. Try after a while.
+Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 83, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+2025-07-02 00:20:13,863 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 00:20:13] "[35m[1mGET /data/SOFI/5y HTTP/1.1[0m" 500 -
+2025-07-02 00:22:03,408 - StockAlerts.App - INFO - Request for ticker: AAPL, period: 5y
+2025-07-02 00:22:03,408 - StockAlerts.App - INFO - Fetching data for AAPL with period 5y
+2025-07-02 00:22:05,540 - StockAlerts.App - ERROR - Error processing data for AAPL: Too Many Requests. Rate limited. Try after a while.
+Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 83, in calculate_metrics
+    complete_data = ticker.history(period="max")
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/base.py", line 80, in history
+    return self._lazy_load_price_history().history(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/scrapers/history.py", line 175, in history
+    data = get_fn(
+        url=url,
+    ...<2 lines>...
+        timeout=timeout
+    )
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 347, in get
+    return self._make_request(url, request_method = self._session.get, user_agent_headers=user_agent_headers, params=params, proxy=proxy, timeout=timeout)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/utils.py", line 104, in wrapper
+    result = func(*args, **kwargs)
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/yfinance/data.py", line 409, in _make_request
+    raise YFRateLimitError()
+yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
+2025-07-02 00:22:05,542 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 00:22:05] "[35m[1mGET /data/AAPL/5y HTTP/1.1[0m" 500 -

@@ -4,8 +4,6 @@ __pycache__/
 *$py.class
 *.so
 .Python
-venv/
-env/
 build/
 develop-eggs/
 dist/
@@ -17,30 +15,40 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+PIPFILE.lock
 
-# Node.js / TypeScript
-/node_modules
-/static/js/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.npm
-*.tsbuildinfo
-package-lock.json
+# Virtual Environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
 
-# Environment variables
+# Environment Variables
 .env
 .env.local
-.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs/*.log
+*.log
+
+# Database
+*.db-journal
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
@@ -51,10 +59,20 @@ package-lock.json
 ehthumbs.db
 Thumbs.db
 
-# Project specific
-__pycache__/
-.pytest_cache/
-*.pyc
-.coverage
-htmlcov/
-.tox/
+# Node.js (not needed for Python app, but just in case)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# TypeScript (removed from project)
+*.tsbuildinfo
+*.js.map
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/

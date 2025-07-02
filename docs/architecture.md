@@ -3,11 +3,11 @@
 ## System Overview
 
 A lightweight client-server application with:
-- **Frontend**: Vanilla JavaScript, HTML, CSS with Plotly.js for charts
+- **Frontend**: Vanilla TypeScript, HTML, CSS with Plotly.js for charts
 - **Backend**: Python Flask server with yfinance package
 - **Data Source**: Yahoo Finance API
 - **Storage**: SQLite database with robust schema design
-- **Alerts**: Telegram Bot API for notifications
+- **Alerts**: Secure Telegram Bot API integration for notifications
 
 ## Data Flow
 ```
@@ -15,17 +15,19 @@ User → Browser → Flask Server → Yahoo Finance API
                      ↓
 Yahoo Finance → Data Processing → JSON → Browser → Charts
                      ↓
-SQLite Database ← → Weekly Checker → Telegram Bot
+        (DB Read/Write)
+                     ↓
+SQLite Database ← → Periodic Checker Script → Telegram API → User Alert
 ```
 
 ## Key Design Decisions
 
-1. **Lightweight Architecture**: Simple Flask server with SQLite database for easy deployment
-2. **Server-side Processing**: All calculations done on server for consistency
-3. **Single-page Application**: Smoother user experience with no page reloads
-4. **Flexible Alert System**: Per-user and per-stock threshold configuration
-5. **Customizable Scheduling**: User-defined check days and times
-6. **Robust Data Storage**: SQLite with foreign key constraints and transactions
+1. **Lightweight Architecture**: Simple Flask server with a single SQLite database file for easy deployment and portability.
+2. **Server-side Processing**: All financial calculations are performed on the server to ensure consistency and keep the frontend light.
+3. **Single-page Application**: Provides a smooth user experience with dynamic chart updates and no page reloads.
+4. **Secure Webhook**: Telegram webhook is validated using a secret token to prevent unauthorized access.
+5. **Efficient Alert System**: The periodic checker script fetches data once per unique stock symbol, regardless of how many users are watching it.
+6. **Robust Data Storage**: SQLite is configured with foreign key constraints and accessed via a manager that ensures transactional integrity.
 
 ## Database Architecture
 
@@ -188,66 +190,53 @@ GROUP BY user_id, symbol;
 ```
 project/
   ├── db/
-  │   └── stockalerts.db     # SQLite database file
-  ├── app.py                 # Flask application entry point
-  ├── db_manager.py          # Database access layer
-  ├── stock_analyzer.py      # Stock data analysis
-  ├── bot_handler.py         # Telegram bot handler
-  ├── weekly_checker.py      # Weekly alert system
+  │   └── stockalerts.db     # SQLite database file (auto-created)
+  ├── app.py                 # Flask application entry point and API
+  ├── db_manager.py          # Database access and management layer
+  ├── webhook_handler.py     # Securely handles incoming Telegram updates
+  ├── periodic_checker.py    # Script for stock analysis and sending alerts
   ├── migrations/            # Database migration scripts
-  │   ├── 001_initial.sql
-  │   └── 002_add_indexes.sql
-  └── static/               # Frontend assets
+  │   └── 001_initial.sql
+  └── static/                # Frontend assets
       ├── css/
-      ├── js/
-      └── ts/
+      ├── ts/                # TypeScript source files
+      └── js/                # Compiled JavaScript files
 ```
 
 ## Database Management
 
 ### Backup Strategy
+A simple cron job can be used to back up the SQLite database file daily.
 ```bash
-# Daily backup script
+# Example daily backup script
 #!/bin/bash
 DATE=$(date +%Y%m%d)
-sqlite3 stockalerts.db ".backup 'backup/stockalerts_${DATE}.db'"
-find backup/ -name "stockalerts_*.db" -mtime +7 -delete
+sqlite3 /path/to/project/db/stockalerts.db ".backup '/path/to/backups/stockalerts_${DATE}.db'"
+# Prune old backups
+find /path/to/backups/ -name "stockalerts_*.db" -mtime +7 -delete
 ```
 
-### Maintenance Tasks
-1. Regular vacuum to reclaim space
-2. Index rebuilding for performance
-3. Cache invalidation for old stock data
-4. Log rotation for size management
-
 ### Schema Migration Strategy
-- Use a simple, linear versioning scheme (e.g. 001, 002, etc.)
-- Each version has an associated SQL script in the `migrations` directory 
-- Scripts are applied in order when setting up a new environment or upgrading an existing one
-- Scripts should be idempotent and able to run multiple times without error
-- Use transactions to ensure scripts run completely or not at all 
-- Avoid modifying existing migration scripts, create a new version instead
+- A simple, linear versioning scheme (e.g., 001, 002, etc.) is used.
+- SQL scripts are located in the `migrations` directory.
+- The `db_manager.py` automatically applies new, unapplied migrations on startup.
+- Scripts are idempotent where possible and run within transactions to ensure atomicity.
 
 ## Security & Infrastructure
 
 ### Data Security
-- SQLite file permissions set to 600
-- All SQL queries use parameterized statements
-- Input validation before database operations
-- Regular backups with encryption
-- Transaction isolation for concurrent access
+- **Webhook Security**: `X-Telegram-Bot-Api-Secret-Token` header is used to validate all incoming webhook calls.
+- **SQL Injection**: All database queries are parameterized.
+- **File Permissions**: The `db/` directory and database file should have restricted permissions on a production server.
 
-### Deployment Options
-- Any Python-compatible web server
-- Container-friendly (Docker)
-- Low resource requirements
-- Automatic database migrations
-- Monitoring and alerting setup
+### Deployment
+- The application is a standard WSGI app and can be deployed with Gunicorn, uWSGI, etc.
+- The `periodic_checker.py` script should be run by a scheduler like cron.
+- A public-facing URL is required for the Telegram webhook to function.
 
 ## Service Dependencies
-- Telegram Bot API: Alert delivery
-- Yahoo Finance: Stock data (rate limited)
-- SQLite: Data storage
+- **Telegram Bot API**: Required for alert delivery and user interaction.
+- **Yahoo Finance**: The primary source for stock data (subject to rate limiting).
 
 ## Performance Considerations
 1. Indexed queries for common operations

@@ -49,6 +49,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 12px;
+    position: relative;
 }
 
 .header-content h1 {
@@ -75,6 +76,20 @@ body {
     position: absolute;
     left: 0;
     color: var(--text-secondary);
+}
+
+.telegram-link {
+    position: absolute;
+    right: 2rem;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.telegram-link:hover {
+    color: #0088cc;
+    transform: scale(1.1);
 }
 
 .hero {
@@ -342,6 +357,11 @@ body {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+    .telegram-link {
+        right: 1rem;
+        font-size: 1.3rem;
+    }
+    
     .hero {
         padding: 6rem 0 1.5rem;
     }

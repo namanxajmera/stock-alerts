@@ -23,7 +23,8 @@ const commonAxisStyle = {
         family: 'Arial',
         size: 13,
         color: 'black'
-    }
+    },
+    fixedrange: true,
 };
 // DOM Elements
 const tickerInput = document.getElementById('ticker-input');
@@ -41,10 +42,11 @@ const changePercentEl = document.getElementById('change-percent');
 const customTooltip = document.getElementById('custom-tooltip');
 const dashboard = document.querySelector('.dashboard');
 // State
-let selectedPeriod = '5y'; // Always use lowercase to match server requirements
+let selectedPeriod = '5y';
 let currentTicker = '';
 let isLoading = false;
-let lastData = null;
+let chartDataCache = null;
+let resizeTimeout;
 // Export the init function and any other necessary functions
 export function init() {
     initializeCharts();
@@ -55,6 +57,7 @@ export function init() {
     periodButtons.forEach(btn => {
         btn.addEventListener('click', handlePeriodChange);
     });
+    window.addEventListener('resize', handleResize);
 }
 function setDefaultPeriod() {
     // Set 5y as default period (lowercase to match server requirements)
@@ -84,33 +87,14 @@ function initializeCharts() {
             },
             padding: 8
         },
-        xaxis: {
-            ...commonAxisStyle,
-            showspikes: true,
-            spikemode: 'across',
-            spikesnap: 'cursor',
-            showline: true,
-            showgrid: true,
-            spikecolor: '#8E8E93',
-            spikethickness: 1,
-            showticklabels: true,
-            tickangle: -45,
-            tickfont: {
+        xaxis: Object.assign(Object.assign({}, commonAxisStyle), { showspikes: true, spikemode: 'across', spikesnap: 'cursor', showline: true, showgrid: true, spikecolor: '#8E8E93', spikethickness: 1, showticklabels: true, tickangle: -45, tickfont: {
                 family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
                 size: 10,
                 color: '#8E8E93'
-            },
-            fixedrange: true, // Prevent zooming on x-axis
-            automargin: true,
-            rangeslider: { visible: false } // Disable range slider if present
-        }
+            }, fixedrange: true, automargin: true, rangeslider: { visible: false } // Disable range slider if present
+         })
     };
-    const mainChartLayout = {
-        ...commonLayout,
-        height: 300,
-        yaxis: {
-            ...commonAxisStyle,
-            title: {
+    const mainChartLayout = Object.assign(Object.assign({}, commonLayout), { height: 300, yaxis: Object.assign(Object.assign({}, commonAxisStyle), { title: {
                 text: 'PRICE (USD)',
                 font: {
                     family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
@@ -118,40 +102,12 @@ function initializeCharts() {
                     weight: 500
                 },
                 standoff: 10
-            },
-            automargin: true,
-            range: [null, null],
-            rangemode: 'normal',
-            autorange: true,
-            fixedrange: true
-        },
-        xaxis: {
-            ...commonAxisStyle,
-            showspikes: true,
-            spikemode: 'across',
-            spikesnap: 'cursor',
-            showline: true,
-            showgrid: true,
-            spikecolor: '#8E8E93',
-            spikethickness: 1,
-            showticklabels: true,
-            tickangle: -45,
-            tickfont: {
+            }, automargin: true, range: [null, null], rangemode: 'normal', autorange: true, fixedrange: true }), xaxis: Object.assign(Object.assign({}, commonAxisStyle), { showspikes: true, spikemode: 'across', spikesnap: 'cursor', showline: true, showgrid: true, spikecolor: '#8E8E93', spikethickness: 1, showticklabels: true, tickangle: -45, tickfont: {
                 family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
                 size: 10,
                 color: '#8E8E93'
-            },
-            fixedrange: true,
-            automargin: true,
-            rangeslider: { visible: false }
-        }
-    };
-    const subChartLayout = {
-        ...commonLayout,
-        height: 200,
-        yaxis: {
-            ...commonAxisStyle,
-            title: {
+            }, fixedrange: true, automargin: true, rangeslider: { visible: false } }) });
+    const subChartLayout = Object.assign(Object.assign({}, commonLayout), { height: 200, yaxis: Object.assign(Object.assign({}, commonAxisStyle), { title: {
                 text: '% DIFFERENCE',
                 font: {
                     family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
@@ -159,31 +115,11 @@ function initializeCharts() {
                     weight: 500
                 },
                 standoff: 10
-            },
-            automargin: true,
-            fixedrange: true
-        },
-        xaxis: {
-            ...commonAxisStyle,
-            showspikes: true,
-            spikemode: 'across',
-            spikesnap: 'cursor',
-            showline: true,
-            showgrid: true,
-            spikecolor: '#8E8E93',
-            spikethickness: 1,
-            showticklabels: true,
-            tickangle: -45,
-            tickfont: {
+            }, automargin: true, fixedrange: true }), xaxis: Object.assign(Object.assign({}, commonAxisStyle), { showspikes: true, spikemode: 'across', spikesnap: 'cursor', showline: true, showgrid: true, spikecolor: '#8E8E93', spikethickness: 1, showticklabels: true, tickangle: -45, tickfont: {
                 family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
                 size: 10,
                 color: '#8E8E93'
-            },
-            fixedrange: true,
-            automargin: true,
-            rangeslider: { visible: false }
-        }
-    };
+            }, fixedrange: true, automargin: true, rangeslider: { visible: false } }) });
     try {
         window.Plotly.newPlot('main-chart', [], mainChartLayout, chartConfig);
         window.Plotly.newPlot('sub-chart', [], subChartLayout, chartConfig);
@@ -191,7 +127,8 @@ function initializeCharts() {
         const mainChartEl = document.getElementById('main-chart');
         const subChartEl = document.getElementById('sub-chart');
         mainChartEl.on('plotly_hover', (data) => {
-            if (!data.points?.[0])
+            var _a;
+            if (!((_a = data.points) === null || _a === void 0 ? void 0 : _a[0]))
                 return;
             window.Plotly.Fx.hover(subChartEl, [
                 { curveNumber: 0, pointNumber: data.points[0].pointNumber }
@@ -199,7 +136,8 @@ function initializeCharts() {
             updateTooltip(data.points[0]);
         });
         subChartEl.on('plotly_hover', (data) => {
-            if (!data.points?.[0])
+            var _a;
+            if (!((_a = data.points) === null || _a === void 0 ? void 0 : _a[0]))
                 return;
             window.Plotly.Fx.hover(mainChartEl, [
                 { curveNumber: 0, pointNumber: data.points[0].pointNumber }
@@ -235,7 +173,7 @@ function filterNullValues(dates, values) {
 function updateCharts(data, ticker) {
     try {
         // Store data for tooltip use
-        lastData = data;
+        chartDataCache = data;
         // Filter out null values
         const [priceDates, priceValues] = filterNullValues(data.dates, data.prices);
         const [maDates, maValues] = filterNullValues(data.dates, data.ma_200);
@@ -246,7 +184,7 @@ function updateCharts(data, ticker) {
         // Show dashboard
         dashboard.style.display = 'block';
         // Update stock info panel with the latest data
-        updateStockInfo(ticker, priceValues[priceValues.length - 1], priceValues[0]);
+        updateStockInfo(ticker, priceValues[priceValues.length - 1], data.previous_close);
         // Main chart traces
         const mainTraces = [
             {
@@ -360,11 +298,7 @@ function updateCharts(data, ticker) {
             window.Plotly.Plots.resize('sub-chart');
         };
         // Debounce resize handler
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = window.setTimeout(updateSize, 100);
-        });
+        resizeTimeout = window.setTimeout(updateSize, 100);
     }
     catch (error) {
         console.error('Error updating charts:', error);
@@ -372,14 +306,18 @@ function updateCharts(data, ticker) {
     }
 }
 // Function to update stock info panel
-function updateStockInfo(ticker, currentPrice, firstPrice) {
+function updateStockInfo(ticker, currentPrice, previousClose) {
     stockNameEl.textContent = ticker;
     currentPriceEl.textContent = `$${currentPrice.toFixed(2)}`;
     // Calculate price change
-    const priceChange = currentPrice - firstPrice;
-    const percentChange = (priceChange / firstPrice) * 100;
+    let priceChange = 0;
+    let percentChange = 0;
+    if (previousClose !== null) {
+        priceChange = currentPrice - previousClose;
+        percentChange = (priceChange / previousClose) * 100;
+    }
     // Update change elements
-    changeValueEl.textContent = `$${priceChange.toFixed(2)}`;
+    changeValueEl.textContent = `${priceChange >= 0 ? '+' : ''}$${priceChange.toFixed(2)}`;
     changePercentEl.textContent = `(${percentChange.toFixed(2)}%)`;
     // Set color based on change
     if (priceChange >= 0) {
@@ -395,23 +333,20 @@ function updateStockInfo(ticker, currentPrice, firstPrice) {
 }
 // Update tooltip content and position
 function updateTooltip(point) {
-    if (!point || !lastData || !point.event)
+    if (!point || !point.x)
         return;
     const date = new Date(point.x).toLocaleDateString();
-    let tooltipContent = '';
-    // Different content based on which chart is being hovered
+    let value = '';
     if (point.data.name === 'Price' || point.data.name === '200-Day MA') {
-        // Main chart (price)
-        tooltipContent = `<div>${date} · $${point.y.toFixed(2)}</div>`;
+        value = `$${point.y.toFixed(2)}`;
     }
     else if (point.data.name === '% Difference') {
-        // Sub chart (percentile)
-        tooltipContent = `<div>${date} · ${point.y.toFixed(1)}%</div>`;
+        value = `${point.y.toFixed(1)}%`;
     }
     else {
         return; // Don't show tooltip for other traces
     }
-    customTooltip.innerHTML = tooltipContent;
+    customTooltip.innerHTML = `<div>${date} · ${value}</div>`;
     customTooltip.style.display = 'block';
     // Position tooltip using the mouse event coordinates
     const evt = point.event;
@@ -434,10 +369,11 @@ function handleTickerInput(event) {
 }
 // Handle period change
 function handlePeriodChange(event) {
+    var _a;
     if (isLoading)
         return;
     const button = event.target;
-    const newPeriod = button.dataset.period?.toLowerCase() || '';
+    const newPeriod = ((_a = button.dataset.period) === null || _a === void 0 ? void 0 : _a.toLowerCase()) || '';
     if (newPeriod && newPeriod !== selectedPeriod) {
         updateSelectedPeriod(newPeriod);
         if (currentTicker) {
@@ -508,11 +444,17 @@ async function fetchData() {
 function clearCharts() {
     const mainChartEl = document.getElementById('main-chart');
     const subChartEl = document.getElementById('sub-chart');
-    window.Plotly.react('main-chart', [], mainChartEl?.layout || {}, chartConfig);
-    window.Plotly.react('sub-chart', [], subChartEl?.layout || {}, chartConfig);
+    window.Plotly.react('main-chart', [], (mainChartEl === null || mainChartEl === void 0 ? void 0 : mainChartEl.layout) || {}, chartConfig);
+    window.Plotly.react('sub-chart', [], (subChartEl === null || subChartEl === void 0 ? void 0 : subChartEl.layout) || {}, chartConfig);
     stockInfoPanel.style.display = 'none';
     dashboard.style.display = 'none';
 }
+function handleResize() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = window.setTimeout(() => {
+        window.Plotly.Plots.resize('main-chart');
+        window.Plotly.Plots.resize('sub-chart');
+    }, 100);
+}
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', init);
-//# sourceMappingURL=main.js.map

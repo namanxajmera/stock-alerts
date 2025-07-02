@@ -3,7 +3,6 @@ flask-cors
 yfinance
 pandas
 numpy
-termcolor
 requests
 python-dotenv
 pytz

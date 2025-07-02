@@ -2,8 +2,9 @@
 
 ## Overview
 
-- Base URL: `http://localhost:5001` (local development)
-- No authentication required
+- **Base URL**: `http://localhost:5001` (local development)
+- **Authentication**: Endpoints are public, but the webhook is secured.
+- **Data Format**: JSON
 - Telegram bot for user interactions and alerts
 - CORS enabled for cross-origin requests
 - SQLite database for data storage with robust schema design
@@ -11,22 +12,17 @@
 ## Endpoints
 
 ### 1. Main Page
-```
-GET /
-```
-Returns the main web application HTML page for stock visualization
+- **`GET /`**
+- **Description**: Returns the main single-page web application.
+- **Response**: `text/html`
 
 ### 2. Stock Data
-```
-GET /data/<ticker>/<period>
-```
-Retrieves stock data and analysis for a ticker symbol and specified time period
-
-**Parameters**:
-- ticker: Stock symbol (e.g., AAPL)
-- period: Time period (valid values: 1y, 3y, 5y, max)
-
-**Response Format**:
+- **`GET /data/<ticker>/<period>`**
+- **Description**: Retrieves processed stock data and technical analysis for a given stock symbol and time period.
+- **URL Parameters**:
+  - `ticker` (string): The stock symbol (e.g., `AAPL`).
+  - `period` (string): The time period. Valid values: `1y`, `3y`, `5y`, `max`.
+- **Success Response (200 OK)**:
 ```json
 {
   "dates": ["2022-01-01", "2022-01-02", ...],
@@ -36,28 +32,31 @@ Retrieves stock data and analysis for a ticker symbol and specified time period
   "percentiles": {
     "p5": -10.2,
     "p95": 12.5
-  }
+  },
+  "previous_close": 172.00
 }
 ```
+- **Error Responses**:
+  - `400 Bad Request`: If the period is invalid.
+  - `404 Not Found`: If the ticker symbol returns no data.
+  - `500 Internal Server Error`: If an error occurs during data processing.
 
 ### 3. Telegram Webhook
-```
-POST /webhook
-```
-Webhook endpoint for Telegram bot updates. This endpoint handles all user interactions.
-
-**Request Body**: Telegram Update object
-**Response**: Empty 200 OK
+- **`POST /webhook`**
+- **Description**: The secure endpoint for receiving updates from the Telegram Bot API. This endpoint handles all user interactions with the bot.
+- **Headers**:
+  - `X-Telegram-Bot-Api-Secret-Token` (string, **required**): A secret token that must match the one configured on the server. Requests without this header or with an invalid token will be rejected with a `403 Forbidden` error.
+- **Request Body**: A standard Telegram `Update` object.
+- **Success Response**: An empty `200 OK`.
 
 ## Bot Commands
 
-### Available Commands
-- `/start` - Initialize bot and show help message
-- `/add <ticker>` - Add stock to your watchlist
-- `/remove <ticker>` - Remove stock from your watchlist
-- `/list` - Show your current watchlist
-- `/settings` - View and update your alert preferences
-- `/thresholds <ticker> <low> <high>` - Set custom thresholds for a stock
+Users interact with the service via the Telegram bot.
+
+- `/start` - Initializes the bot and shows the welcome message.
+- `/add <TICKER> [TICKER...]` - Adds one or more stocks to the user's watchlist.
+- `/remove <TICKER> [TICKER...]` - Removes one or more stocks from the watchlist.
+- `/list` - Shows the user's current watchlist.
 
 ## Database Schema
 
