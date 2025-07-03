@@ -48,8 +48,10 @@ class DatabaseManager:
             with self._get_connection() as conn:
                 cursor = conn.cursor()
 
-                cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
-                if cursor.fetchone() is not None:
+                # Check if database needs migration by looking for max_stocks column
+                cursor.execute("PRAGMA table_info(users)")
+                users_columns = [column[1] for column in cursor.fetchall()]
+                if 'users' in [table[0] for table in cursor.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()] and 'max_stocks' in users_columns:
                     logger.info("Database already initialized, skipping.")
                     return
 
