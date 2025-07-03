@@ -7,4 +7,5 @@ python-dotenv
 pytz
 Werkzeug
 Jinja2
-tiingo  # Tiingo API for stock data 
+tiingo
+gunicorn 
