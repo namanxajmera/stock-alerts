@@ -306,23 +306,23 @@ def admin_panel():
             
             # Users
             cursor.execute("SELECT * FROM users")
-            users = [dict(row) for row in cursor.fetchall()]
+            users = cursor.fetchall()
             
             # Watchlist items
             cursor.execute("SELECT * FROM watchlist_items ORDER BY user_id, symbol")
-            watchlist = [dict(row) for row in cursor.fetchall()]
+            watchlist = cursor.fetchall()
             
             # Alert history (last 50)
             cursor.execute("SELECT * FROM alert_history ORDER BY sent_at DESC LIMIT 50")
-            alerts = [dict(row) for row in cursor.fetchall()]
+            alerts = cursor.fetchall()
             
             # Stock cache
             cursor.execute("SELECT * FROM stock_cache ORDER BY last_check DESC")
-            cache = [dict(row) for row in cursor.fetchall()]
+            cache = cursor.fetchall()
             
             # Config (filter out sensitive data)
             cursor.execute("SELECT * FROM config WHERE key != 'telegram_token'")
-            config = [dict(row) for row in cursor.fetchall()]
+            config = cursor.fetchall()
         
         # Simple HTML template
         html = f"""
