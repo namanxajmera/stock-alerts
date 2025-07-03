@@ -8,4 +8,5 @@ pytz
 Werkzeug
 Jinja2
 tiingo
-gunicorn 
+gunicorn
+termcolor 

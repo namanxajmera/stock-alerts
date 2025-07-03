@@ -106,8 +106,8 @@ class WebhookHandler:
             "Welcome to Stock Alerts Bot! 📈\n\n"
             "I will alert you when your stocks reach historically high or low prices compared to their 200-day moving average.\n\n"
             "<b>Available commands:</b>\n"
-            "/add <TICKER> [TICKER...] - Add one or more stocks to track\n"
-            "/remove <TICKER> [TICKER...] - Remove stock(s)\n"
+            "/add TICKER [TICKER...] - Add one or more stocks to track\n"
+            "/remove TICKER [TICKER...] - Remove stock(s)\n"
             "/list - Show your watchlist\n"
         )
 
