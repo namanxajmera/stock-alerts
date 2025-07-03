@@ -14,8 +14,7 @@ setup_directories()
 
 from flask import Flask, render_template, jsonify, send_from_directory, request, abort, g
 from flask_cors import CORS
-import yfinance as yf
-from yfinance.exceptions import YFRateLimitError
+from tiingo import TiingoClient
 import pandas as pd
 import numpy as np
 import traceback
@@ -72,39 +71,79 @@ except Exception as e:
     logger.critical(f"FATAL: Error during initialization: {e}", exc_info=True)
     raise
 
-def fetch_yahoo_data_with_retry(ticker_symbol, max_retries=3):
-    """Fetch data from Yahoo Finance with retry logic and exponential backoff."""
-    ticker = yf.Ticker(ticker_symbol)
-    
-    for attempt in range(max_retries):
-        try:
-            logger.info(f"Fetching Yahoo Finance data for {ticker_symbol} (attempt {attempt + 1}/{max_retries})")
-            complete_data = ticker.history(period="max")
-            
-            if complete_data.empty:
-                logger.warning(f"No data returned from Yahoo Finance for {ticker_symbol}")
-                return None
-                
-            logger.info(f"Successfully fetched {len(complete_data)} data points for {ticker_symbol}")
-            return complete_data
-            
-        except YFRateLimitError as e:
-            wait_time = (2 ** attempt) * 2  # Exponential backoff: 2, 4, 8 seconds
-            logger.warning(f"Rate limited on attempt {attempt + 1} for {ticker_symbol}. Waiting {wait_time} seconds...")
-            
-            if attempt < max_retries - 1:  # Don't sleep on the last attempt
-                time.sleep(wait_time)
-            else:
-                logger.error(f"Rate limited after {max_retries} attempts for {ticker_symbol}")
-                raise
-                
-        except Exception as e:
-            logger.error(f"Unexpected error fetching data for {ticker_symbol} on attempt {attempt + 1}: {e}")
-            if attempt == max_retries - 1:  # Last attempt
-                raise
-            time.sleep(1)  # Brief pause before retry
-    
-    return None
+def fetch_tiingo_data(ticker_symbol):
+    """Fetch data from Tiingo API using direct REST calls."""
+    try:
+        # Get API token from environment
+        api_token = os.getenv('TIINGO_API_TOKEN')
+        if not api_token:
+            raise ValueError("TIINGO_API_TOKEN not found in environment variables")
+        
+        logger.info(f"Fetching Tiingo data for {ticker_symbol}")
+        
+        # Calculate start date for maximum historical data (30+ years available)
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=30*365)  # 30 years ago
+        
+        # Build the REST API URL as per Tiingo docs
+        url = f"https://api.tiingo.com/tiingo/daily/{ticker_symbol}/prices"
+        
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Token {api_token}'
+        }
+        
+        params = {
+            'startDate': start_date.strftime('%Y-%m-%d'),
+            'endDate': end_date.strftime('%Y-%m-%d')
+        }
+        
+        logger.info(f"Making request to: {url} with dates {params['startDate']} to {params['endDate']}")
+        
+        # Make the API request
+        import requests
+        response = requests.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        
+        data = response.json()
+        
+        if not data:
+            logger.warning(f"No data returned from Tiingo for {ticker_symbol}")
+            return None
+        
+        # Convert JSON response to DataFrame
+        df = pd.DataFrame(data)
+        
+        # Convert Tiingo format to match expected format
+        # Tiingo returns: date, close, high, low, open, volume, adjClose, adjHigh, adjLow, adjOpen, adjVolume, divCash, splitFactor
+        # We need: Date, Open, High, Low, Close, Volume (matching yfinance format)
+        
+        # Rename columns to match yfinance format
+        column_mapping = {
+            'date': 'Date',
+            'open': 'Open', 
+            'high': 'High',
+            'low': 'Low',
+            'close': 'Close',
+            'volume': 'Volume'
+        }
+        
+        # Select and rename only the columns we need
+        df_filtered = df[list(column_mapping.keys())].rename(columns=column_mapping)
+        
+        # Convert date string to datetime and set as index
+        df_filtered['Date'] = pd.to_datetime(df_filtered['Date'])
+        df_filtered.set_index('Date', inplace=True)
+        
+        # Sort by date (oldest first)
+        df_filtered = df_filtered.sort_index()
+        
+        logger.info(f"Successfully fetched {len(df_filtered)} data points for {ticker_symbol} from Tiingo")
+        return df_filtered
+        
+    except Exception as e:
+        logger.error(f"Error fetching data from Tiingo for {ticker_symbol}: {e}")
+        raise
 
 def calculate_metrics(ticker_symbol, period="5y"):
     """Calculate stock metrics including MA and percentiles with caching and retry logic."""
@@ -116,7 +155,8 @@ def calculate_metrics(ticker_symbol, period="5y"):
             return {"error": f"Invalid period. Must be one of: {', '.join(valid_periods)}"}, 400
 
         # Check cache first (1 hour cache)
-        cached_data = db_manager.get_fresh_cache(ticker_symbol, max_age_hours=1)
+        cache_hours = int(os.getenv('CACHE_HOURS', 1))
+        cached_data = db_manager.get_fresh_cache(ticker_symbol, max_age_hours=cache_hours)
         
         if cached_data and cached_data.get('data_json'):
             logger.info(f"Using cached data for {ticker_symbol}")
@@ -131,31 +171,24 @@ def calculate_metrics(ticker_symbol, period="5y"):
                     percentile_5th = -10.0
                     percentile_95th = 10.0
                     
-                # Return cached data notice for now, we'd need to store full historical data for complete cache support
-                return {
-                    "error": f"Using recent cached data for {ticker_symbol}. Full historical cache not yet implemented.",
-                    "cache_info": f"Last updated: {cached_data['last_check']}, Price: ${cached_data['last_price']:.2f}"
-                }, 202
+                # For now, fetch fresh data but note it was in cache
+                # In a full implementation, we'd store the complete time series data in cache
+                logger.info(f"Cache hit for {ticker_symbol}, but fetching fresh data for complete time series")
+                # Fall through to fetch fresh data, but we'll use the cached price info
                 
             except (json.JSONDecodeError, KeyError) as e:
                 logger.warning(f"Invalid cached data for {ticker_symbol}: {e}")
                 # Continue to fetch fresh data
 
-        # Fetch fresh data with retry logic
+        # Fetch fresh data from Tiingo API
         try:
-            complete_data = fetch_yahoo_data_with_retry(ticker_symbol)
+            complete_data = fetch_tiingo_data(ticker_symbol)
             
             if complete_data is None or complete_data.empty:
                 return {"error": "No data available for this ticker symbol"}, 404
 
-        except YFRateLimitError:
-            return {
-                "error": "Yahoo Finance is temporarily limiting requests. Please try again in a few minutes.",
-                "retry_after": "2-3 minutes"
-            }, 429
-            
         except Exception as e:
-            logger.error(f"Failed to fetch data for {ticker_symbol}: {e}")
+            logger.error(f"Failed to fetch data from Tiingo for {ticker_symbol}: {e}")
             return {"error": "Unable to fetch stock data. Please try again later."}, 500
 
         # Calculate technical indicators
@@ -184,12 +217,20 @@ def calculate_metrics(ticker_symbol, period="5y"):
         else:
             data = complete_data
 
-        # Prepare result
+        # Prepare result - convert NaN to None for valid JSON
+        def clean_for_json(series):
+            """Convert pandas series to list with NaN/inf converted to None"""
+            # Replace inf/-inf with NaN, then convert to list and replace NaN with None
+            cleaned = series.replace([np.inf, -np.inf], np.nan)
+            result = cleaned.tolist()
+            # Replace any remaining NaN values with None for valid JSON
+            return [None if pd.isna(x) else x for x in result]
+        
         result = {
             "dates": data.index.strftime('%Y-%m-%d').tolist(),
-            "prices": data['Close'].fillna(np.nan).replace([np.inf, -np.inf], np.nan).tolist(),
-            "ma_200": data['MA200'].fillna(np.nan).replace([np.inf, -np.inf], np.nan).tolist(),
-            "pct_diff": data['pct_diff'].fillna(np.nan).replace([np.inf, -np.inf], np.nan).tolist(),
+            "prices": clean_for_json(data['Close']),
+            "ma_200": clean_for_json(data['MA200']),
+            "pct_diff": clean_for_json(data['pct_diff']),
             "percentiles": {"p5": percentile_5th, "p95": percentile_95th},
             "previous_close": previous_close,
         }

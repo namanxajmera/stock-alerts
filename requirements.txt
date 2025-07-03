@@ -1,13 +1,10 @@
 flask
 flask-cors
-yfinance
 pandas
 numpy
 requests
 python-dotenv
 pytz
-multitasking>=0.0.11  # Required by yfinance
-beautifulsoup4>=4.12.2  # Required by yfinance
-html5lib>=1.1  # Required by yfinance
 Werkzeug
-Jinja2 
+Jinja2
+tiingo  # Tiingo API for stock data 

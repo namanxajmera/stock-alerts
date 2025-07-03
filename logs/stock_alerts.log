@@ -1859,3 +1859,599 @@ Traceback (most recent call last):
     raise YFRateLimitError()
 yfinance.exceptions.YFRateLimitError: Too Many Requests. Rate limited. Try after a while.
 2025-07-02 00:22:05,542 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 00:22:05] "[35m[1mGET /data/AAPL/5y HTTP/1.1[0m" 500 -
+2025-07-02 07:44:34,772 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 07:44:34,772 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 07:44:34,775 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 07:44:34,775 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 07:44:34,775 - StockAlerts.App - INFO - Flask app initialized with CORS.
+2025-07-02 07:44:34,776 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 07:44:34,783 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 07:44:34,783 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 07:44:42,787 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:44:42] "GET / HTTP/1.1" 200 -
+2025-07-02 07:44:42,803 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:44:42] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-02 07:44:42,804 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:44:42] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-07-02 07:44:43,714 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:44:43] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-07-02 07:44:43,722 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:44:43] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-07-02 07:44:47,453 - StockAlerts.App - INFO - Request for ticker: AAPL, period: 5y
+2025-07-02 07:44:47,453 - StockAlerts.App - INFO - Processing request for AAPL with period 5y
+2025-07-02 07:44:49,460 - StockAlerts.App - INFO - Fetching Yahoo Finance data for AAPL (attempt 1/3)
+2025-07-02 07:44:51,097 - StockAlerts.App - ERROR - Unexpected error fetching data for AAPL on attempt 1: No module named 'scipy'
+2025-07-02 07:44:56,104 - StockAlerts.App - INFO - Fetching Yahoo Finance data for AAPL (attempt 2/3)
+2025-07-02 07:44:56,867 - StockAlerts.App - ERROR - Unexpected error fetching data for AAPL on attempt 2: No module named 'scipy'
+2025-07-02 07:45:01,874 - StockAlerts.App - INFO - Fetching Yahoo Finance data for AAPL (attempt 3/3)
+2025-07-02 07:45:02,657 - StockAlerts.App - ERROR - Unexpected error fetching data for AAPL on attempt 3: No module named 'scipy'
+2025-07-02 07:45:02,657 - StockAlerts.App - ERROR - Failed to fetch data for AAPL: No module named 'scipy'
+2025-07-02 07:45:02,658 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:45:02] "[35m[1mGET /data/AAPL/5y HTTP/1.1[0m" 500 -
+2025-07-02 07:45:47,259 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 07:45:47,259 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 07:45:47,259 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 07:45:47,259 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 07:45:47,260 - StockAlerts.App - INFO - Flask app initialized with CORS.
+2025-07-02 07:45:47,261 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 07:45:47,267 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 07:45:47,267 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 07:45:49,021 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:45:49] "GET / HTTP/1.1" 200 -
+2025-07-02 07:45:49,067 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:45:49] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-02 07:45:49,070 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:45:49] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-07-02 07:45:50,371 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:45:50] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 07:45:50,873 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:45:50] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 07:45:56,273 - StockAlerts.App - INFO - Request for ticker: AAPL, period: 5y
+2025-07-02 07:45:56,273 - StockAlerts.App - INFO - Processing request for AAPL with period 5y
+2025-07-02 07:45:58,280 - StockAlerts.App - INFO - Fetching Yahoo Finance data for AAPL (attempt 1/3)
+2025-07-02 07:46:01,097 - StockAlerts.App - WARNING - Rate limited on attempt 1 for AAPL. Waiting 30 seconds...
+2025-07-02 07:46:23,943 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:46:23] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-02 07:46:23,944 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:46:23] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+2025-07-02 07:46:31,099 - StockAlerts.App - INFO - Fetching Yahoo Finance data for AAPL (attempt 2/3)
+2025-07-02 07:46:32,166 - StockAlerts.App - WARNING - Rate limited on attempt 2 for AAPL. Waiting 90 seconds...
+2025-07-02 07:47:23,238 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 07:47:23,239 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 07:47:23,239 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 07:47:23,239 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 07:47:23,240 - StockAlerts.App - INFO - Flask app initialized with CORS.
+2025-07-02 07:47:23,240 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 07:47:23,246 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 07:47:23,246 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 07:47:24,551 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:47:24] "GET / HTTP/1.1" 200 -
+2025-07-02 07:47:24,590 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:47:24] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-02 07:47:24,590 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:47:24] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-07-02 07:47:25,355 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:47:25] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 07:47:25,735 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:47:25] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 07:47:30,940 - StockAlerts.App - INFO - Request for ticker: ZM, period: 5y
+2025-07-02 07:47:30,940 - StockAlerts.App - INFO - Processing request for ZM with period 5y
+2025-07-02 07:47:32,946 - StockAlerts.App - INFO - Fetching Yahoo Finance data for ZM (attempt 1/3)
+2025-07-02 07:47:36,812 - StockAlerts.App - WARNING - Rate limited on attempt 1 for ZM. Waiting 30 seconds...
+2025-07-02 07:48:06,814 - StockAlerts.App - INFO - Fetching Yahoo Finance data for ZM (attempt 2/3)
+2025-07-02 07:48:08,201 - StockAlerts.App - WARNING - Rate limited on attempt 2 for ZM. Waiting 90 seconds...
+2025-07-02 07:49:38,195 - StockAlerts.App - INFO - Fetching Yahoo Finance data for ZM (attempt 3/3)
+2025-07-02 07:49:40,563 - StockAlerts.App - WARNING - Rate limited on attempt 3 for ZM. Waiting 270 seconds...
+2025-07-02 07:49:40,563 - StockAlerts.App - ERROR - Rate limited after 3 attempts for ZM
+2025-07-02 07:49:40,564 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:49:40] "[31m[1mGET /data/ZM/5y HTTP/1.1[0m" 429 -
+2025-07-02 07:59:55,868 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 07:59:55,868 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 07:59:55,868 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 07:59:55,868 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 07:59:55,869 - StockAlerts.App - INFO - Flask app initialized with CORS.
+2025-07-02 07:59:55,870 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 07:59:55,875 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 07:59:55,875 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 07:59:58,499 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:59:58] "GET / HTTP/1.1" 200 -
+2025-07-02 07:59:58,517 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:59:58] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-02 07:59:58,518 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:59:58] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-07-02 07:59:58,809 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:59:58] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-07-02 07:59:58,819 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 07:59:58] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-07-02 08:00:10,947 - StockAlerts.App - INFO - Request for ticker: SOFI, period: 5y
+2025-07-02 08:00:10,947 - StockAlerts.App - INFO - Processing request for SOFI with period 5y
+2025-07-02 08:00:12,955 - StockAlerts.App - INFO - Fetching Yahoo Finance data for SOFI (attempt 1/3)
+2025-07-02 08:00:15,523 - StockAlerts.App - WARNING - Rate limited with period='max', trying period='10y' for SOFI
+2025-07-02 08:00:17,264 - StockAlerts.App - WARNING - Rate limited on attempt 1 for SOFI. Waiting 30 seconds...
+2025-07-02 08:00:47,269 - StockAlerts.App - INFO - Fetching Yahoo Finance data for SOFI (attempt 2/3)
+2025-07-02 08:00:48,747 - StockAlerts.App - WARNING - Rate limited with period='max', trying period='10y' for SOFI
+2025-07-02 08:00:50,200 - StockAlerts.App - WARNING - Rate limited on attempt 2 for SOFI. Waiting 90 seconds...
+2025-07-02 08:01:44,791 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 08:01:44,791 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 08:01:44,791 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 08:01:44,792 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 08:01:44,792 - StockAlerts.App - INFO - Flask app initialized with CORS.
+2025-07-02 08:01:44,793 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 08:01:44,798 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 08:01:44,798 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 08:01:46,270 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:01:46] "GET / HTTP/1.1" 200 -
+2025-07-02 08:01:46,306 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:01:46] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-07-02 08:01:46,307 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:01:46] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-02 08:01:47,045 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:01:47] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 08:01:47,455 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:01:47] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 08:01:58,648 - StockAlerts.App - INFO - Request for ticker: AAPL, period: 1y
+2025-07-02 08:01:58,648 - StockAlerts.App - INFO - Processing request for AAPL with period 1y
+2025-07-02 08:02:03,655 - StockAlerts.App - INFO - Fetching Yahoo Finance data for AAPL (attempt 1/3)
+2025-07-02 08:02:03,655 - StockAlerts.App - INFO - Trying period='5y' for AAPL
+2025-07-02 08:02:06,815 - StockAlerts.App - WARNING - Rate limited with period='5y' for AAPL
+2025-07-02 08:02:06,815 - StockAlerts.App - INFO - Trying period='10y' for AAPL
+2025-07-02 08:02:08,481 - StockAlerts.App - WARNING - Rate limited with period='10y' for AAPL
+2025-07-02 08:02:08,481 - StockAlerts.App - INFO - Trying period='max' for AAPL
+2025-07-02 08:02:09,828 - StockAlerts.App - WARNING - Rate limited with period='max' for AAPL
+2025-07-02 08:02:09,828 - StockAlerts.App - WARNING - Rate limited on attempt 1 for AAPL. Waiting 30 seconds...
+2025-07-02 08:02:39,833 - StockAlerts.App - INFO - Fetching Yahoo Finance data for AAPL (attempt 2/3)
+2025-07-02 08:02:39,833 - StockAlerts.App - INFO - Trying period='5y' for AAPL
+2025-07-02 08:02:41,540 - StockAlerts.App - WARNING - Rate limited with period='5y' for AAPL
+2025-07-02 08:02:41,541 - StockAlerts.App - INFO - Trying period='10y' for AAPL
+2025-07-02 08:02:43,043 - StockAlerts.App - WARNING - Rate limited with period='10y' for AAPL
+2025-07-02 08:02:43,044 - StockAlerts.App - INFO - Trying period='max' for AAPL
+2025-07-02 08:02:44,433 - StockAlerts.App - WARNING - Rate limited with period='max' for AAPL
+2025-07-02 08:02:44,433 - StockAlerts.App - WARNING - Rate limited on attempt 2 for AAPL. Waiting 90 seconds...
+2025-07-02 08:04:14,439 - StockAlerts.App - INFO - Fetching Yahoo Finance data for AAPL (attempt 3/3)
+2025-07-02 08:04:14,440 - StockAlerts.App - INFO - Trying period='5y' for AAPL
+2025-07-02 08:04:17,414 - StockAlerts.App - WARNING - Rate limited with period='5y' for AAPL
+2025-07-02 08:04:17,415 - StockAlerts.App - INFO - Trying period='10y' for AAPL
+2025-07-02 08:04:19,118 - StockAlerts.App - WARNING - Rate limited with period='10y' for AAPL
+2025-07-02 08:04:19,118 - StockAlerts.App - INFO - Trying period='max' for AAPL
+2025-07-02 08:04:21,512 - StockAlerts.App - WARNING - Rate limited with period='max' for AAPL
+2025-07-02 08:04:21,513 - StockAlerts.App - WARNING - Rate limited on attempt 3 for AAPL. Waiting 270 seconds...
+2025-07-02 08:04:21,513 - StockAlerts.App - ERROR - Rate limited after 3 attempts for AAPL
+2025-07-02 08:04:21,515 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:04:21] "[31m[1mGET /data/AAPL/1y HTTP/1.1[0m" 429 -
+2025-07-02 08:09:40,100 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 08:09:40,100 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 08:09:40,101 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 08:09:40,101 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 08:09:40,101 - StockAlerts.App - INFO - Flask app initialized with CORS.
+2025-07-02 08:09:40,102 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 08:09:40,107 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 08:09:40,107 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 08:09:43,467 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:09:43] "GET / HTTP/1.1" 200 -
+2025-07-02 08:09:43,508 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:09:43] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-02 08:09:43,508 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:09:43] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-07-02 08:09:44,242 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:09:44] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 08:09:44,521 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:09:44] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 08:09:48,566 - StockAlerts.App - INFO - Request for ticker: AAPL, period: 1y
+2025-07-02 08:09:48,567 - StockAlerts.App - INFO - Processing request for AAPL with period 1y
+2025-07-02 08:09:53,575 - StockAlerts.App - INFO - Fetching Yahoo Finance data for AAPL (attempt 1/3)
+2025-07-02 08:09:53,575 - StockAlerts.App - INFO - Trying period='5y' for AAPL
+2025-07-02 08:09:57,613 - StockAlerts.App - WARNING - Rate limited with period='5y' for AAPL
+2025-07-02 08:09:57,613 - StockAlerts.App - INFO - Trying period='10y' for AAPL
+2025-07-02 08:10:00,169 - StockAlerts.App - WARNING - Rate limited with period='10y' for AAPL
+2025-07-02 08:10:00,170 - StockAlerts.App - INFO - Trying period='max' for AAPL
+2025-07-02 08:10:02,249 - StockAlerts.App - WARNING - Rate limited with period='max' for AAPL
+2025-07-02 08:10:02,250 - StockAlerts.App - WARNING - Rate limited on attempt 1 for AAPL. Waiting 30 seconds...
+2025-07-02 08:10:32,255 - StockAlerts.App - INFO - Fetching Yahoo Finance data for AAPL (attempt 2/3)
+2025-07-02 08:10:32,255 - StockAlerts.App - INFO - Trying period='5y' for AAPL
+2025-07-02 08:10:35,028 - StockAlerts.App - WARNING - Rate limited with period='5y' for AAPL
+2025-07-02 08:10:35,028 - StockAlerts.App - INFO - Trying period='10y' for AAPL
+2025-07-02 08:10:37,342 - StockAlerts.App - WARNING - Rate limited with period='10y' for AAPL
+2025-07-02 08:10:37,342 - StockAlerts.App - INFO - Trying period='max' for AAPL
+2025-07-02 08:10:40,398 - StockAlerts.App - WARNING - Rate limited with period='max' for AAPL
+2025-07-02 08:10:40,398 - StockAlerts.App - WARNING - Rate limited on attempt 2 for AAPL. Waiting 90 seconds...
+2025-07-02 08:12:10,400 - StockAlerts.App - INFO - Fetching Yahoo Finance data for AAPL (attempt 3/3)
+2025-07-02 08:12:10,401 - StockAlerts.App - INFO - Trying period='5y' for AAPL
+2025-07-02 08:12:15,101 - StockAlerts.App - WARNING - Rate limited with period='5y' for AAPL
+2025-07-02 08:12:15,102 - StockAlerts.App - INFO - Trying period='10y' for AAPL
+2025-07-02 08:12:16,487 - StockAlerts.App - WARNING - Rate limited with period='10y' for AAPL
+2025-07-02 08:12:16,487 - StockAlerts.App - INFO - Trying period='max' for AAPL
+2025-07-02 08:12:18,809 - StockAlerts.App - WARNING - Rate limited with period='max' for AAPL
+2025-07-02 08:12:18,810 - StockAlerts.App - WARNING - Rate limited on attempt 3 for AAPL. Waiting 270 seconds...
+2025-07-02 08:12:18,810 - StockAlerts.App - ERROR - Rate limited after 3 attempts for AAPL
+2025-07-02 08:12:18,811 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:12:18] "[31m[1mGET /data/AAPL/1y HTTP/1.1[0m" 429 -
+2025-07-02 08:16:07,877 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 08:16:07,877 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 08:16:07,878 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 08:16:07,878 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 08:16:07,878 - StockAlerts.App - INFO - Flask app initialized with CORS.
+2025-07-02 08:16:07,879 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 08:16:07,884 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 08:16:07,884 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 08:16:08,372 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:16:08] "GET / HTTP/1.1" 200 -
+2025-07-02 08:16:08,414 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:16:08] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-07-02 08:16:08,414 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:16:08] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-02 08:16:09,069 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:16:09] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 08:16:09,466 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:16:09] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 08:16:15,298 - StockAlerts.App - INFO - Request for ticker: AAPL, period: 1y
+2025-07-02 08:16:15,298 - StockAlerts.App - INFO - Processing request for AAPL with period 1y
+2025-07-02 08:16:15,300 - StockAlerts.App - INFO - Fetching Tiingo data for AAPL
+2025-07-02 08:16:15,664 - root - ERROR - b'{"detail":"Not found."}'
+2025-07-02 08:16:15,665 - StockAlerts.App - ERROR - Error fetching data from Tiingo for AAPL: 404 Client Error: Not Found for url: https://api.tiingo.com/tiingo/daily/AAPL/prices?format=pandas&resampleFreq=daily&startDate=1995-07-10&endDate=2025-07-02
+2025-07-02 08:16:15,665 - StockAlerts.App - ERROR - Failed to fetch data from Tiingo for AAPL: 404 Client Error: Not Found for url: https://api.tiingo.com/tiingo/daily/AAPL/prices?format=pandas&resampleFreq=daily&startDate=1995-07-10&endDate=2025-07-02
+2025-07-02 08:16:15,667 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:16:15] "[35m[1mGET /data/AAPL/1y HTTP/1.1[0m" 500 -
+2025-07-02 08:19:55,164 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 08:19:55,164 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 08:19:55,164 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 08:19:55,164 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 08:19:55,165 - StockAlerts.App - INFO - Flask app initialized with CORS.
+2025-07-02 08:19:55,166 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 08:19:55,170 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 08:19:55,170 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 08:19:56,569 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:19:56] "GET / HTTP/1.1" 200 -
+2025-07-02 08:19:56,586 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:19:56] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-02 08:19:56,589 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:19:56] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-07-02 08:19:57,269 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:19:57] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 08:19:57,492 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:19:57] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 08:20:01,422 - StockAlerts.App - INFO - Request for ticker: AAPL, period: 1y
+2025-07-02 08:20:01,422 - StockAlerts.App - INFO - Processing request for AAPL with period 1y
+2025-07-02 08:20:01,427 - StockAlerts.App - INFO - Fetching Tiingo data for AAPL
+2025-07-02 08:20:01,428 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/AAPL/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 08:20:02,233 - StockAlerts.App - INFO - Successfully fetched 7545 data points for AAPL from Tiingo
+2025-07-02 08:20:02,751 - StockAlerts.App - INFO - Successfully processed AAPL with 249 data points
+2025-07-02 08:20:02,753 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:20:02] "GET /data/AAPL/1y HTTP/1.1" 200 -
+2025-07-02 08:20:14,772 - StockAlerts.App - INFO - Request for ticker: AAPL, period: 5y
+2025-07-02 08:20:14,772 - StockAlerts.App - INFO - Processing request for AAPL with period 5y
+2025-07-02 08:20:14,774 - StockAlerts.DB - INFO - Using cached data for AAPL (age: 2025-07-02 15:20:02)
+2025-07-02 08:20:14,775 - StockAlerts.App - INFO - Using cached data for AAPL
+2025-07-02 08:20:14,776 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:20:14] "[35m[1mGET /data/AAPL/5y HTTP/1.1[0m" 202 -
+2025-07-02 08:20:16,273 - StockAlerts.App - INFO - Request for ticker: AAPL, period: 3y
+2025-07-02 08:20:16,274 - StockAlerts.App - INFO - Processing request for AAPL with period 3y
+2025-07-02 08:20:16,278 - StockAlerts.DB - INFO - Using cached data for AAPL (age: 2025-07-02 15:20:02)
+2025-07-02 08:20:16,278 - StockAlerts.App - INFO - Using cached data for AAPL
+2025-07-02 08:20:16,279 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:20:16] "[35m[1mGET /data/AAPL/3y HTTP/1.1[0m" 202 -
+2025-07-02 08:20:17,303 - StockAlerts.App - INFO - Request for ticker: AAPL, period: 1y
+2025-07-02 08:20:17,303 - StockAlerts.App - INFO - Processing request for AAPL with period 1y
+2025-07-02 08:20:17,304 - StockAlerts.DB - INFO - Using cached data for AAPL (age: 2025-07-02 15:20:02)
+2025-07-02 08:20:17,305 - StockAlerts.App - INFO - Using cached data for AAPL
+2025-07-02 08:20:17,305 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:20:17] "[35m[1mGET /data/AAPL/1y HTTP/1.1[0m" 202 -
+2025-07-02 08:20:17,902 - StockAlerts.App - INFO - Request for ticker: AAPL, period: 3y
+2025-07-02 08:20:17,902 - StockAlerts.App - INFO - Processing request for AAPL with period 3y
+2025-07-02 08:20:17,904 - StockAlerts.DB - INFO - Using cached data for AAPL (age: 2025-07-02 15:20:02)
+2025-07-02 08:20:17,904 - StockAlerts.App - INFO - Using cached data for AAPL
+2025-07-02 08:20:17,905 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:20:17] "[35m[1mGET /data/AAPL/3y HTTP/1.1[0m" 202 -
+2025-07-02 08:20:18,327 - StockAlerts.App - INFO - Request for ticker: AAPL, period: 5y
+2025-07-02 08:20:18,327 - StockAlerts.App - INFO - Processing request for AAPL with period 5y
+2025-07-02 08:20:18,328 - StockAlerts.DB - INFO - Using cached data for AAPL (age: 2025-07-02 15:20:02)
+2025-07-02 08:20:18,329 - StockAlerts.App - INFO - Using cached data for AAPL
+2025-07-02 08:20:18,329 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:20:18] "[35m[1mGET /data/AAPL/5y HTTP/1.1[0m" 202 -
+2025-07-02 08:20:18,739 - StockAlerts.App - INFO - Request for ticker: AAPL, period: max
+2025-07-02 08:20:18,740 - StockAlerts.App - INFO - Processing request for AAPL with period max
+2025-07-02 08:20:18,743 - StockAlerts.DB - INFO - Using cached data for AAPL (age: 2025-07-02 15:20:02)
+2025-07-02 08:20:18,744 - StockAlerts.App - INFO - Using cached data for AAPL
+2025-07-02 08:20:18,744 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:20:18] "[35m[1mGET /data/AAPL/max HTTP/1.1[0m" 202 -
+2025-07-02 08:20:41,056 - StockAlerts.App - INFO - Request for ticker: AAPL, period: 3y
+2025-07-02 08:20:41,056 - StockAlerts.App - INFO - Processing request for AAPL with period 3y
+2025-07-02 08:20:41,058 - StockAlerts.DB - INFO - Using cached data for AAPL (age: 2025-07-02 15:20:02)
+2025-07-02 08:20:41,058 - StockAlerts.App - INFO - Using cached data for AAPL
+2025-07-02 08:20:41,059 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:20:41] "[35m[1mGET /data/AAPL/3y HTTP/1.1[0m" 202 -
+2025-07-02 08:21:40,145 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:21:40] "GET / HTTP/1.1" 200 -
+2025-07-02 08:21:40,162 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:21:40] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-02 08:21:40,162 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:21:40] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-07-02 08:21:40,886 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:21:40] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 08:21:41,400 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:21:41] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 08:21:44,089 - StockAlerts.App - INFO - Request for ticker: ZM, period: 5y
+2025-07-02 08:21:44,089 - StockAlerts.App - INFO - Processing request for ZM with period 5y
+2025-07-02 08:21:44,090 - StockAlerts.App - INFO - Fetching Tiingo data for ZM
+2025-07-02 08:21:44,090 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/ZM/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 08:21:44,656 - StockAlerts.App - INFO - Successfully fetched 1559 data points for ZM from Tiingo
+2025-07-02 08:21:45,172 - StockAlerts.App - INFO - Successfully processed ZM with 1254 data points
+2025-07-02 08:21:45,176 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:21:45] "GET /data/ZM/5y HTTP/1.1" 200 -
+2025-07-02 08:21:47,072 - StockAlerts.App - INFO - Request for ticker: ZM, period: 3y
+2025-07-02 08:21:47,073 - StockAlerts.App - INFO - Processing request for ZM with period 3y
+2025-07-02 08:21:47,074 - StockAlerts.DB - INFO - Using cached data for ZM (age: 2025-07-02 15:21:44)
+2025-07-02 08:21:47,074 - StockAlerts.App - INFO - Using cached data for ZM
+2025-07-02 08:21:47,075 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:21:47] "[35m[1mGET /data/ZM/3y HTTP/1.1[0m" 202 -
+2025-07-02 08:21:48,120 - StockAlerts.App - INFO - Request for ticker: ZM, period: max
+2025-07-02 08:21:48,123 - StockAlerts.App - INFO - Processing request for ZM with period max
+2025-07-02 08:21:48,124 - StockAlerts.DB - INFO - Using cached data for ZM (age: 2025-07-02 15:21:44)
+2025-07-02 08:21:48,124 - StockAlerts.App - INFO - Using cached data for ZM
+2025-07-02 08:21:48,125 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:21:48] "[35m[1mGET /data/ZM/max HTTP/1.1[0m" 202 -
+2025-07-02 08:21:48,951 - StockAlerts.App - INFO - Request for ticker: ZM, period: 1y
+2025-07-02 08:21:48,951 - StockAlerts.App - INFO - Processing request for ZM with period 1y
+2025-07-02 08:21:48,953 - StockAlerts.DB - INFO - Using cached data for ZM (age: 2025-07-02 15:21:44)
+2025-07-02 08:21:48,953 - StockAlerts.App - INFO - Using cached data for ZM
+2025-07-02 08:21:48,954 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:21:48] "[35m[1mGET /data/ZM/1y HTTP/1.1[0m" 202 -
+2025-07-02 08:21:49,642 - StockAlerts.App - INFO - Request for ticker: ZM, period: 3y
+2025-07-02 08:21:49,642 - StockAlerts.App - INFO - Processing request for ZM with period 3y
+2025-07-02 08:21:49,643 - StockAlerts.DB - INFO - Using cached data for ZM (age: 2025-07-02 15:21:44)
+2025-07-02 08:21:49,644 - StockAlerts.App - INFO - Using cached data for ZM
+2025-07-02 08:21:49,645 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:21:49] "[35m[1mGET /data/ZM/3y HTTP/1.1[0m" 202 -
+2025-07-02 08:21:50,491 - StockAlerts.App - INFO - Request for ticker: ZM, period: 5y
+2025-07-02 08:21:50,491 - StockAlerts.App - INFO - Processing request for ZM with period 5y
+2025-07-02 08:21:50,493 - StockAlerts.DB - INFO - Using cached data for ZM (age: 2025-07-02 15:21:44)
+2025-07-02 08:21:50,493 - StockAlerts.App - INFO - Using cached data for ZM
+2025-07-02 08:21:50,494 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:21:50] "[35m[1mGET /data/ZM/5y HTTP/1.1[0m" 202 -
+2025-07-02 08:21:51,281 - StockAlerts.App - INFO - Request for ticker: ZM, period: 1y
+2025-07-02 08:21:51,281 - StockAlerts.App - INFO - Processing request for ZM with period 1y
+2025-07-02 08:21:51,282 - StockAlerts.DB - INFO - Using cached data for ZM (age: 2025-07-02 15:21:44)
+2025-07-02 08:21:51,282 - StockAlerts.App - INFO - Using cached data for ZM
+2025-07-02 08:21:51,282 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:21:51] "[35m[1mGET /data/ZM/1y HTTP/1.1[0m" 202 -
+2025-07-02 08:22:26,341 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 08:22:26,342 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 08:22:26,342 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 08:22:26,342 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 08:22:26,342 - StockAlerts.App - INFO - Flask app initialized with CORS.
+2025-07-02 08:22:26,343 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 08:22:26,349 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 08:22:26,349 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 08:22:26,990 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:22:26] "GET / HTTP/1.1" 200 -
+2025-07-02 08:22:27,032 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:22:27] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-07-02 08:22:27,034 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:22:27] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-02 08:22:27,329 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:22:27] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 08:22:27,647 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:22:27] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 08:22:34,093 - StockAlerts.App - INFO - Request for ticker: MSFT, period: 5y
+2025-07-02 08:22:34,093 - StockAlerts.App - INFO - Processing request for MSFT with period 5y
+2025-07-02 08:22:34,094 - StockAlerts.App - INFO - Fetching Tiingo data for MSFT
+2025-07-02 08:22:34,095 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/MSFT/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 08:22:34,914 - StockAlerts.App - INFO - Successfully fetched 7545 data points for MSFT from Tiingo
+2025-07-02 08:22:35,427 - StockAlerts.App - INFO - Successfully processed MSFT with 1254 data points
+2025-07-02 08:22:35,432 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:22:35] "GET /data/MSFT/5y HTTP/1.1" 200 -
+2025-07-02 08:22:37,155 - StockAlerts.App - INFO - Request for ticker: MSFT, period: max
+2025-07-02 08:22:37,156 - StockAlerts.App - INFO - Processing request for MSFT with period max
+2025-07-02 08:22:37,158 - StockAlerts.DB - INFO - Using cached data for MSFT (age: 2025-07-02 15:22:34)
+2025-07-02 08:22:37,158 - StockAlerts.App - INFO - Using cached data for MSFT
+2025-07-02 08:22:37,158 - StockAlerts.App - INFO - Cache hit for MSFT, but fetching fresh data for complete time series
+2025-07-02 08:22:37,158 - StockAlerts.App - INFO - Fetching Tiingo data for MSFT
+2025-07-02 08:22:37,159 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/MSFT/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 08:22:38,039 - StockAlerts.App - INFO - Successfully fetched 7545 data points for MSFT from Tiingo
+2025-07-02 08:22:38,567 - StockAlerts.App - INFO - Successfully processed MSFT with 7545 data points
+2025-07-02 08:22:38,583 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:22:38] "GET /data/MSFT/max HTTP/1.1" 200 -
+2025-07-02 08:22:39,955 - StockAlerts.App - INFO - Request for ticker: MSFT, period: 3y
+2025-07-02 08:22:39,955 - StockAlerts.App - INFO - Processing request for MSFT with period 3y
+2025-07-02 08:22:39,957 - StockAlerts.DB - INFO - Using cached data for MSFT (age: 2025-07-02 15:22:38)
+2025-07-02 08:22:39,957 - StockAlerts.App - INFO - Using cached data for MSFT
+2025-07-02 08:22:39,957 - StockAlerts.App - INFO - Cache hit for MSFT, but fetching fresh data for complete time series
+2025-07-02 08:22:39,958 - StockAlerts.App - INFO - Fetching Tiingo data for MSFT
+2025-07-02 08:22:39,958 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/MSFT/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 08:22:40,770 - StockAlerts.App - INFO - Successfully fetched 7545 data points for MSFT from Tiingo
+2025-07-02 08:22:41,281 - StockAlerts.App - INFO - Successfully processed MSFT with 751 data points
+2025-07-02 08:22:41,285 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:22:41] "GET /data/MSFT/3y HTTP/1.1" 200 -
+2025-07-02 08:22:41,938 - StockAlerts.App - INFO - Request for ticker: MSFT, period: 1y
+2025-07-02 08:22:41,938 - StockAlerts.App - INFO - Processing request for MSFT with period 1y
+2025-07-02 08:22:41,940 - StockAlerts.DB - INFO - Using cached data for MSFT (age: 2025-07-02 15:22:40)
+2025-07-02 08:22:41,940 - StockAlerts.App - INFO - Using cached data for MSFT
+2025-07-02 08:22:41,940 - StockAlerts.App - INFO - Cache hit for MSFT, but fetching fresh data for complete time series
+2025-07-02 08:22:41,941 - StockAlerts.App - INFO - Fetching Tiingo data for MSFT
+2025-07-02 08:22:41,941 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/MSFT/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 08:22:42,716 - StockAlerts.App - INFO - Successfully fetched 7545 data points for MSFT from Tiingo
+2025-07-02 08:22:43,226 - StockAlerts.App - INFO - Successfully processed MSFT with 249 data points
+2025-07-02 08:22:43,228 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:22:43] "GET /data/MSFT/1y HTTP/1.1" 200 -
+2025-07-02 08:22:43,520 - StockAlerts.App - INFO - Request for ticker: MSFT, period: 3y
+2025-07-02 08:22:43,520 - StockAlerts.App - INFO - Processing request for MSFT with period 3y
+2025-07-02 08:22:43,523 - StockAlerts.DB - INFO - Using cached data for MSFT (age: 2025-07-02 15:22:42)
+2025-07-02 08:22:43,523 - StockAlerts.App - INFO - Using cached data for MSFT
+2025-07-02 08:22:43,524 - StockAlerts.App - INFO - Cache hit for MSFT, but fetching fresh data for complete time series
+2025-07-02 08:22:43,524 - StockAlerts.App - INFO - Fetching Tiingo data for MSFT
+2025-07-02 08:22:43,524 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/MSFT/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 08:22:44,321 - StockAlerts.App - INFO - Successfully fetched 7545 data points for MSFT from Tiingo
+2025-07-02 08:22:44,832 - StockAlerts.App - INFO - Successfully processed MSFT with 751 data points
+2025-07-02 08:22:44,835 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:22:44] "GET /data/MSFT/3y HTTP/1.1" 200 -
+2025-07-02 08:22:45,254 - StockAlerts.App - INFO - Request for ticker: MSFT, period: 5y
+2025-07-02 08:22:45,254 - StockAlerts.App - INFO - Processing request for MSFT with period 5y
+2025-07-02 08:22:45,255 - StockAlerts.DB - INFO - Using cached data for MSFT (age: 2025-07-02 15:22:44)
+2025-07-02 08:22:45,255 - StockAlerts.App - INFO - Using cached data for MSFT
+2025-07-02 08:22:45,255 - StockAlerts.App - INFO - Cache hit for MSFT, but fetching fresh data for complete time series
+2025-07-02 08:22:45,255 - StockAlerts.App - INFO - Fetching Tiingo data for MSFT
+2025-07-02 08:22:45,255 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/MSFT/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 08:22:46,022 - StockAlerts.App - INFO - Successfully fetched 7545 data points for MSFT from Tiingo
+2025-07-02 08:22:46,531 - StockAlerts.App - INFO - Successfully processed MSFT with 1254 data points
+2025-07-02 08:22:46,535 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:22:46] "GET /data/MSFT/5y HTTP/1.1" 200 -
+2025-07-02 08:22:46,665 - StockAlerts.App - INFO - Request for ticker: MSFT, period: max
+2025-07-02 08:22:46,665 - StockAlerts.App - INFO - Processing request for MSFT with period max
+2025-07-02 08:22:46,666 - StockAlerts.DB - INFO - Using cached data for MSFT (age: 2025-07-02 15:22:46)
+2025-07-02 08:22:46,666 - StockAlerts.App - INFO - Using cached data for MSFT
+2025-07-02 08:22:46,666 - StockAlerts.App - INFO - Cache hit for MSFT, but fetching fresh data for complete time series
+2025-07-02 08:22:46,666 - StockAlerts.App - INFO - Fetching Tiingo data for MSFT
+2025-07-02 08:22:46,667 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/MSFT/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 08:22:47,461 - StockAlerts.App - INFO - Successfully fetched 7545 data points for MSFT from Tiingo
+2025-07-02 08:22:47,989 - StockAlerts.App - INFO - Successfully processed MSFT with 7545 data points
+2025-07-02 08:22:48,005 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:22:48] "GET /data/MSFT/max HTTP/1.1" 200 -
+2025-07-02 08:22:50,037 - StockAlerts.App - INFO - Request for ticker: MSFT, period: 5y
+2025-07-02 08:22:50,037 - StockAlerts.App - INFO - Processing request for MSFT with period 5y
+2025-07-02 08:22:50,038 - StockAlerts.DB - INFO - Using cached data for MSFT (age: 2025-07-02 15:22:47)
+2025-07-02 08:22:50,039 - StockAlerts.App - INFO - Using cached data for MSFT
+2025-07-02 08:22:50,039 - StockAlerts.App - INFO - Cache hit for MSFT, but fetching fresh data for complete time series
+2025-07-02 08:22:50,039 - StockAlerts.App - INFO - Fetching Tiingo data for MSFT
+2025-07-02 08:22:50,039 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/MSFT/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 08:22:50,869 - StockAlerts.App - INFO - Successfully fetched 7545 data points for MSFT from Tiingo
+2025-07-02 08:22:51,381 - StockAlerts.App - INFO - Successfully processed MSFT with 1254 data points
+2025-07-02 08:22:51,384 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:22:51] "GET /data/MSFT/5y HTTP/1.1" 200 -
+2025-07-02 08:22:52,637 - StockAlerts.App - INFO - Request for ticker: MSFT, period: 3y
+2025-07-02 08:22:52,638 - StockAlerts.App - INFO - Processing request for MSFT with period 3y
+2025-07-02 08:22:52,639 - StockAlerts.DB - INFO - Using cached data for MSFT (age: 2025-07-02 15:22:50)
+2025-07-02 08:22:52,639 - StockAlerts.App - INFO - Using cached data for MSFT
+2025-07-02 08:22:52,640 - StockAlerts.App - INFO - Cache hit for MSFT, but fetching fresh data for complete time series
+2025-07-02 08:22:52,640 - StockAlerts.App - INFO - Fetching Tiingo data for MSFT
+2025-07-02 08:22:52,640 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/MSFT/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 08:22:53,427 - StockAlerts.App - INFO - Successfully fetched 7545 data points for MSFT from Tiingo
+2025-07-02 08:22:53,937 - StockAlerts.App - INFO - Successfully processed MSFT with 751 data points
+2025-07-02 08:22:53,941 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:22:53] "GET /data/MSFT/3y HTTP/1.1" 200 -
+2025-07-02 08:22:55,198 - StockAlerts.App - INFO - Request for ticker: MSFT, period: 1y
+2025-07-02 08:22:55,199 - StockAlerts.App - INFO - Processing request for MSFT with period 1y
+2025-07-02 08:22:55,199 - StockAlerts.DB - INFO - Using cached data for MSFT (age: 2025-07-02 15:22:53)
+2025-07-02 08:22:55,199 - StockAlerts.App - INFO - Using cached data for MSFT
+2025-07-02 08:22:55,199 - StockAlerts.App - INFO - Cache hit for MSFT, but fetching fresh data for complete time series
+2025-07-02 08:22:55,199 - StockAlerts.App - INFO - Fetching Tiingo data for MSFT
+2025-07-02 08:22:55,199 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/MSFT/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 08:22:55,976 - StockAlerts.App - INFO - Successfully fetched 7545 data points for MSFT from Tiingo
+2025-07-02 08:22:56,486 - StockAlerts.App - INFO - Successfully processed MSFT with 249 data points
+2025-07-02 08:22:56,489 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:22:56] "GET /data/MSFT/1y HTTP/1.1" 200 -
+2025-07-02 08:22:59,219 - StockAlerts.App - INFO - Request for ticker: MSFT, period: max
+2025-07-02 08:22:59,219 - StockAlerts.App - INFO - Processing request for MSFT with period max
+2025-07-02 08:22:59,221 - StockAlerts.DB - INFO - Using cached data for MSFT (age: 2025-07-02 15:22:55)
+2025-07-02 08:22:59,221 - StockAlerts.App - INFO - Using cached data for MSFT
+2025-07-02 08:22:59,221 - StockAlerts.App - INFO - Cache hit for MSFT, but fetching fresh data for complete time series
+2025-07-02 08:22:59,221 - StockAlerts.App - INFO - Fetching Tiingo data for MSFT
+2025-07-02 08:22:59,221 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/MSFT/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 08:22:59,976 - StockAlerts.App - INFO - Successfully fetched 7545 data points for MSFT from Tiingo
+2025-07-02 08:23:00,504 - StockAlerts.App - INFO - Successfully processed MSFT with 7545 data points
+2025-07-02 08:23:00,520 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:23:00] "GET /data/MSFT/max HTTP/1.1" 200 -
+2025-07-02 08:47:54,943 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 08:47:54,944 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 08:47:54,946 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 08:47:54,946 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 08:47:54,948 - StockAlerts.App - INFO - Flask app initialized with CORS.
+2025-07-02 08:47:54,950 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 08:47:54,962 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 08:47:54,963 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 08:47:57,096 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:47:57] "GET / HTTP/1.1" 200 -
+2025-07-02 08:47:57,111 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:47:57] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-02 08:47:57,111 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:47:57] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-07-02 08:47:57,890 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:47:57] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 08:47:58,171 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:47:58] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 08:48:31,679 - StockAlerts.App - INFO - Request for ticker: ROKU, period: 5y
+2025-07-02 08:48:31,679 - StockAlerts.App - INFO - Processing request for ROKU with period 5y
+2025-07-02 08:48:31,682 - StockAlerts.App - INFO - Fetching Tiingo data for ROKU
+2025-07-02 08:48:31,682 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/ROKU/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 08:48:32,378 - StockAlerts.App - INFO - Successfully fetched 1949 data points for ROKU from Tiingo
+2025-07-02 08:48:32,386 - StockAlerts.App - ERROR - Unexpected error processing ROKU: Must specify a fill 'value' or 'method'.
+Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 227, in calculate_metrics
+    "prices": clean_for_json(data['Close']),
+              ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 223, in clean_for_json
+    return series.replace([np.inf, -np.inf], np.nan).fillna(value=None).tolist()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/pandas/core/generic.py", line 7293, in fillna
+    value, method = validate_fillna_kwargs(value, method)
+                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/pandas/util/_validators.py", line 293, in validate_fillna_kwargs
+    raise ValueError("Must specify a fill 'value' or 'method'.")
+ValueError: Must specify a fill 'value' or 'method'.
+2025-07-02 08:48:32,390 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:48:32] "[35m[1mGET /data/ROKU/5y HTTP/1.1[0m" 500 -
+2025-07-02 08:49:28,300 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 08:49:28,300 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 08:49:28,300 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 08:49:28,300 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 08:49:28,301 - StockAlerts.App - INFO - Flask app initialized with CORS.
+2025-07-02 08:49:28,302 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 08:49:28,308 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 08:49:28,308 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 08:49:53,288 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:49:53] "GET / HTTP/1.1" 200 -
+2025-07-02 08:49:53,351 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:49:53] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-02 08:49:53,353 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:49:53] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-07-02 08:49:54,075 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:49:54] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 08:49:54,475 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:49:54] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 08:49:56,198 - StockAlerts.App - INFO - Request for ticker: ROKU, period: 5y
+2025-07-02 08:49:56,198 - StockAlerts.App - INFO - Processing request for ROKU with period 5y
+2025-07-02 08:49:56,199 - StockAlerts.App - INFO - Fetching Tiingo data for ROKU
+2025-07-02 08:49:56,199 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/ROKU/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 08:49:56,877 - StockAlerts.App - INFO - Successfully fetched 1949 data points for ROKU from Tiingo
+2025-07-02 08:49:56,888 - StockAlerts.App - ERROR - Unexpected error processing ROKU: Must specify a fill 'value' or 'method'.
+Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 227, in calculate_metrics
+    "prices": clean_for_json(data['Close']),
+              ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/app.py", line 223, in clean_for_json
+    return series.replace([np.inf, -np.inf], np.nan).fillna(None).tolist()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/pandas/core/generic.py", line 7293, in fillna
+    value, method = validate_fillna_kwargs(value, method)
+                    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/naman/Desktop/projects/stock-alerts/venv/lib/python3.13/site-packages/pandas/util/_validators.py", line 293, in validate_fillna_kwargs
+    raise ValueError("Must specify a fill 'value' or 'method'.")
+ValueError: Must specify a fill 'value' or 'method'.
+2025-07-02 08:49:56,907 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 08:49:56] "[35m[1mGET /data/ROKU/5y HTTP/1.1[0m" 500 -
+2025-07-02 18:46:19,679 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 18:46:19,679 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 18:46:19,682 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 18:46:19,682 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 18:46:19,683 - StockAlerts.App - INFO - Flask app initialized with CORS.
+2025-07-02 18:46:19,684 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 18:46:19,695 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 18:46:19,695 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 18:46:19,813 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 18:46:19] "GET / HTTP/1.1" 200 -
+2025-07-02 18:46:19,872 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 18:46:19] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-02 18:46:19,872 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 18:46:19] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-07-02 18:46:20,860 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 18:46:20] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 18:46:21,070 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 18:46:21] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 18:46:45,284 - StockAlerts.App - INFO - Request for ticker: RIVN, period: 5y
+2025-07-02 18:46:45,285 - StockAlerts.App - INFO - Processing request for RIVN with period 5y
+2025-07-02 18:46:45,286 - StockAlerts.App - INFO - Fetching Tiingo data for RIVN
+2025-07-02 18:46:45,287 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/RIVN/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 18:46:45,914 - StockAlerts.App - INFO - Successfully fetched 913 data points for RIVN from Tiingo
+2025-07-02 18:46:46,431 - StockAlerts.App - INFO - Successfully processed RIVN with 913 data points
+2025-07-02 18:46:46,433 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 18:46:46] "GET /data/RIVN/5y HTTP/1.1" 200 -
+2025-07-02 18:46:50,632 - StockAlerts.App - INFO - Request for ticker: RIVN, period: 3y
+2025-07-02 18:46:50,632 - StockAlerts.App - INFO - Processing request for RIVN with period 3y
+2025-07-02 18:46:50,634 - StockAlerts.DB - INFO - Using cached data for RIVN (age: 2025-07-03 01:46:45)
+2025-07-02 18:46:50,635 - StockAlerts.App - INFO - Using cached data for RIVN
+2025-07-02 18:46:50,635 - StockAlerts.App - INFO - Cache hit for RIVN, but fetching fresh data for complete time series
+2025-07-02 18:46:50,635 - StockAlerts.App - INFO - Fetching Tiingo data for RIVN
+2025-07-02 18:46:50,635 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/RIVN/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 18:46:51,197 - StockAlerts.App - INFO - Successfully fetched 913 data points for RIVN from Tiingo
+2025-07-02 18:46:51,707 - StockAlerts.App - INFO - Successfully processed RIVN with 752 data points
+2025-07-02 18:46:51,711 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 18:46:51] "GET /data/RIVN/3y HTTP/1.1" 200 -
+2025-07-02 18:46:53,013 - StockAlerts.App - INFO - Request for ticker: RIVN, period: 1y
+2025-07-02 18:46:53,014 - StockAlerts.App - INFO - Processing request for RIVN with period 1y
+2025-07-02 18:46:53,015 - StockAlerts.DB - INFO - Using cached data for RIVN (age: 2025-07-03 01:46:51)
+2025-07-02 18:46:53,015 - StockAlerts.App - INFO - Using cached data for RIVN
+2025-07-02 18:46:53,016 - StockAlerts.App - INFO - Cache hit for RIVN, but fetching fresh data for complete time series
+2025-07-02 18:46:53,016 - StockAlerts.App - INFO - Fetching Tiingo data for RIVN
+2025-07-02 18:46:53,016 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/RIVN/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 18:46:53,553 - StockAlerts.App - INFO - Successfully fetched 913 data points for RIVN from Tiingo
+2025-07-02 18:46:54,066 - StockAlerts.App - INFO - Successfully processed RIVN with 249 data points
+2025-07-02 18:46:54,067 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 18:46:54] "GET /data/RIVN/1y HTTP/1.1" 200 -
+2025-07-02 18:47:00,399 - StockAlerts.App - INFO - Request for ticker: RIVN, period: 5y
+2025-07-02 18:47:00,401 - StockAlerts.App - INFO - Processing request for RIVN with period 5y
+2025-07-02 18:47:00,402 - StockAlerts.DB - INFO - Using cached data for RIVN (age: 2025-07-03 01:46:53)
+2025-07-02 18:47:00,402 - StockAlerts.App - INFO - Using cached data for RIVN
+2025-07-02 18:47:00,402 - StockAlerts.App - INFO - Cache hit for RIVN, but fetching fresh data for complete time series
+2025-07-02 18:47:00,402 - StockAlerts.App - INFO - Fetching Tiingo data for RIVN
+2025-07-02 18:47:00,402 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/RIVN/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 18:47:01,403 - StockAlerts.App - INFO - Successfully fetched 913 data points for RIVN from Tiingo
+2025-07-02 18:47:01,918 - StockAlerts.App - INFO - Successfully processed RIVN with 913 data points
+2025-07-02 18:47:01,922 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 18:47:01] "GET /data/RIVN/5y HTTP/1.1" 200 -
+2025-07-02 18:47:08,358 - StockAlerts.App - INFO - Request for ticker: RIVN, period: 3y
+2025-07-02 18:47:08,358 - StockAlerts.App - INFO - Processing request for RIVN with period 3y
+2025-07-02 18:47:08,359 - StockAlerts.DB - INFO - Using cached data for RIVN (age: 2025-07-03 01:47:01)
+2025-07-02 18:47:08,359 - StockAlerts.App - INFO - Using cached data for RIVN
+2025-07-02 18:47:08,360 - StockAlerts.App - INFO - Cache hit for RIVN, but fetching fresh data for complete time series
+2025-07-02 18:47:08,360 - StockAlerts.App - INFO - Fetching Tiingo data for RIVN
+2025-07-02 18:47:08,360 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/RIVN/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 18:47:08,905 - StockAlerts.App - INFO - Successfully fetched 913 data points for RIVN from Tiingo
+2025-07-02 18:47:09,420 - StockAlerts.App - INFO - Successfully processed RIVN with 752 data points
+2025-07-02 18:47:09,423 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 18:47:09] "GET /data/RIVN/3y HTTP/1.1" 200 -
+2025-07-02 18:47:55,131 - StockAlerts.App - INFO - Request for ticker: RIVN, period: max
+2025-07-02 18:47:55,131 - StockAlerts.App - INFO - Processing request for RIVN with period max
+2025-07-02 18:47:55,133 - StockAlerts.DB - INFO - Using cached data for RIVN (age: 2025-07-03 01:47:08)
+2025-07-02 18:47:55,133 - StockAlerts.App - INFO - Using cached data for RIVN
+2025-07-02 18:47:55,134 - StockAlerts.App - INFO - Cache hit for RIVN, but fetching fresh data for complete time series
+2025-07-02 18:47:55,134 - StockAlerts.App - INFO - Fetching Tiingo data for RIVN
+2025-07-02 18:47:55,134 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/RIVN/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 18:47:55,642 - StockAlerts.App - INFO - Successfully fetched 913 data points for RIVN from Tiingo
+2025-07-02 18:47:56,156 - StockAlerts.App - INFO - Successfully processed RIVN with 913 data points
+2025-07-02 18:47:56,157 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 18:47:56] "GET /data/RIVN/max HTTP/1.1" 200 -
+2025-07-02 18:48:03,587 - StockAlerts.App - INFO - Request for ticker: ROKU, period: max
+2025-07-02 18:48:03,588 - StockAlerts.App - INFO - Processing request for ROKU with period max
+2025-07-02 18:48:03,589 - StockAlerts.App - INFO - Fetching Tiingo data for ROKU
+2025-07-02 18:48:03,589 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/ROKU/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 18:48:04,164 - StockAlerts.App - INFO - Successfully fetched 1950 data points for ROKU from Tiingo
+2025-07-02 18:48:04,681 - StockAlerts.App - INFO - Successfully processed ROKU with 1950 data points
+2025-07-02 18:48:04,686 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 18:48:04] "GET /data/ROKU/max HTTP/1.1" 200 -
+2025-07-02 18:48:12,530 - StockAlerts.App - INFO - Request for ticker: ROKU, period: 5y
+2025-07-02 18:48:12,530 - StockAlerts.App - INFO - Processing request for ROKU with period 5y
+2025-07-02 18:48:12,531 - StockAlerts.DB - INFO - Using cached data for ROKU (age: 2025-07-03 01:48:04)
+2025-07-02 18:48:12,531 - StockAlerts.App - INFO - Using cached data for ROKU
+2025-07-02 18:48:12,531 - StockAlerts.App - INFO - Cache hit for ROKU, but fetching fresh data for complete time series
+2025-07-02 18:48:12,531 - StockAlerts.App - INFO - Fetching Tiingo data for ROKU
+2025-07-02 18:48:12,531 - StockAlerts.App - INFO - Making request to: https://api.tiingo.com/tiingo/daily/ROKU/prices with dates 1995-07-10 to 2025-07-02
+2025-07-02 18:48:14,522 - StockAlerts.App - INFO - Successfully fetched 1950 data points for ROKU from Tiingo
+2025-07-02 18:48:15,034 - StockAlerts.App - INFO - Successfully processed ROKU with 1255 data points
+2025-07-02 18:48:15,039 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 18:48:15] "GET /data/ROKU/5y HTTP/1.1" 200 -
