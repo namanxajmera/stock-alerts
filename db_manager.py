@@ -13,10 +13,15 @@ logger = logging.getLogger("StockAlerts.DB")
 class DatabaseManager:
     def __init__(self, db_url=None):
         """Initialize the database manager."""
+        logger.info("DatabaseManager __init__ starting...")
         self.db_url = db_url or os.getenv("DATABASE_URL")
         if not self.db_url:
+            logger.error("DATABASE_URL environment variable is missing")
             raise ValueError("DATABASE_URL environment variable is required")
+        logger.info(f"DATABASE_URL configured: {self.db_url[:50]}...")
+        logger.info("Starting database initialization...")
         self.initialize_database()
+        logger.info("DatabaseManager __init__ completed successfully")
 
     def _get_connection(self):
         """Get a database connection with proper configuration."""
@@ -43,7 +48,9 @@ class DatabaseManager:
         """Initialize the database schema if it doesn't exist."""
         try:
             logger.info("Initializing database...")
+            logger.info("Attempting database connection...")
             with self._get_connection() as conn:
+                logger.info("Database connection successful")
                 cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
                 # Check if database needs migration by looking for users table

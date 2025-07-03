@@ -70,23 +70,43 @@ class CustomJSONEncoder(json.JSONEncoder):
 
 
 try:
-    logger.info("Initializing database manager and webhook handler...")
+    logger.info("Starting application initialization...")
+    
+    # Check environment variables
+    db_url = os.getenv("DATABASE_URL")
+    bot_token = os.getenv("TELEGRAM_BOT_TOKEN") 
+    webhook_secret = os.getenv("TELEGRAM_WEBHOOK_SECRET")
+    tiingo_token = os.getenv("TIINGO_API_TOKEN")
+    
+    logger.info(f"Environment check - DATABASE_URL: {bool(db_url)}")
+    logger.info(f"Environment check - TELEGRAM_BOT_TOKEN: {bool(bot_token)}")
+    logger.info(f"Environment check - TELEGRAM_WEBHOOK_SECRET: {bool(webhook_secret)}")
+    logger.info(f"Environment check - TIINGO_API_TOKEN: {bool(tiingo_token)}")
+    
+    logger.info("Initializing database manager...")
     db_manager = DatabaseManager()
+    logger.info("Database manager initialized successfully")
+    
+    logger.info("Initializing webhook handler...")
     webhook_handler = WebhookHandler(
         db_manager,
-        os.getenv("TELEGRAM_BOT_TOKEN"),
-        os.getenv("TELEGRAM_WEBHOOK_SECRET"),
+        bot_token,
+        webhook_secret,
     )
+    logger.info("Webhook handler initialized successfully")
 
+    logger.info("Creating Flask app...")
     app = Flask(__name__)
     app.json_encoder = CustomJSONEncoder
-    CORS(app)  # Enable CORS for all routes by default for simplicity
-    logger.info(
-        "Flask app initialized with CORS and ready for Railway deployment. Environment variables fixed."
-    )
+    CORS(app)
+    logger.info("Flask app created with CORS enabled")
+    
+    logger.info("Application initialization completed successfully")
 
 except Exception as e:
     logger.critical(f"FATAL: Error during initialization: {e}", exc_info=True)
+    import traceback
+    traceback.print_exc()
     raise
 
 
@@ -494,6 +514,10 @@ if __name__ == "__main__":
     try:
         port = int(os.environ.get("PORT", 5001))
         logger.info(f"Starting Stock Analytics Dashboard server on port {port}...")
+        logger.info("Flask app routes registered successfully")
         app.run(debug=False, host="0.0.0.0", port=port)
     except Exception as e:
         logger.critical(f"Failed to start server: {e}", exc_info=True)
+        import traceback
+        traceback.print_exc()
+        raise

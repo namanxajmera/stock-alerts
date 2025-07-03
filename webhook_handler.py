@@ -12,14 +12,17 @@ logger = logging.getLogger('StockAlerts.WebhookHandler')
 
 class WebhookHandler:
     def __init__(self, db_manager, bot_token, secret_token=None):
+        logger.info("WebhookHandler __init__ starting...")
         self.db = db_manager
         self.token = bot_token
         self.secret_token = secret_token
+        logger.info(f"Bot token present: {bool(bot_token)}")
+        logger.info(f"Secret token present: {bool(secret_token)}")
         if not self.token:
             logger.error("TELEGRAM_BOT_TOKEN is not configured")
             raise ValueError("TELEGRAM_BOT_TOKEN is not configured")
         self.api_url = f"https://api.telegram.org/bot{self.token}"
-        logger.info("Webhook handler initialized")
+        logger.info("WebhookHandler initialized successfully")
 
     def validate_webhook(self, request_data, secret_token_header):
         """Validate that the webhook request is from Telegram."""
