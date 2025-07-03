@@ -65,7 +65,7 @@ try:
     app = Flask(__name__)
     app.json_encoder = CustomJSONEncoder
     CORS(app) # Enable CORS for all routes by default for simplicity
-    logger.info("Flask app initialized with CORS and ready for Railway deployment.")
+    logger.info("Flask app initialized with CORS and ready for Railway deployment. Environment variables fixed.")
     
 except Exception as e:
     logger.critical(f"FATAL: Error during initialization: {e}", exc_info=True)
