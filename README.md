@@ -245,13 +245,52 @@ stock-alerts/
 5. Push to branch (`git push origin feature/amazing-feature`)
 6. Open Pull Request
 
+## 🧪 Testing & Development
+
+### Automated Testing (Pre-Commit Hooks)
+
+The project includes comprehensive automated testing that runs before every commit:
+
+```bash
+# Setup once
+pip install -r requirements.txt
+pre-commit install
+
+# Now every commit automatically runs:
+git commit -m "your changes"
+# ✅ Database Tests.............................Passed
+# ✅ Type Check (MyPy).........................Passed
+# ✅ Lint Check (Pylint).......................Passed
+# ✅ Format Check (Black)......................Passed
+```
+
+### Manual Testing
+
+```bash
+# Quick pre-deployment validation
+./pre_deploy.sh
+
+# Full test suite with PostgreSQL
+./test_local.sh
+
+# Database-specific tests
+python test_db.py
+```
+
+### What Gets Tested
+- **Database Operations**: PostgreSQL compatibility, migrations, CRUD operations
+- **API Endpoints**: Response formats, error handling, performance
+- **Type Safety**: MyPy static analysis for type correctness
+- **Code Quality**: Pylint standards and best practices
+- **Data Integrity**: Split-adjusted price calculations
+
 ## 📚 Additional Documentation
 
-- [**ARCHITECTURE.md**](./ARCHITECTURE.md) - Detailed technical architecture
-- [**SETUP.md**](./SETUP.md) - Complete installation and configuration guide
-- [**API.md**](./API.md) - Comprehensive API documentation
-- [**DEPLOYMENT.md**](./DEPLOYMENT.md) - Production deployment procedures
-- [**TROUBLESHOOTING.md**](./TROUBLESHOOTING.md) - Common issues and solutions
+- [**SETUP.md**](docs/SETUP.md) - Complete installation and configuration guide
+- [**ARCHITECTURE.md**](docs/ARCHITECTURE.md) - Detailed technical architecture
+- [**API.md**](docs/API.md) - Comprehensive API documentation
+- [**DEPLOYMENT.md**](docs/DEPLOYMENT.md) - Production deployment procedures
+- [**TROUBLESHOOTING.md**](docs/TROUBLESHOOTING.md) - Common issues and solutions
 
 ---
 

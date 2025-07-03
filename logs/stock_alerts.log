@@ -2586,3 +2586,43 @@ sqlite3.IntegrityError: FOREIGN KEY constraint failed
 2025-07-02 22:37:47,517 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:37:47] "POST /webhook HTTP/1.1" 200 -
 2025-07-02 22:37:56,085 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:37:56] "GET /admin HTTP/1.1" 200 -
 2025-07-02 22:37:56,229 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:37:56] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-02 23:34:00,363 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 23:34:00,364 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 23:34:00,459 - StockAlerts.DB - INFO - Applying migration: 000_migrations_table.sql
+2025-07-02 23:34:00,463 - StockAlerts.DB - INFO - Successfully applied migration: 000_migrations_table.sql
+2025-07-02 23:34:00,463 - StockAlerts.DB - INFO - Applying migration: 001_initial.sql
+2025-07-02 23:34:00,490 - StockAlerts.DB - INFO - Successfully applied migration: 001_initial.sql
+2025-07-02 23:34:00,490 - StockAlerts.DB - INFO - Database initialization complete
+2025-07-02 23:34:00,490 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 23:34:00,491 - StockAlerts.App - INFO - Flask app initialized with CORS and ready for Railway deployment. Environment variables fixed.
+2025-07-02 23:34:00,493 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 23:34:00,499 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 23:34:00,510 - StockAlerts.DB - INFO - User Test User (test_user) added/updated successfully
+2025-07-02 23:34:00,514 - StockAlerts.DB - ERROR - Error adding to watchlist for user test_user: 0
+2025-07-02 23:34:00,526 - StockAlerts.App - INFO - Health check passed
+2025-07-02 23:34:00,527 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 23:34:00,531 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 23:34:19,300 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 23:34:19,300 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 23:34:19,329 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 23:34:19,330 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 23:34:19,331 - StockAlerts.App - INFO - Flask app initialized with CORS and ready for Railway deployment. Environment variables fixed.
+2025-07-02 23:34:19,332 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 23:34:19,340 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 23:34:19,352 - StockAlerts.DB - INFO - User Test User (test_user) added/updated successfully
+2025-07-02 23:34:19,358 - StockAlerts.DB - INFO - Added AAPL to watchlist for user test_user
+2025-07-02 23:34:19,374 - StockAlerts.App - INFO - Health check passed
+2025-07-02 23:34:19,375 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 23:34:19,379 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 23:40:01,766 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 23:40:01,766 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 23:40:01,799 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 23:40:01,799 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 23:40:01,800 - StockAlerts.App - INFO - Flask app initialized with CORS and ready for Railway deployment. Environment variables fixed.
+2025-07-02 23:40:01,802 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 23:40:01,811 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 23:40:01,822 - StockAlerts.DB - INFO - User Test User (test_user) added/updated successfully
+2025-07-02 23:40:01,826 - StockAlerts.DB - INFO - Added AAPL to watchlist for user test_user
+2025-07-02 23:40:01,842 - StockAlerts.App - INFO - Health check passed
+2025-07-02 23:40:01,842 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 23:40:01,847 - StockAlerts.DB - INFO - Database already initialized, skipping.

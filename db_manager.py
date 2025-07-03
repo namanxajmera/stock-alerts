@@ -7,12 +7,13 @@ import logging
 from contextlib import contextmanager
 from urllib.parse import urlparse
 
-logger = logging.getLogger('StockAlerts.DB')
+logger = logging.getLogger("StockAlerts.DB")
+
 
 class DatabaseManager:
     def __init__(self, db_url=None):
         """Initialize the database manager."""
-        self.db_url = db_url or os.getenv('DATABASE_URL')
+        self.db_url = db_url or os.getenv("DATABASE_URL")
         if not self.db_url:
             raise ValueError("DATABASE_URL environment variable is required")
         self.initialize_database()
@@ -46,54 +47,70 @@ class DatabaseManager:
                 cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
                 # Check if database needs migration by looking for users table
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT EXISTS (
-                        SELECT FROM information_schema.tables 
-                        WHERE table_schema = 'public' 
+                        SELECT FROM information_schema.tables
+                        WHERE table_schema = 'public'
                         AND table_name = 'users'
                     )
-                """)
+                """
+                )
                 result = cursor.fetchone()
-                if result and result['exists']:
+                if result and result["exists"]:
                     logger.info("Database already initialized, skipping.")
                     return
 
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE TABLE IF NOT EXISTS migrations (
                         id SERIAL PRIMARY KEY,
                         filename TEXT NOT NULL,
                         applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
-                """)
+                """
+                )
                 conn.commit()
 
                 cursor.execute("SELECT filename FROM migrations")
-                applied_migrations = {row['filename'] for row in cursor.fetchall()}
+                applied_migrations = {row["filename"] for row in cursor.fetchall()}
 
-                migrations_dir = 'migrations'
+                migrations_dir = "migrations"
                 if not os.path.exists(migrations_dir):
                     logger.warning(f"Migrations directory '{migrations_dir}' not found")
                     return
 
-                migration_files = sorted([f for f in os.listdir(migrations_dir) if f.endswith('.sql')])
-                
+                migration_files = sorted(
+                    [f for f in os.listdir(migrations_dir) if f.endswith(".sql")]
+                )
+
                 for migration_file in migration_files:
                     if migration_file in applied_migrations:
                         continue
 
                     logger.info(f"Applying migration: {migration_file}")
                     try:
-                        with open(os.path.join(migrations_dir, migration_file), 'r', encoding='utf-8') as f:
+                        with open(
+                            os.path.join(migrations_dir, migration_file),
+                            "r",
+                            encoding="utf-8",
+                        ) as f:
                             migration_sql = f.read()
-                        
+
                         cursor.execute("BEGIN")
                         cursor.execute(migration_sql)
-                        cursor.execute("INSERT INTO migrations (filename) VALUES (%s)", (migration_file,))
+                        cursor.execute(
+                            "INSERT INTO migrations (filename) VALUES (%s)",
+                            (migration_file,),
+                        )
                         cursor.execute("COMMIT")
                         logger.info(f"Successfully applied migration: {migration_file}")
                     except Exception as e:
                         cursor.execute("ROLLBACK")
-                        logger.error(f"Error applying migration {migration_file}: {e}", exc_info=True)
+                        logger.error(
+                            f"Error applying migration {migration_file}: {e}",
+                            exc_info=True,
+                        )
                         raise
             logger.info("Database initialization complete")
         except Exception as e:
@@ -122,15 +139,21 @@ class DatabaseManager:
                 user_row = cursor.fetchone()
                 if not user_row:
                     raise ValueError("User does not exist")
-                max_stocks = user_row['max_stocks']
+                max_stocks = user_row["max_stocks"]
 
-                cursor.execute("SELECT COUNT(*) FROM watchlist_items WHERE user_id = %s", (user_id,))
-                current_count = cursor.fetchone()[0]
-                
+                cursor.execute(
+                    "SELECT COUNT(*) as count FROM watchlist_items WHERE user_id = %s",
+                    (user_id,),
+                )
+                current_count = cursor.fetchone()["count"]
+
                 if current_count >= max_stocks:
                     raise ValueError(f"Watchlist limit of {max_stocks} stocks reached")
-                
-                cursor.execute("INSERT INTO watchlist_items (user_id, symbol) VALUES (%s, %s)", (user_id, symbol.upper()))
+
+                cursor.execute(
+                    "INSERT INTO watchlist_items (user_id, symbol) VALUES (%s, %s)",
+                    (user_id, symbol.upper()),
+                )
             logger.info(f"Added {symbol} to watchlist for user {user_id}")
             return True, None
         except Exception as e:
@@ -141,7 +164,10 @@ class DatabaseManager:
         """Remove a stock from user's watchlist."""
         try:
             with self._managed_cursor(commit=True) as cursor:
-                cursor.execute("DELETE FROM watchlist_items WHERE user_id = %s AND symbol = %s", (user_id, symbol.upper()))
+                cursor.execute(
+                    "DELETE FROM watchlist_items WHERE user_id = %s AND symbol = %s",
+                    (user_id, symbol.upper()),
+                )
                 if cursor.rowcount == 0:
                     raise ValueError(f"Stock {symbol} not found in watchlist")
             logger.info(f"Removed {symbol} from watchlist for user {user_id}")
@@ -202,12 +228,14 @@ class DatabaseManager:
             with self._managed_cursor() as cursor:
                 cursor.execute("SELECT value FROM config WHERE key = %s", (key,))
                 row = cursor.fetchone()
-                return row['value'] if row else None
+                return row["value"] if row else None
         except Exception:
             logger.error(f"Error getting config for key {key}")
             return None
 
-    def add_alert_history(self, user_id, symbol, price, percentile, status='sent', error_message=None):
+    def add_alert_history(
+        self, user_id, symbol, price, percentile, status="sent", error_message=None
+    ):
         """Add an alert to the history."""
         sql = """
             INSERT INTO alert_history (user_id, symbol, price, percentile, status, error_message)
@@ -215,7 +243,10 @@ class DatabaseManager:
         """
         try:
             with self._managed_cursor(commit=True) as cursor:
-                cursor.execute(sql, (user_id, symbol.upper(), price, percentile, status, error_message))
+                cursor.execute(
+                    sql,
+                    (user_id, symbol.upper(), price, percentile, status, error_message),
+                )
             logger.info(f"Added alert history for {symbol} for user {user_id}")
             return True
         except Exception:
@@ -253,21 +284,21 @@ class DatabaseManager:
         """Get cached stock data if it's recent enough."""
         sql = """
             SELECT symbol, last_check, last_price, ma_200, data_json
-            FROM stock_cache 
-            WHERE symbol = %s 
+            FROM stock_cache
+            WHERE symbol = %s
             AND last_check > NOW() - INTERVAL '%s hours'
         """
-        
+
         try:
             with self._managed_cursor() as cursor:
                 cursor.execute(sql, (symbol.upper(), max_age_hours))
                 row = cursor.fetchone()
                 if row:
-                    logger.info(f"Using cached data for {symbol} (age: {row['last_check']})")
+                    logger.info(
+                        f"Using cached data for {symbol} (age: {row['last_check']})"
+                    )
                     return dict(row)
                 return None
         except Exception as e:
             logger.error(f"Error getting cached data for {symbol}: {e}")
             return None
-
- 

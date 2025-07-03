@@ -90,7 +90,7 @@ ls -la
    ```
    BotFather: Alright, a new bot. How are we going to call it?
    You: Stock Alerts Bot
-   
+
    BotFather: Good. Now let's choose a username for your bot.
    You: your_unique_bot_name_bot
    ```
@@ -133,14 +133,38 @@ PORT=5001                    # Flask server port (default: 5001)
 
 ## Database Setup
 
-### Automatic Initialization
+### PostgreSQL Configuration (Production)
 
-The database automatically initializes on first run via [`db_manager.py:initialize_database()`](./db_manager.py#L44-95):
+For production deployment (Railway/Heroku), the application uses PostgreSQL:
 
-1. **Creates SQLite database** at `db/stockalerts.db`
-2. **Runs migrations** from [`migrations/`](./migrations/) directory
-3. **Sets up tables** as defined in [`migrations/001_initial.sql`](./migrations/001_initial.sql)
-4. **Creates indexes** for optimal performance
+1. **Database URL**: Set `DATABASE_URL` environment variable
+2. **Auto-initialization**: Runs via [`db_manager.py:initialize_database()`](./db_manager.py#L44-95)
+3. **Migrations**: Applied from [`migrations/`](./migrations/) directory
+4. **Split-adjusted data**: Uses Tiingo's adjusted prices for accurate historical charts
+
+### Local Development Setup
+
+For local testing with PostgreSQL:
+
+```bash
+# Install PostgreSQL
+brew install postgresql  # macOS
+sudo apt install postgresql  # Ubuntu
+
+# Start PostgreSQL service
+brew services start postgresql@15  # macOS
+sudo systemctl start postgresql  # Ubuntu
+
+# Create test database
+createdb stockalerts_test
+
+# Set environment variable
+export DATABASE_URL="postgresql://user@localhost/stockalerts_test"
+```
+
+### SQLite Fallback (Development Only)
+
+For simple local development, you can still use SQLite by modifying the database manager constructor.
 
 ### Manual Database Verification
 
@@ -167,6 +191,66 @@ The schema includes the following tables created by [`migrations/001_initial.sql
 - **`alert_history`**: Alert audit trail ([Line 56-67](./migrations/001_initial.sql#L56-67))
 - **`config`**: Application configuration ([Line 75-82](./migrations/001_initial.sql#L75-82))
 - **`logs`**: Event logging ([Line 93-101](./migrations/001_initial.sql#L93-101))
+
+## Simple Testing
+
+### 1. Database Testing Script
+
+Always test your database configuration before deploying:
+
+```bash
+# Run comprehensive database tests
+python test_db.py
+```
+
+The test script validates:
+- Database connectivity
+- Migration execution
+- CRUD operations
+- Admin panel queries
+- Data type compatibility (PostgreSQL vs SQLite)
+
+### 2. Pre-Commit Hooks (Recommended)
+
+Set up automatic testing before commits:
+
+```bash
+# Install pre-commit hooks
+pip install pre-commit
+
+# Set up the hooks (see .pre-commit-config.yaml)
+pre-commit install
+
+# Test manually
+pre-commit run --all-files
+```
+
+### 3. Type Checking & Linting
+
+Catch issues early with static analysis:
+
+```bash
+# Install development tools
+pip install mypy pylint black
+
+# Run type checking
+mypy app.py db_manager.py
+
+# Run linting
+pylint app.py db_manager.py
+
+# Format code
+black app.py db_manager.py
+```
+
+### 4. Quick Pre-Deploy Check
+
+Use the quick validation script:
+
+```bash
+# Run before deploying
+./pre_deploy.sh
+```
 
 ## Application Testing
 
