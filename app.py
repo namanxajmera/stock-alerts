@@ -69,6 +69,15 @@ class CustomJSONEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
+# Create Flask app first so gunicorn can always find it
+app = Flask(__name__)
+app.json_encoder = CustomJSONEncoder
+CORS(app)
+
+# Initialize other components
+db_manager = None
+webhook_handler = None
+
 try:
     logger.info("Starting application initialization...")
     
@@ -94,12 +103,6 @@ try:
         webhook_secret,
     )
     logger.info("Webhook handler initialized successfully")
-
-    logger.info("Creating Flask app...")
-    app = Flask(__name__)
-    app.json_encoder = CustomJSONEncoder
-    CORS(app)
-    logger.info("Flask app created with CORS enabled")
     
     logger.info("Application initialization completed successfully")
 
@@ -107,7 +110,7 @@ except Exception as e:
     logger.critical(f"FATAL: Error during initialization: {e}", exc_info=True)
     import traceback
     traceback.print_exc()
-    raise
+    # Don't raise - let the app start but show errors in health check
 
 
 def fetch_tiingo_data(ticker_symbol):
@@ -197,11 +200,16 @@ def calculate_metrics(ticker_symbol, period="5y"):
                 "error": f"Invalid period. Must be one of: {', '.join(valid_periods)}"
             }, 400
 
-        # Check cache first (1 hour cache)
-        cache_hours = int(os.getenv("CACHE_HOURS", 1))
-        cached_data = db_manager.get_fresh_cache(
-            ticker_symbol, max_age_hours=cache_hours
-        )
+        # Check if database manager is available
+        if db_manager is None:
+            logger.warning("Database manager not available, skipping cache")
+            cached_data = None
+        else:
+            # Check cache first (1 hour cache)
+            cache_hours = int(os.getenv("CACHE_HOURS", 1))
+            cached_data = db_manager.get_fresh_cache(
+                ticker_symbol, max_age_hours=cache_hours
+            )
 
         if cached_data and cached_data.get("data_json"):
             logger.info(f"Using cached data for {ticker_symbol}")
@@ -296,12 +304,16 @@ def calculate_metrics(ticker_symbol, period="5y"):
             "last_updated": datetime.now().isoformat(),
         }
 
-        db_manager.update_stock_cache(
-            symbol=ticker_symbol,
-            price=float(current_price),
-            ma_200=float(current_ma_200) if not pd.isna(current_ma_200) else None,
-            data_json=json.dumps(cache_data),
-        )
+        # Update cache if database manager is available
+        if db_manager is not None:
+            db_manager.update_stock_cache(
+                symbol=ticker_symbol,
+                price=float(current_price),
+                ma_200=float(current_ma_200) if not pd.isna(current_ma_200) else None,
+                data_json=json.dumps(cache_data),
+            )
+        else:
+            logger.warning(f"Skipping cache update for {ticker_symbol} - database not available")
 
         # Add small delay to be respectful to Yahoo Finance
         time.sleep(0.5)
@@ -336,6 +348,10 @@ def get_stock_data(ticker, period):
 
 @app.route("/webhook", methods=["POST"])
 def telegram_webhook():
+    if webhook_handler is None:
+        logger.error("Webhook handler not initialized")
+        abort(503)  # Service Unavailable
+        
     secret_token = request.headers.get("X-Telegram-Bot-Api-Secret-Token")
     if not webhook_handler.validate_webhook(request.get_data(), secret_token):
         logger.warning("Invalid webhook request validation failed.")
@@ -348,8 +364,13 @@ def telegram_webhook():
 @app.route("/health", methods=["GET"])
 def health_check():
     try:
+        logger.info("Health check endpoint called")
+        if db_manager is None:
+            logger.error("Health check failed: Database manager not initialized")
+            return jsonify({"status": "unhealthy", "error": "Database manager not initialized"}), 500
+        
         db_manager.get_config("telegram_token")
-        logger.info("Health check passed")
+        logger.info("Health check database test passed")
         return jsonify({"status": "healthy"}), 200
     except Exception as e:
         logger.error(f"Health check failed: {e}", exc_info=True)
@@ -359,6 +380,9 @@ def health_check():
 @app.route("/admin", methods=["GET"])
 def admin_panel():
     try:
+        if db_manager is None:
+            return "<h1>Error</h1><p>Database manager not initialized</p>", 500
+            
         # Get all table data
         with db_manager._get_connection() as conn:
             cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
