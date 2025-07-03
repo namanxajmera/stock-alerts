@@ -41,6 +41,8 @@ logs/*.log
 *.log
 
 # Database
+db/
+*.db
 *.db-journal
 
 # IDE
