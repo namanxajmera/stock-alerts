@@ -53,7 +53,8 @@ class DatabaseManager:
                         AND table_name = 'users'
                     )
                 """)
-                if cursor.fetchone()[0]:
+                result = cursor.fetchone()
+                if result and result['exists']:
                     logger.info("Database already initialized, skipping.")
                     return
 
