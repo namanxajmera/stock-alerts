@@ -182,7 +182,7 @@ class DatabaseManager:
             SELECT w.symbol, w.alert_threshold_low, w.alert_threshold_high, sc.last_price, sc.ma_200
             FROM watchlist_items w
             LEFT JOIN stock_cache sc ON w.symbol = sc.symbol
-            WHERE w.user_id = ? ORDER BY w.symbol
+            WHERE w.user_id = %s ORDER BY w.symbol
         """
         try:
             with self._managed_cursor() as cursor:
