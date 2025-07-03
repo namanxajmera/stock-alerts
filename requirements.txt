@@ -9,4 +9,5 @@ Werkzeug
 Jinja2
 tiingo
 gunicorn
-termcolor 
+termcolor
+psycopg2-binary 

@@ -1,40 +1,37 @@
-import sqlite3
+import psycopg2
+import psycopg2.extras
 import os
 from datetime import datetime
 import traceback
 import logging
 from contextlib import contextmanager
+from urllib.parse import urlparse
 
 logger = logging.getLogger('StockAlerts.DB')
 
 class DatabaseManager:
-    def __init__(self, db_path='db/stockalerts.db'):
+    def __init__(self, db_url=None):
         """Initialize the database manager."""
-        self.db_path = db_path
-        self._ensure_directories()
+        self.db_url = db_url or os.getenv('DATABASE_URL')
+        if not self.db_url:
+            raise ValueError("DATABASE_URL environment variable is required")
         self.initialize_database()
-
-    def _ensure_directories(self):
-        """Ensure the database directory exists."""
-        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
 
     def _get_connection(self):
         """Get a database connection with proper configuration."""
-        conn = sqlite3.connect(self.db_path, timeout=10)
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA foreign_keys = ON")
+        conn = psycopg2.connect(self.db_url)
         return conn
 
     @contextmanager
     def _managed_cursor(self, commit=False):
         """A context manager for database connections and cursors."""
         conn = self._get_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         try:
             yield cursor
             if commit:
                 conn.commit()
-        except sqlite3.Error as e:
+        except psycopg2.Error as e:
             logger.error(f"Database error: {e}", exc_info=True)
             conn.rollback()
             raise
@@ -46,18 +43,23 @@ class DatabaseManager:
         try:
             logger.info("Initializing database...")
             with self._get_connection() as conn:
-                cursor = conn.cursor()
+                cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-                # Check if database needs migration by looking for max_stocks column
-                cursor.execute("PRAGMA table_info(users)")
-                users_columns = [column[1] for column in cursor.fetchall()]
-                if 'users' in [table[0] for table in cursor.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()] and 'max_stocks' in users_columns:
+                # Check if database needs migration by looking for users table
+                cursor.execute("""
+                    SELECT EXISTS (
+                        SELECT FROM information_schema.tables 
+                        WHERE table_schema = 'public' 
+                        AND table_name = 'users'
+                    )
+                """)
+                if cursor.fetchone()[0]:
                     logger.info("Database already initialized, skipping.")
                     return
 
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS migrations (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        id SERIAL PRIMARY KEY,
                         filename TEXT NOT NULL,
                         applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
@@ -83,10 +85,10 @@ class DatabaseManager:
                         with open(os.path.join(migrations_dir, migration_file), 'r', encoding='utf-8') as f:
                             migration_sql = f.read()
                         
-                        cursor.execute("BEGIN TRANSACTION")
-                        cursor.executescript(migration_sql)
-                        cursor.execute("INSERT INTO migrations (filename) VALUES (?)", (migration_file,))
-                        cursor.execute("COMMIT") # Explicit commit for transaction
+                        cursor.execute("BEGIN")
+                        cursor.execute(migration_sql)
+                        cursor.execute("INSERT INTO migrations (filename) VALUES (%s)", (migration_file,))
+                        cursor.execute("COMMIT")
                         logger.info(f"Successfully applied migration: {migration_file}")
                     except Exception as e:
                         cursor.execute("ROLLBACK")
@@ -99,7 +101,7 @@ class DatabaseManager:
     def add_user(self, user_id, name):
         """Add a new user or update their name."""
         sql = """
-            INSERT INTO users (id, name) VALUES (?, ?)
+            INSERT INTO users (id, name) VALUES (%s, %s)
             ON CONFLICT(id) DO UPDATE SET name = excluded.name
         """
         try:
@@ -115,19 +117,19 @@ class DatabaseManager:
         """Add a stock to user's watchlist."""
         try:
             with self._managed_cursor(commit=True) as cursor:
-                cursor.execute("SELECT max_stocks FROM users WHERE id = ?", (user_id,))
+                cursor.execute("SELECT max_stocks FROM users WHERE id = %s", (user_id,))
                 user_row = cursor.fetchone()
                 if not user_row:
                     raise ValueError("User does not exist")
                 max_stocks = user_row['max_stocks']
 
-                cursor.execute("SELECT COUNT(*) FROM watchlist_items WHERE user_id = ?", (user_id,))
+                cursor.execute("SELECT COUNT(*) FROM watchlist_items WHERE user_id = %s", (user_id,))
                 current_count = cursor.fetchone()[0]
                 
                 if current_count >= max_stocks:
                     raise ValueError(f"Watchlist limit of {max_stocks} stocks reached")
                 
-                cursor.execute("INSERT INTO watchlist_items (user_id, symbol) VALUES (?, ?)", (user_id, symbol.upper()))
+                cursor.execute("INSERT INTO watchlist_items (user_id, symbol) VALUES (%s, %s)", (user_id, symbol.upper()))
             logger.info(f"Added {symbol} to watchlist for user {user_id}")
             return True, None
         except Exception as e:
@@ -138,7 +140,7 @@ class DatabaseManager:
         """Remove a stock from user's watchlist."""
         try:
             with self._managed_cursor(commit=True) as cursor:
-                cursor.execute("DELETE FROM watchlist_items WHERE user_id = ? AND symbol = ?", (user_id, symbol.upper()))
+                cursor.execute("DELETE FROM watchlist_items WHERE user_id = %s AND symbol = %s", (user_id, symbol.upper()))
                 if cursor.rowcount == 0:
                     raise ValueError(f"Stock {symbol} not found in watchlist")
             logger.info(f"Removed {symbol} from watchlist for user {user_id}")
@@ -167,9 +169,9 @@ class DatabaseManager:
         """Update or insert stock data in cache."""
         sql = """
             INSERT INTO stock_cache (symbol, last_check, last_price, ma_200, data_json)
-            VALUES (?, datetime('now'), ?, ?, ?)
+            VALUES (%s, NOW(), %s, %s, %s)
             ON CONFLICT(symbol) DO UPDATE SET
-                last_check = datetime('now'),
+                last_check = NOW(),
                 last_price = excluded.last_price,
                 ma_200 = excluded.ma_200,
                 data_json = excluded.data_json
@@ -184,7 +186,7 @@ class DatabaseManager:
 
     def log_event(self, log_type, message, user_id=None, symbol=None):
         """Log an event to the database."""
-        sql = "INSERT INTO logs (timestamp, log_type, message, user_id, symbol) VALUES (datetime('now'), ?, ?, ?, ?)"
+        sql = "INSERT INTO logs (timestamp, log_type, message, user_id, symbol) VALUES (NOW(), %s, %s, %s, %s)"
         try:
             with self._managed_cursor(commit=True) as cursor:
                 cursor.execute(sql, (log_type, message, user_id, symbol))
@@ -197,7 +199,7 @@ class DatabaseManager:
         """Get configuration value."""
         try:
             with self._managed_cursor() as cursor:
-                cursor.execute("SELECT value FROM config WHERE key = ?", (key,))
+                cursor.execute("SELECT value FROM config WHERE key = %s", (key,))
                 row = cursor.fetchone()
                 return row['value'] if row else None
         except Exception:
@@ -208,7 +210,7 @@ class DatabaseManager:
         """Add an alert to the history."""
         sql = """
             INSERT INTO alert_history (user_id, symbol, price, percentile, status, error_message)
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """
         try:
             with self._managed_cursor(commit=True) as cursor:
@@ -237,7 +239,7 @@ class DatabaseManager:
 
     def update_user_notification_time(self, user_id):
         """Update the last notification time for a user."""
-        sql = "UPDATE users SET last_notified = datetime('now') WHERE id = ?"
+        sql = "UPDATE users SET last_notified = NOW() WHERE id = %s"
         try:
             with self._managed_cursor(commit=True) as cursor:
                 cursor.execute(sql, (user_id,))
@@ -251,13 +253,13 @@ class DatabaseManager:
         sql = """
             SELECT symbol, last_check, last_price, ma_200, data_json
             FROM stock_cache 
-            WHERE symbol = ? 
-            AND datetime(last_check) > datetime('now', '-{} hours')
-        """.format(max_age_hours)
+            WHERE symbol = %s 
+            AND last_check > NOW() - INTERVAL '%s hours'
+        """
         
         try:
             with self._managed_cursor() as cursor:
-                cursor.execute(sql, (symbol.upper(),))
+                cursor.execute(sql, (symbol.upper(), max_age_hours))
                 row = cursor.fetchone()
                 if row:
                     logger.info(f"Using cached data for {symbol} (age: {row['last_check']})")

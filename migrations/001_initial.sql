@@ -54,7 +54,7 @@ CREATE INDEX idx_cache_check ON stock_cache(last_check);
 
 -- Alert history table
 CREATE TABLE alert_history (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     user_id TEXT,
     symbol TEXT,
     price REAL,
@@ -91,7 +91,7 @@ INSERT INTO config (key, value, description) VALUES
 
 -- Logs table
 CREATE TABLE logs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     timestamp TIMESTAMP NOT NULL,
     log_type TEXT NOT NULL,
     message TEXT NOT NULL,
