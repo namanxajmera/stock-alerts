@@ -169,8 +169,7 @@ class WebhookHandler:
         
         message_lines = ["📋 <b>Your Watchlist:</b>"]
         for item in watchlist:
-            price_str = f"${item['last_price']:.2f}" if item['last_price'] is not None else "N/A"
-            message_lines.append(f" • {item['symbol'].upper()} (Last Price: {price_str})")
+            message_lines.append(f" • {item['symbol'].upper()}")
         
         self._send_message(user_id, "\n".join(message_lines))
 

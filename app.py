@@ -143,11 +143,7 @@ def fetch_tiingo_data(ticker_symbol):
         # Use split-adjusted prices for accurate historical charts
         column_mapping = {
             "date": "Date",
-            "adjOpen": "Open",
-            "adjHigh": "High",
-            "adjLow": "Low",
             "adjClose": "Close",
-            "adjVolume": "Volume",
         }
 
         # Select and rename only the columns we need

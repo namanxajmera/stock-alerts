@@ -94,11 +94,7 @@ class PeriodicChecker:
             # Rename columns to match expected format
             column_mapping = {
                 'date': 'Date',
-                'open': 'Open', 
-                'high': 'High',
-                'low': 'Low',
-                'close': 'Close',
-                'volume': 'Volume'
+                'adjClose': 'Close',
             }
             
             # Select and rename only the columns we need
