@@ -189,12 +189,12 @@ def calculate_metrics(ticker_symbol, period="5y"):
                 cache_data = json.loads(cached_data["data_json"])
                 # Use cached percentiles if available
                 if "percentiles" in cache_data:
-                    percentile_5th = cache_data["percentiles"]["p5"]
-                    percentile_95th = cache_data["percentiles"]["p95"]
+                    percentile_16th = cache_data["percentiles"]["p16"]
+                    percentile_84th = cache_data["percentiles"]["p84"]
                 else:
                     # Fallback percentiles
-                    percentile_5th = -10.0
-                    percentile_95th = 10.0
+                    percentile_16th = -6.0
+                    percentile_84th = 6.0
 
                 # For now, fetch fresh data but note it was in cache
                 # In a full implementation, we'd store the complete time series data in cache
@@ -230,8 +230,8 @@ def calculate_metrics(ticker_symbol, period="5y"):
                 "error": "Insufficient data for meaningful analysis (need at least 20 data points)"
             }, 400
 
-        percentile_5th = np.percentile(valid_pct_diff, 5)
-        percentile_95th = np.percentile(valid_pct_diff, 95)
+        percentile_16th = np.percentile(valid_pct_diff, 16)
+        percentile_84th = np.percentile(valid_pct_diff, 84)
 
         previous_close = (
             complete_data["Close"].iloc[-2] if len(complete_data) >= 2 else None
@@ -264,7 +264,7 @@ def calculate_metrics(ticker_symbol, period="5y"):
             "prices": clean_for_json(data["Close"]),
             "ma_200": clean_for_json(data["MA200"]),
             "pct_diff": clean_for_json(data["pct_diff"]),
-            "percentiles": {"p5": percentile_5th, "p95": percentile_95th},
+            "percentiles": {"p16": percentile_16th, "p84": percentile_84th},
             "previous_close": previous_close,
         }
 
@@ -272,7 +272,7 @@ def calculate_metrics(ticker_symbol, period="5y"):
         cache_data = {
             "price": float(current_price),
             "ma_200": float(current_ma_200) if not pd.isna(current_ma_200) else None,
-            "percentiles": {"p5": percentile_5th, "p95": percentile_95th},
+            "percentiles": {"p16": percentile_16th, "p84": percentile_84th},
             "last_updated": datetime.now().isoformat(),
         }
 

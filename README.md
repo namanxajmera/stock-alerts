@@ -34,7 +34,7 @@ A comprehensive web application for visualizing stock price history and technica
 
 ### Telegram Bot Features
 - **Watchlist Management**: Add/remove stocks ([`webhook_handler.py:_handle_add_command()`](./webhook_handler.py#L177))
-- **Smart Alerts**: Notifications when stocks hit 5th/95th percentiles
+- **Smart Alerts**: Notifications when stocks hit 16th/84th percentiles (1σ)
 - **Secure Webhooks**: HMAC validation ([`webhook_handler.py:validate_webhook()`](./webhook_handler.py#L24))
 
 ### Technical Capabilities
@@ -108,8 +108,8 @@ PORT=5001  # Default Flask port
 The database auto-initializes with default settings stored in the `config` table:
 - `cache_duration_hours`: 24 (configurable via [`db_manager.py:get_config()`](./db_manager.py#L194))
 - `max_stocks_per_user`: 20
-- `default_threshold_low`: 5.0 (5th percentile)
-- `default_threshold_high`: 95.0 (95th percentile)
+- `default_threshold_low`: 16.0 (16th percentile)
+- `default_threshold_high`: 84.0 (84th percentile)
 
 ## 📡 API Endpoints
 
@@ -134,8 +134,8 @@ The database auto-initializes with default settings stored in the `config` table
 
 ### Alert Triggers
 Alerts are sent when a stock's current price deviation from its 200-day moving average reaches:
-- **5th Percentile or Lower**: Historically extreme low
-- **95th Percentile or Higher**: Historically extreme high
+- **16th Percentile or Lower**: Statistically significant low (1σ below)
+- **84th Percentile or Higher**: Statistically significant high (1σ above)
 
 ### Alert Logic Flow
 1. **Data Collection**: [`periodic_checker.py:_fetch_symbol_data_with_retry()`](./periodic_checker.py#L51)

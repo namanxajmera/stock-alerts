@@ -129,17 +129,17 @@ class PeriodicChecker:
                     current_ma_200 = cached_data['ma_200']
                     
                     if 'percentiles' in cache_data:
-                        percentile_5 = cache_data['percentiles']['p5']
-                        percentile_95 = cache_data['percentiles']['p95']
+                        percentile_16 = cache_data['percentiles']['p16']
+                        percentile_84 = cache_data['percentiles']['p84']
                         current_pct_diff = ((current_price - current_ma_200) / current_ma_200) * 100
                         
                         # Check if alert should be sent
-                        if current_pct_diff <= percentile_5 or current_pct_diff >= percentile_95:
+                        if current_pct_diff <= percentile_16 or current_pct_diff >= percentile_84:
                             logger.info(f"ALERT TRIGGERED for {symbol} at {current_pct_diff:.2f}% (cached data)")
                             for user_id in user_ids:
                                 self.webhook_handler.send_alert(
                                     user_id=user_id, symbol=symbol, price=current_price,
-                                    percentile=current_pct_diff, percentile_5=percentile_5, percentile_95=percentile_95
+                                    percentile=current_pct_diff, percentile_16=percentile_16, percentile_84=percentile_84
                                 )
                         return
                 except (json.JSONDecodeError, KeyError) as e:
@@ -166,16 +166,16 @@ class PeriodicChecker:
             current_ma_200 = float(historical_data['ma_200'].iloc[-1])
             current_pct_diff = ((current_price - current_ma_200) / current_ma_200) * 100
             
-            percentile_5 = float(valid_diffs.quantile(0.05))
-            percentile_95 = float(valid_diffs.quantile(0.95))
+            percentile_16 = float(valid_diffs.quantile(0.16))
+            percentile_84 = float(valid_diffs.quantile(0.84))
             
             logger.debug(f"{symbol} | Price: ${current_price:.2f} | MA200: ${current_ma_200:.2f} | Diff: {current_pct_diff:.2f}%")
-            logger.debug(f"{symbol} | 5th Pct: {percentile_5:.2f}% | 95th Pct: {percentile_95:.2f}%")
+            logger.debug(f"{symbol} | 16th Pct: {percentile_16:.2f}% | 84th Pct: {percentile_84:.2f}%")
             
             # Update stock cache
             cache_data = {
                 'price': current_price, 'ma_200': current_ma_200, 'pct_diff': current_pct_diff,
-                'percentile_5': percentile_5, 'percentile_95': percentile_95,
+                'percentile_16': percentile_16, 'percentile_84': percentile_84,
                 'historical_min': float(valid_diffs.min()), 'historical_max': float(valid_diffs.max())
             }
             self.db.update_stock_cache(
@@ -183,13 +183,13 @@ class PeriodicChecker:
             )
             
             # Check if an alert should be sent
-            if current_pct_diff <= percentile_5 or current_pct_diff >= percentile_95:
+            if current_pct_diff <= percentile_16 or current_pct_diff >= percentile_84:
                 logger.info(f"ALERT TRIGGERED for {symbol} at {current_pct_diff:.2f}%")
                 for user_id in user_ids:
                     logger.info(f"Sending alert for {symbol} to user {user_id}")
                     self.webhook_handler.send_alert(
                         user_id=user_id, symbol=symbol, price=current_price,
-                        percentile=current_pct_diff, percentile_5=percentile_5, percentile_95=percentile_95
+                        percentile=current_pct_diff, percentile_16=percentile_16, percentile_84=percentile_84
                     )
             else:
                 logger.info(f"No alert for {symbol} (current diff: {current_pct_diff:.2f}%)")

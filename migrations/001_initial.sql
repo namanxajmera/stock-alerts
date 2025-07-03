@@ -86,8 +86,8 @@ INSERT INTO config (key, value, description) VALUES
     ('telegram_token', 'your_bot_token', 'Telegram Bot API Token'),
     ('cache_duration_hours', '24', 'How long to cache stock data'),
     ('max_stocks_per_user', '20', 'Maximum stocks per user watchlist'),
-    ('default_threshold_low', '5.0', 'Default lower percentile threshold'),
-    ('default_threshold_high', '95.0', 'Default upper percentile threshold');
+    ('default_threshold_low', '16.0', 'Default lower percentile threshold'),
+    ('default_threshold_high', '84.0', 'Default upper percentile threshold');
 
 -- Logs table
 CREATE TABLE logs (

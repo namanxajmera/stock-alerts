@@ -235,23 +235,23 @@ function updateCharts(data, ticker) {
             }
         ];
         // Only add percentile lines if we have valid percentiles
-        if (data.percentiles && data.percentiles.p5 !== null && data.percentiles.p95 !== null) {
+        if (data.percentiles && data.percentiles.p16 !== null && data.percentiles.p84 !== null) {
             subTraces.push({
                 x: [data.dates[0], data.dates[data.dates.length - 1]],
-                y: [data.percentiles.p5, data.percentiles.p5],
+                y: [data.percentiles.p16, data.percentiles.p16],
                 type: 'scatter',
                 mode: 'lines',
                 line: { color: '#007AFF', width: 1, dash: 'dash' },
-                name: '5th Percentile',
+                name: '16th Percentile',
                 hoverinfo: 'skip',
                 showlegend: false
             }, {
                 x: [data.dates[0], data.dates[data.dates.length - 1]],
-                y: [data.percentiles.p95, data.percentiles.p95],
+                y: [data.percentiles.p84, data.percentiles.p84],
                 type: 'scatter',
                 mode: 'lines',
                 line: { color: '#5856D6', width: 1, dash: 'dash' },
-                name: '95th Percentile',
+                name: '84th Percentile',
                 hoverinfo: 'skip',
                 showlegend: false
             });

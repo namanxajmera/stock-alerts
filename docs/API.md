@@ -62,8 +62,8 @@ curl "http://localhost:5001/data/AAPL/5y"
     -10.95
   ],
   "percentiles": {
-    "p5": -25.4,
-    "p95": 18.7
+    "p16": -15.2,
+    "p84": 12.8
   },
   "previous_close": 142.19
 }
@@ -74,7 +74,7 @@ curl "http://localhost:5001/data/AAPL/5y"
 - `prices`: Array of closing prices (null for missing data)
 - `ma_200`: Array of 200-day moving average values
 - `pct_diff`: Array of percentage differences from MA200
-- `percentiles`: Historical 5th and 95th percentiles
+- `percentiles`: Historical 16th and 84th percentiles (1σ)
 - `previous_close`: Previous trading day's closing price
 
 #### Error Responses
@@ -120,8 +120,8 @@ if cached_data and cached_data.get('data_json'):
     cache_data = json.loads(cached_data['data_json'])
     # Use cached percentiles if available
     if 'percentiles' in cache_data:
-        percentile_5th = cache_data['percentiles']['p5']
-        percentile_95th = cache_data['percentiles']['p95']
+        percentile_16th = cache_data['percentiles']['p16']
+        percentile_84th = cache_data['percentiles']['p84']
 ```
 
 **Rate Limiting** ([`app.py:fetch_yahoo_data_with_retry()`](./app.py#L75-107))
@@ -434,14 +434,14 @@ message = (
     f"Current Price: ${price:.2f}\n"
     f"Current Deviation from 200MA: {percentile:.1f}%\n\n"
     f"📊 <b>Historical Context:</b>\n"
-    f" • 5th percentile: {percentile_5:.1f}%\n"
-    f" • 95th percentile: {percentile_95:.1f}%\n\n"
+    f" • 16th percentile: {percentile_16:.1f}%\n"
+    f" • 84th percentile: {percentile_84:.1f}%\n\n"
 )
 
-if percentile <= percentile_5:
-    message += f"This is <b>EXTREMELY LOW</b>. Only 5% of the time has {symbol.upper()} been this far below its 200-day moving average."
-elif percentile >= percentile_95:
-    message += f"This is <b>EXTREMELY HIGH</b>. Only 5% of the time has {symbol.upper()} been this far above its 200-day moving average."
+if percentile <= percentile_16:
+    message += f"This is <b>SIGNIFICANTLY LOW</b>. Only 16% of the time has {symbol.upper()} been this far below its 200-day moving average."
+elif percentile >= percentile_84:
+    message += f"This is <b>SIGNIFICANTLY HIGH</b>. Only 16% of the time has {symbol.upper()} been this far above its 200-day moving average."
 ```
 
 #### Alert History

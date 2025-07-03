@@ -276,11 +276,11 @@ body {
     background-color: var(--hover-color);
 }
 
-.percentile.p95 {
+.percentile.p84 {
     color: #5856D6;
 }
 
-.percentile.p5 {
+.percentile.p16 {
     color: #007AFF;
 }
 

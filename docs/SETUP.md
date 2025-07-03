@@ -449,9 +449,9 @@ UPDATE config SET value = '12' WHERE key = 'cache_duration_hours';
 -- Update max stocks per user (default: 20)
 UPDATE config SET value = '50' WHERE key = 'max_stocks_per_user';
 
--- Update alert thresholds (default: 5.0 and 95.0)
-UPDATE config SET value = '10.0' WHERE key = 'default_threshold_low';
-UPDATE config SET value = '90.0' WHERE key = 'default_threshold_high';
+-- Update alert thresholds (default: 16.0 and 84.0)
+UPDATE config SET value = '16.0' WHERE key = 'default_threshold_low';
+UPDATE config SET value = '84.0' WHERE key = 'default_threshold_high';
 ```
 
 ### Performance Tuning

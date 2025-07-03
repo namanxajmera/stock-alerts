@@ -182,7 +182,7 @@ for symbol, user_ids in symbol_user_map.items():
 1. **Cache Check**: Attempt to use recent cached data (2-hour tolerance)
 2. **Data Fetching**: Yahoo Finance API with retry logic
 3. **Technical Analysis**: 200-day MA and percentile calculations
-4. **Threshold Evaluation**: 5th/95th percentile comparison
+4. **Threshold Evaluation**: 16th/84th percentile comparison (1σ)
 5. **Alert Delivery**: Telegram notification via `webhook_handler`
 6. **History Tracking**: Alert logging and user notification timestamps
 
@@ -211,8 +211,8 @@ CREATE TABLE users (
 CREATE TABLE watchlist_items (
     user_id TEXT,
     symbol TEXT,
-    alert_threshold_low REAL DEFAULT 5.0,   -- 5th percentile
-    alert_threshold_high REAL DEFAULT 95.0, -- 95th percentile
+    alert_threshold_low REAL DEFAULT 16.0,   -- 16th percentile
+    alert_threshold_high REAL DEFAULT 84.0, -- 84th percentile
     PRIMARY KEY (user_id, symbol),
     FOREIGN KEY (user_id) REFERENCES users(id)
 );

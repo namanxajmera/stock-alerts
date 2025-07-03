@@ -124,7 +124,7 @@ class WebhookHandler:
             self.db.log_event('error', f"Error sending message: {e}", user_id=chat_id)
             return False
 
-    def send_alert(self, user_id, symbol, price, percentile, percentile_5, percentile_95):
+    def send_alert(self, user_id, symbol, price, percentile, percentile_16, percentile_84):
         """Send a stock alert to a user."""
         try:
             message = (
@@ -132,14 +132,14 @@ class WebhookHandler:
                 f"Current Price: ${price:.2f}\n"
                 f"Current Deviation from 200MA: {percentile:.1f}%\n\n"
                 f"📊 <b>Historical Context:</b>\n"
-                f" • 5th percentile: {percentile_5:.1f}%\n"
-                f" • 95th percentile: {percentile_95:.1f}%\n\n"
+                f" • 16th percentile: {percentile_16:.1f}%\n"
+                f" • 84th percentile: {percentile_84:.1f}%\n\n"
             )
             
-            if percentile <= percentile_5:
-                message += f"This is <b>EXTREMELY LOW</b>. Only 5% of the time has {symbol.upper()} been this far below its 200-day moving average."
-            elif percentile >= percentile_95:
-                message += f"This is <b>EXTREMELY HIGH</b>. Only 5% of the time has {symbol.upper()} been this far above its 200-day moving average."
+            if percentile <= percentile_16:
+                message += f"This is <b>SIGNIFICANTLY LOW</b>. Only 16% of the time has {symbol.upper()} been this far below its 200-day moving average."
+            elif percentile >= percentile_84:
+                message += f"This is <b>SIGNIFICANTLY HIGH</b>. Only 16% of the time has {symbol.upper()} been this far above its 200-day moving average."
             
             success = self._send_message(user_id, message)
             

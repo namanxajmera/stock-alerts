@@ -502,7 +502,7 @@ from webhook_handler import WebhookHandler
 from db_manager import DatabaseManager
 import os
 wh = WebhookHandler(DatabaseManager(), os.getenv('TELEGRAM_BOT_TOKEN'))
-wh.send_alert('USER_ID', 'AAPL', 150.0, -25.0, -30.0, 20.0)
+wh.send_alert('USER_ID', 'AAPL', 150.0, -18.5, -20.0, 15.0)
 "
 ```
 
