@@ -406,7 +406,7 @@ def admin_panel():
                 <div id="cache" class="section-content">
                     <table>
                         <tr><th>Symbol</th><th>Last Price</th><th>MA200</th><th>Last Check</th></tr>
-                        {''.join([f"<tr><td>{c['symbol']}</td><td>${c['last_price']:.2f if c['last_price'] else 'N/A'}</td><td>${c['ma_200']:.2f if c['ma_200'] else 'N/A'}</td><td>{c['last_check']}</td></tr>" for c in cache])}
+                        {''.join([f"<tr><td>{c['symbol']}</td><td>{'${:.2f}'.format(c['last_price']) if c['last_price'] else 'N/A'}</td><td>{'${:.2f}'.format(c['ma_200']) if c['ma_200'] else 'N/A'}</td><td>{c['last_check']}</td></tr>" for c in cache])}
                     </table>
                 </div>
             </div>
