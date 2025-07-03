@@ -2455,3 +2455,134 @@ ValueError: Must specify a fill 'value' or 'method'.
 2025-07-02 18:48:14,522 - StockAlerts.App - INFO - Successfully fetched 1950 data points for ROKU from Tiingo
 2025-07-02 18:48:15,034 - StockAlerts.App - INFO - Successfully processed ROKU with 1255 data points
 2025-07-02 18:48:15,039 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 18:48:15] "GET /data/ROKU/5y HTTP/1.1" 200 -
+2025-07-02 22:28:31,549 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 22:28:31,550 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 22:28:31,553 - StockAlerts.DB - INFO - Applying migration: 000_migrations_table.sql
+2025-07-02 22:28:31,554 - StockAlerts.DB - INFO - Successfully applied migration: 000_migrations_table.sql
+2025-07-02 22:28:31,554 - StockAlerts.DB - INFO - Applying migration: 001_initial.sql
+2025-07-02 22:28:31,554 - StockAlerts.DB - ERROR - Error initializing database: cannot rollback - no transaction is active
+Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/db_manager.py", line 87, in initialize_database
+    cursor.executescript(migration_sql)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.OperationalError: table users already exists
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/db_manager.py", line 92, in initialize_database
+    cursor.execute("ROLLBACK")
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^
+sqlite3.OperationalError: cannot rollback - no transaction is active
+2025-07-02 22:28:31,555 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 22:28:31,557 - StockAlerts.App - INFO - Flask app initialized with CORS and ready for Railway deployment. Environment variables fixed.
+2025-07-02 22:28:31,559 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 8080...
+2025-07-02 22:28:31,569 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://10.5.0.2:8080
+2025-07-02 22:28:31,570 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 22:29:12,668 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 22:29:12,668 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 22:29:12,669 - StockAlerts.DB - INFO - Applying migration: 001_initial.sql
+2025-07-02 22:29:12,669 - StockAlerts.DB - ERROR - Error initializing database: cannot rollback - no transaction is active
+Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/db_manager.py", line 87, in initialize_database
+    cursor.executescript(migration_sql)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.OperationalError: table users already exists
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/db_manager.py", line 92, in initialize_database
+    cursor.execute("ROLLBACK")
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^
+sqlite3.OperationalError: cannot rollback - no transaction is active
+2025-07-02 22:29:12,670 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 22:29:12,671 - StockAlerts.App - INFO - Flask app initialized with CORS and ready for Railway deployment. Environment variables fixed.
+2025-07-02 22:29:12,672 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 22:29:12,683 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 22:29:12,683 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 22:30:51,060 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 22:30:51,060 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 22:30:51,061 - StockAlerts.DB - INFO - Applying migration: 000_migrations_table.sql
+2025-07-02 22:30:51,062 - StockAlerts.DB - INFO - Successfully applied migration: 000_migrations_table.sql
+2025-07-02 22:30:51,062 - StockAlerts.DB - INFO - Applying migration: 001_initial.sql
+2025-07-02 22:30:51,071 - StockAlerts.DB - INFO - Successfully applied migration: 001_initial.sql
+2025-07-02 22:30:51,071 - StockAlerts.DB - INFO - Database initialization complete
+2025-07-02 22:30:51,071 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 22:30:51,072 - StockAlerts.App - INFO - Flask app initialized with CORS and ready for Railway deployment. Environment variables fixed.
+2025-07-02 22:30:51,074 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 22:30:51,083 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 22:30:51,083 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 22:30:54,681 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:30:54] "GET / HTTP/1.1" 200 -
+2025-07-02 22:30:54,706 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:30:54] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-07-02 22:30:54,707 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:30:54] "[36mGET /static/js/main.js HTTP/1.1[0m" 304 -
+2025-07-02 22:30:55,184 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:30:55] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-07-02 22:30:55,194 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:30:55] "[36mGET /static/favicon.ico HTTP/1.1[0m" 304 -
+2025-07-02 22:30:58,526 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:30:58] "GET /admin HTTP/1.1" 200 -
+2025-07-02 22:30:58,654 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:30:58] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-02 22:31:57,578 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:31:57] "GET /admin HTTP/1.1" 200 -
+2025-07-02 22:31:57,706 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:31:57] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-02 22:32:12,735 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 22:32:12,736 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 22:32:12,736 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 22:32:12,736 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 22:32:12,737 - StockAlerts.App - INFO - Flask app initialized with CORS and ready for Railway deployment. Environment variables fixed.
+2025-07-02 22:32:12,739 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 22:32:12,747 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 22:32:12,747 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 22:32:15,473 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:32:15] "GET /admin HTTP/1.1" 200 -
+2025-07-02 22:32:15,568 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:32:15] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-02 22:32:16,515 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:32:16] "GET /admin HTTP/1.1" 200 -
+2025-07-02 22:32:16,609 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:32:16] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-07-02 22:35:19,824 - StockAlerts.App - INFO - Initializing database manager and webhook handler...
+2025-07-02 22:35:19,824 - StockAlerts.DB - INFO - Initializing database...
+2025-07-02 22:35:19,825 - StockAlerts.DB - INFO - Database already initialized, skipping.
+2025-07-02 22:35:19,825 - StockAlerts.WebhookHandler - INFO - Webhook handler initialized
+2025-07-02 22:35:19,826 - StockAlerts.App - INFO - Flask app initialized with CORS and ready for Railway deployment. Environment variables fixed.
+2025-07-02 22:35:19,827 - StockAlerts.App - INFO - Starting Stock Analytics Dashboard server on port 5001...
+2025-07-02 22:35:19,838 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.5.0.2:5001
+2025-07-02 22:35:19,838 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-07-02 22:36:18,633 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:36:18] "GET / HTTP/1.1" 200 -
+2025-07-02 22:36:18,687 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:36:18] "GET /static/js/main.js HTTP/1.1" 200 -
+2025-07-02 22:36:18,687 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:36:18] "GET /static/css/style.css HTTP/1.1" 200 -
+2025-07-02 22:36:19,394 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:36:19] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 22:36:19,592 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:36:19] "GET /static/favicon.ico HTTP/1.1" 200 -
+2025-07-02 22:36:52,711 - StockAlerts.WebhookHandler - INFO - Processing update ID: 1
+2025-07-02 22:36:52,711 - StockAlerts.WebhookHandler - INFO - Processing message from user testuser (12345)
+2025-07-02 22:36:52,712 - StockAlerts.DB - ERROR - Database error: FOREIGN KEY constraint failed
+Traceback (most recent call last):
+  File "/Users/naman/Desktop/projects/stock-alerts/db_manager.py", line 34, in _managed_cursor
+    yield cursor
+  File "/Users/naman/Desktop/projects/stock-alerts/db_manager.py", line 190, in log_event
+    cursor.execute(sql, (log_type, message, user_id, symbol))
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: FOREIGN KEY constraint failed
+2025-07-02 22:36:52,713 - StockAlerts.DB - ERROR - CRITICAL: Failed to write log to database: FOREIGN KEY constraint failed
+2025-07-02 22:36:52,713 - StockAlerts.DB - ERROR - Original log message: [telegram_update] Received update ID: 1
+2025-07-02 22:36:52,714 - StockAlerts.DB - INFO - User testuser (12345) added/updated successfully
+2025-07-02 22:36:55,062 - StockAlerts.WebhookHandler - ERROR - Error sending message to 12345: 400 Client Error: Bad Request for url: https://api.telegram.org/bot8179936496:AAGPNKezBcFvEg_IRmhBi-eZRUb9v8JqB0E/sendMessage
+2025-07-02 22:36:55,064 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:36:55] "POST /webhook HTTP/1.1" 200 -
+2025-07-02 22:37:46,698 - StockAlerts.WebhookHandler - INFO - Processing update ID: 2
+2025-07-02 22:37:46,698 - StockAlerts.WebhookHandler - INFO - Processing message from user testuser (12345)
+2025-07-02 22:37:46,701 - StockAlerts.DB - INFO - User testuser (12345) added/updated successfully
+2025-07-02 22:37:46,702 - StockAlerts.DB - INFO - Added AAPL to watchlist for user 12345
+2025-07-02 22:37:46,702 - StockAlerts.DB - INFO - Added TSLA to watchlist for user 12345
+2025-07-02 22:37:47,515 - StockAlerts.WebhookHandler - ERROR - Error sending message to 12345: 400 Client Error: Bad Request for url: https://api.telegram.org/bot8179936496:AAGPNKezBcFvEg_IRmhBi-eZRUb9v8JqB0E/sendMessage
+2025-07-02 22:37:47,517 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:37:47] "POST /webhook HTTP/1.1" 200 -
+2025-07-02 22:37:56,085 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:37:56] "GET /admin HTTP/1.1" 200 -
+2025-07-02 22:37:56,229 - werkzeug - INFO - 127.0.0.1 - - [02/Jul/2025 22:37:56] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
