@@ -282,8 +282,8 @@ def calculate_metrics(ticker_symbol, period="5y"):
 
         db_manager.update_stock_cache(
             symbol=ticker_symbol,
-            price=current_price,
-            ma_200=current_ma_200 if not pd.isna(current_ma_200) else None,
+            price=float(current_price),
+            ma_200=float(current_ma_200) if not pd.isna(current_ma_200) else None,
             data_json=json.dumps(cache_data),
         )
 
