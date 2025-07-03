@@ -265,4 +265,6 @@ class DatabaseManager:
                 return None
         except Exception as e:
             logger.error(f"Error getting cached data for {symbol}: {e}")
-            return None 
+            return None
+
+ 

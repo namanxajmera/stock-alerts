@@ -116,16 +116,16 @@ def fetch_tiingo_data(ticker_symbol):
         
         # Convert Tiingo format to match expected format
         # Tiingo returns: date, close, high, low, open, volume, adjClose, adjHigh, adjLow, adjOpen, adjVolume, divCash, splitFactor
-        # We need: Date, Open, High, Low, Close, Volume (matching yfinance format)
+        # Use adjusted prices which incorporate split and dividend adjustments per CRSP methodology
         
-        # Rename columns to match yfinance format
+        # Use split-adjusted prices for accurate historical charts
         column_mapping = {
             'date': 'Date',
-            'open': 'Open', 
-            'high': 'High',
-            'low': 'Low',
-            'close': 'Close',
-            'volume': 'Volume'
+            'adjOpen': 'Open', 
+            'adjHigh': 'High',
+            'adjLow': 'Low',
+            'adjClose': 'Close',
+            'adjVolume': 'Volume'
         }
         
         # Select and rename only the columns we need
@@ -144,6 +144,7 @@ def fetch_tiingo_data(ticker_symbol):
     except Exception as e:
         logger.error(f"Error fetching data from Tiingo for {ticker_symbol}: {e}")
         raise
+
 
 def calculate_metrics(ticker_symbol, period="5y"):
     """Calculate stock metrics including MA and percentiles with caching and retry logic."""
@@ -274,6 +275,7 @@ def get_stock_data(ticker, period):
     logger.info(f"Request for ticker: {ticker}, period: {period}")
     result, status_code = calculate_metrics(ticker.upper(), period)
     return jsonify(result), status_code
+
 
 @app.route('/webhook', methods=['POST'])
 def telegram_webhook():
