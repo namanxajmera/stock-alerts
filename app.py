@@ -518,6 +518,26 @@ def admin_panel():
         return f"<h1>Error</h1><p>{e}</p>", 500
 
 
+@app.route("/admin/check", methods=["POST"])
+def trigger_stock_check():
+    """Endpoint to trigger periodic stock checking for GitHub Actions."""
+    try:
+        logger.info("Stock check triggered via /admin/check endpoint")
+        
+        # Import and run the periodic checker
+        from periodic_checker import PeriodicChecker
+        
+        checker = PeriodicChecker()
+        checker.check_watchlists()
+        
+        logger.info("Stock check completed successfully")
+        return jsonify({"status": "success", "message": "Stock check completed"}), 200
+        
+    except Exception as e:
+        logger.error(f"Error in stock check: {e}", exc_info=True)
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({"error": "Not Found"}), 404

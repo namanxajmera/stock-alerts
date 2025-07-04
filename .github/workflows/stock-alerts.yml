@@ -1,0 +1,11 @@
+name: Daily Stock Alerts
+on:
+  schedule:
+    - cron: '0 1 * * *'  # 1 AM UTC daily
+  workflow_dispatch:  # Allow manual trigger
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Stock Check
+        run: curl -X POST https://web-production-59017.up.railway.app/admin/check
