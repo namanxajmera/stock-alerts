@@ -66,6 +66,10 @@ class StockService:
             
             # Fetch from Tiingo API
             return self._fetch_from_tiingo(symbol, period)
+            
+        except Exception as e:
+            self.logger.error(f"Error fetching stock data for {symbol}: {e}", exc_info=True)
+            raise
     
     def _filter_data_by_period(self, data: Dict[str, Any], period: str) -> Dict[str, Any]:
         """
