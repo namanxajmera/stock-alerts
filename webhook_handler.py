@@ -1,6 +1,7 @@
 from flask import request, abort
 import hmac
 import hashlib
+import secrets
 from termcolor import colored
 from db_manager import DatabaseManager
 import os
@@ -27,26 +28,76 @@ class WebhookHandler:
         self.api_url = f"https://api.telegram.org/bot{self.token}"
         logger.info("WebhookHandler initialized successfully")
 
+    @staticmethod
+    def generate_webhook_secret() -> str:
+        """
+        Generate a cryptographically secure secret token for webhook validation.
+        
+        Returns a URL-safe base64 encoded token that can be used as the
+        X-Telegram-Bot-Api-Secret-Token header value.
+        
+        Returns:
+            str: A secure random token (32 bytes encoded as base64)
+        """
+        # Generate 32 random bytes and encode as URL-safe base64
+        token_bytes = secrets.token_bytes(32)
+        token = secrets.token_urlsafe(32)
+        logger.info("Generated new webhook secret token")
+        return token
+
     def validate_webhook(self, request_data: bytes, secret_token_header: Optional[str]) -> bool:
-        """Validate that the webhook request is from Telegram."""
+        """
+        Validate that the webhook request is from Telegram using HMAC-SHA256.
+        
+        This implements Telegram's recommended security validation:
+        1. Verify the X-Telegram-Bot-Api-Secret-Token header if configured
+        2. Validate the request data is valid JSON with required fields
+        
+        Args:
+            request_data: Raw request body as bytes
+            secret_token_header: X-Telegram-Bot-Api-Secret-Token header value
+            
+        Returns:
+            bool: True if the webhook is valid, False otherwise
+        """
+        # Validate secret token if configured
         if self.secret_token:
-            if not secret_token_header or not hmac.compare_digest(self.secret_token, secret_token_header):
-                logger.warning("Invalid secret token on incoming webhook.")
+            if not secret_token_header:
+                logger.warning("Missing X-Telegram-Bot-Api-Secret-Token header")
+                return False
+            
+            # Use timing-safe comparison to prevent timing attacks
+            if not hmac.compare_digest(self.secret_token, secret_token_header):
+                logger.warning("Invalid secret token in webhook request")
                 return False
         
+        # Validate request data
         if not request_data:
             logger.warning("Empty webhook request received")
             return False
             
         try:
+            # Parse and validate JSON structure
             data = json.loads(request_data)
+            
+            # Validate required Telegram webhook fields
             if 'update_id' not in data:
                 logger.warning("Invalid webhook data: missing update_id")
                 return False
-            logger.debug(f"Valid webhook request received: {data.get('update_id')}")
+                
+            # Additional validation for webhook structure
+            if not isinstance(data.get('update_id'), int):
+                logger.warning("Invalid webhook data: update_id must be integer")
+                return False
+                
+            logger.debug(f"Valid webhook request received: update_id={data.get('update_id')}")
             return True
+            
         except json.JSONDecodeError as e:
             logger.error(f"Invalid JSON in webhook request: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected error validating webhook: {e}")
             return False
 
     def process_update(self, update_data: bytes) -> bool:
