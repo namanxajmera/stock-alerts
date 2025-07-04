@@ -1,19 +1,20 @@
 """
-Authentication service for handling authentication and authorization.
+Authentication service for handling admin authentication and API key validation.
 
-This service provides authentication methods and decorators for:
-- Admin panel authentication
-- API key authentication
-- Request validation
+This service provides secure authentication mechanisms for admin access
+and API key validation for protected endpoints.
 """
 
-import os
-import base64
+import functools
 import logging
-from functools import wraps
-from typing import Any, Callable, Tuple, Dict
+import hashlib
+import hmac
+from typing import Tuple, Callable, Any, Optional
+from flask import request, Response, jsonify
 
-from flask import request, jsonify
+from utils.config import config
+
+logger = logging.getLogger("StockAlerts.AuthService")
 
 
 class AuthService:
@@ -23,105 +24,92 @@ class AuthService:
         """Initialize the AuthService."""
         self.logger = logging.getLogger("StockAlerts.AuthService")
         
-    def require_admin_auth(self, f: Callable[..., Any]) -> Callable[..., Any]:
+    def require_admin_auth(self, f: Callable) -> Callable:
         """
-        Decorator to require admin authentication for sensitive endpoints.
+        Decorator for routes requiring admin authentication.
         
         Args:
-            f: The function to decorate
+            f: The function to wrap with authentication
             
         Returns:
-            Decorated function that requires admin authentication
+            Wrapped function with authentication check
         """
-        @wraps(f)
+        @functools.wraps(f)
         def decorated_function(*args: Any, **kwargs: Any) -> Any:
-            auth_header = request.headers.get('Authorization')
+            auth = request.authorization
             
-            def authenticate() -> Tuple[str, int, Dict[str, str]]:
-                """Send a 401 response with WWW-Authenticate header to trigger browser popup."""
-                return ('Authentication required', 401, {
-                    'WWW-Authenticate': 'Basic realm="Admin Panel"'
-                })
+            if not auth:
+                self.logger.warning("Admin access attempt without credentials")
+                return Response(
+                    'Access denied. Authentication required.',
+                    401,
+                    {'WWW-Authenticate': 'Basic realm="Admin"'}
+                )
             
-            if not auth_header:
-                return authenticate()
+            admin_username = config.ADMIN_USERNAME
+            admin_password = config.ADMIN_PASSWORD
             
-            try:
-                # Parse Basic Auth header
-                if not auth_header.startswith('Basic '):
-                    return authenticate()
-                
-                encoded_credentials = auth_header.split(' ', 1)[1]
-                decoded_credentials = base64.b64decode(encoded_credentials).decode('utf-8')
-                username, password = decoded_credentials.split(':', 1)
-                
-                # Get admin credentials from environment
-                admin_username = os.getenv('ADMIN_USERNAME')
-                admin_password = os.getenv('ADMIN_PASSWORD')
-                
-                if not admin_username or not admin_password:
-                    self.logger.error("Admin credentials not configured in environment")
-                    return jsonify({"error": "Admin authentication not configured"}), 500
-                
-                if username != admin_username or password != admin_password:
-                    self.logger.warning(f"Failed admin authentication attempt from {request.remote_addr}")
-                    return authenticate()
-                
-                return f(*args, **kwargs)
-                
-            except Exception as e:
-                self.logger.error(f"Authentication error: {e}")
-                return authenticate()
-        
-        return decorated_function
-    
-    def require_api_key(self, f: Callable[..., Any]) -> Callable[..., Any]:
-        """
-        Decorator to require API key authentication for automated endpoints.
-        
-        Args:
-            f: The function to decorate
+            if not admin_username or not admin_password:
+                self.logger.error("Admin credentials not configured")
+                return jsonify({"error": "Admin authentication not properly configured"}), 503
             
-        Returns:
-            Decorated function that requires API key authentication
-        """
-        @wraps(f)
-        def decorated_function(*args: Any, **kwargs: Any) -> Any:
-            api_key = request.headers.get('X-API-Key')
-            if not api_key:
-                return jsonify({"error": "API key required"}), 401
+            if auth.username != admin_username or auth.password != admin_password:
+                self.logger.warning(f"Failed admin login attempt for username: {auth.username}")
+                return Response(
+                    'Access denied. Invalid credentials.',
+                    401,
+                    {'WWW-Authenticate': 'Basic realm="Admin"'}
+                )
             
-            expected_api_key = os.getenv('API_SECRET_KEY')
-            if not expected_api_key:
-                self.logger.error("API secret key not configured in environment")
-                return jsonify({"error": "API authentication not configured"}), 500
-            
-            if api_key != expected_api_key:
-                self.logger.warning(f"Failed API key authentication attempt from {request.remote_addr}")
-                return jsonify({"error": "Invalid API key"}), 401
-            
+            self.logger.info(f"Successful admin authentication for user: {auth.username}")
             return f(*args, **kwargs)
         
         return decorated_function
     
-    def validate_admin_api_key(self, api_key: str) -> Tuple[bool, str]:
+    def validate_admin_api_key(self, provided_key: str) -> Tuple[bool, str]:
         """
-        Validate admin API key for manual operations.
+        Validate admin API key for programmatic access.
         
         Args:
-            api_key: The API key to validate
+            provided_key: The API key provided by the client
             
         Returns:
             Tuple of (is_valid, error_message)
         """
-        expected_key = os.getenv('ADMIN_API_KEY')
+        expected_api_key = config.API_SECRET_KEY
         
-        if not expected_key:
-            self.logger.warning("ADMIN_API_KEY not configured - admin endpoint disabled")
-            return False, "Admin endpoint not configured"
+        if not expected_api_key:
+            self.logger.error("API_SECRET_KEY not configured")
+            return False, "Service configuration error"
         
-        if not api_key or api_key != expected_key:
-            self.logger.warning("Unauthorized access attempt to admin endpoint")
+        # Use constant-time comparison to prevent timing attacks
+        if not hmac.compare_digest(provided_key, expected_api_key):
+            self.logger.warning("Invalid API key provided for admin access")
             return False, "Unauthorized"
         
-        return True, ""
+        self.logger.info("Valid admin API key provided")
+        return True, "Authorized"
+    
+    def validate_admin_access_key(self, provided_key: str) -> Tuple[bool, str]:
+        """
+        Validate admin access key for admin panel operations.
+        
+        Args:
+            provided_key: The admin access key provided by the client
+            
+        Returns:
+            Tuple of (is_valid, error_message)
+        """
+        expected_key = config.ADMIN_API_KEY
+        
+        if not expected_key:
+            self.logger.error("ADMIN_API_KEY not configured")
+            return False, "Service configuration error"
+        
+        # Use constant-time comparison to prevent timing attacks  
+        if not hmac.compare_digest(provided_key, expected_key):
+            self.logger.warning("Invalid admin access key provided")
+            return False, "Unauthorized"
+        
+        self.logger.info("Valid admin access key provided")
+        return True, "Authorized"

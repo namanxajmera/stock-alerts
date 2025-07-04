@@ -1,7 +1,7 @@
 """Admin routes for database management and manual operations."""
 import logging
 from typing import Tuple, Union
-from flask import Blueprint, request, jsonify, current_app, Response
+from flask import Blueprint, request, jsonify, current_app, Response, render_template
 from utils.validators import validate_api_key, ValidationError
 
 logger = logging.getLogger("StockAlerts.Admin")
@@ -29,10 +29,9 @@ def admin_panel() -> Union[str, Tuple[str, int]]:
             # Get admin data using the service
             admin_data = admin_service.get_admin_data()
             
-            # Generate HTML using the service
-            html = admin_service.generate_admin_panel_html(admin_data)
+            # Render template with admin data (secure HTML escaping)
+            return render_template('admin.html', **admin_data)
             
-            return html  # type: ignore
         except Exception as e:
             logger.error(f"Admin panel error: {e}", exc_info=True)
             return f"<h1>Error</h1><p>{e}</p>", 500

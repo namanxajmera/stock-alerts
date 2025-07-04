@@ -1,4 +1,5 @@
 import os
+import atexit
 from typing import Tuple, Any
 from dotenv import load_dotenv
 
@@ -29,6 +30,7 @@ import mimetypes
 # Import utilities
 from utils.json_encoder import CustomJSONEncoder
 from utils.scheduler import setup_scheduler
+from utils.config import config
 
 # Import route blueprints
 from routes.api_routes import api_bp
@@ -69,45 +71,34 @@ stock_service = None
 auth_service = None
 admin_service = None
 
-try:
-    logger.info("Starting application initialization...")
-    
-    # Check environment variables
-    db_url = os.getenv("DATABASE_URL")
-    bot_token = os.getenv("TELEGRAM_BOT_TOKEN") 
-    webhook_secret = os.getenv("TELEGRAM_WEBHOOK_SECRET")
-    tiingo_token = os.getenv("TIINGO_API_TOKEN")
-    
-    logger.info(f"Environment check - DATABASE_URL: {bool(db_url)}")
-    logger.info(f"Environment check - TELEGRAM_BOT_TOKEN: {bool(bot_token)}")
-    logger.info(f"Environment check - TELEGRAM_WEBHOOK_SECRET: {bool(webhook_secret)}")
-    logger.info(f"Environment check - TIINGO_API_TOKEN: {bool(tiingo_token)}")
-    
-    logger.info("Initializing database manager...")
-    db_manager = DatabaseManager()
-    logger.info("Database manager initialized successfully")
-    
-    logger.info("Initializing webhook handler...")
-    webhook_handler = WebhookHandler(
-        db_manager,
-        bot_token or "",
-        webhook_secret,
-    )
-    logger.info("Webhook handler initialized successfully")
-    
-    logger.info("Initializing service layer...")
-    stock_service = StockService(db_manager)
-    auth_service = AuthService()
-    admin_service = AdminService(db_manager)
-    logger.info("Service layer initialized successfully")
-    
-    logger.info("Application initialization completed successfully")
+logger.info("Starting application initialization...")
 
-except Exception as e:
-    logger.critical(f"FATAL: Error during initialization: {e}", exc_info=True)
-    import traceback
-    traceback.print_exc()
-    # Don't raise - let the app start but show errors in health check
+# Log configuration summary (without sensitive values)
+config_summary = config.get_config_summary()
+logger.info(f"Configuration loaded: {config_summary}")
+
+logger.info("Initializing database manager...")
+db_manager = DatabaseManager(config.DATABASE_URL)
+
+# Register cleanup function for database connection pool
+atexit.register(lambda: db_manager.close_pool() if db_manager else None)
+logger.info("Database manager initialized successfully with connection pooling")
+
+logger.info("Initializing webhook handler...")
+webhook_handler = WebhookHandler(
+    db_manager,
+    config.TELEGRAM_BOT_TOKEN,
+    config.TELEGRAM_WEBHOOK_SECRET,
+)
+logger.info("Webhook handler initialized successfully")
+
+logger.info("Initializing service layer...")
+stock_service = StockService(db_manager)
+auth_service = AuthService()
+admin_service = AdminService(db_manager)
+logger.info("Service layer initialized successfully")
+
+logger.info("Application initialization completed successfully")
 
 # Store components in app context for blueprints to access
 app.db_manager = db_manager  # type: ignore
@@ -157,10 +148,9 @@ def forbidden(error: Any) -> Tuple[Any, int]:
 
 if __name__ == "__main__":
     try:
-        port = int(os.environ.get("PORT", 5001))
-        logger.info(f"Starting Stock Analytics Dashboard server on port {port}...")
+        logger.info(f"Starting Stock Analytics Dashboard server on port {config.PORT}...")
         logger.info("Flask app routes registered successfully")
-        app.run(debug=False, host="0.0.0.0", port=port)
+        app.run(debug=config.DEBUG, host="0.0.0.0", port=config.PORT)
     except Exception as e:
         logger.critical(f"Failed to start server: {e}", exc_info=True)
         import traceback

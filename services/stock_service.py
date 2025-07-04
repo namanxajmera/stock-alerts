@@ -18,12 +18,17 @@ import pandas as pd
 import numpy as np
 import pytz
 import requests
+from flask import current_app
+
+from db_manager import DatabaseManager
+from type_definitions.stock_types import StockData, StockCacheRow
+from utils.config import config
 
 
 class StockService:
     """Service class for stock data operations."""
     
-    def __init__(self, db_manager: Any = None) -> None:
+    def __init__(self, db_manager: DatabaseManager) -> None:
         """
         Initialize the StockService.
         
@@ -33,90 +38,86 @@ class StockService:
         self.db_manager = db_manager
         self.logger = logging.getLogger("StockAlerts.StockService")
         
-    def fetch_tiingo_data(self, ticker_symbol: str) -> Optional[pd.DataFrame]:
+    def get_stock_data(self, symbol: str, period: str) -> Dict[str, Any]:
         """
-        Fetch data from Tiingo API using direct REST calls.
+        Get stock data for a given symbol and period.
         
         Args:
-            ticker_symbol: Stock ticker symbol to fetch data for
+            symbol: Stock symbol (e.g., 'AAPL')
+            period: Time period ('1y', '3y', '5y', 'max')
             
         Returns:
-            DataFrame with Date index and Close prices, or None if no data
+            Dictionary containing stock data and analysis
             
         Raises:
-            ValueError: If API token is not configured
-            Exception: If API request fails
+            Exception: If data fetching fails
         """
         try:
-            # Get API token from environment
-            api_token = os.getenv("TIINGO_API_TOKEN")
-            if not api_token:
-                raise ValueError("TIINGO_API_TOKEN not found in environment variables")
-
-            self.logger.info(f"Fetching Tiingo data for {ticker_symbol}")
-
-            # Calculate start date for maximum historical data (30+ years available)
-            end_date = datetime.now()
-            start_date = end_date - timedelta(days=30 * 365)  # 30 years ago
-
-            # Build the REST API URL as per Tiingo docs
-            url = f"https://api.tiingo.com/tiingo/daily/{ticker_symbol}/prices"
-
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Token {api_token}",
-            }
-
-            params = {
-                "startDate": start_date.strftime("%Y-%m-%d"),
-                "endDate": end_date.strftime("%Y-%m-%d"),
-            }
-
-            self.logger.info(
-                f"Making request to: {url} with dates {params['startDate']} to {params['endDate']}"
-            )
-
-            # Make the API request
-            response = requests.get(url, headers=headers, params=params)
-            response.raise_for_status()
-
-            data = response.json()
-
-            if not data:
-                self.logger.warning(f"No data returned from Tiingo for {ticker_symbol}")
-                return None
-
-            # Convert JSON response to DataFrame
-            df = pd.DataFrame(data)
-
-            # Convert Tiingo format to match expected format
-            # Tiingo returns: date, close, high, low, open, volume, adjClose, adjHigh, adjLow, adjOpen, adjVolume, divCash, splitFactor
-            # Use adjusted prices which incorporate split and dividend adjustments per CRSP methodology
-
-            # Use split-adjusted prices for accurate historical charts
-            column_mapping = {
-                "date": "Date",
-                "adjClose": "Close",
-            }
-
-            # Select and rename only the columns we need
-            df_filtered = df[list(column_mapping.keys())].rename(columns=column_mapping)
-
-            # Convert date string to datetime and set as index
-            df_filtered["Date"] = pd.to_datetime(df_filtered["Date"])
-            df_filtered.set_index("Date", inplace=True)
-
-            # Sort by date (oldest first)
-            df_filtered = df_filtered.sort_index()
-
-            self.logger.info(
-                f"Successfully fetched {len(df_filtered)} data points for {ticker_symbol} from Tiingo"
-            )
-            return df_filtered
-
+            self.logger.info(f"Fetching stock data for {symbol} ({period})")
+            
+            # Check cache first
+            cache_hours = config.CACHE_HOURS
+            cached_data = self.db_manager.get_fresh_cache(symbol, cache_hours)
+            
+            if cached_data:
+                self.logger.info(f"Using cached data for {symbol}")
+                data = json.loads(cached_data['data_json'])
+                return self._filter_data_by_period(data, period)
+            
+            # Fetch from Tiingo API
+            return self._fetch_from_tiingo(symbol, period)
+            
         except Exception as e:
-            self.logger.error(f"Error fetching data from Tiingo for {ticker_symbol}: {e}")
+            self.logger.error(f"Error fetching stock data for {symbol}: {e}", exc_info=True)
             raise
+    
+    def _fetch_from_tiingo(self, symbol: str, period: str) -> Dict[str, Any]:
+        """
+        Fetch stock data from Tiingo API.
+        
+        Args:
+            symbol: Stock symbol
+            period: Time period
+            
+        Returns:
+            Stock data dictionary
+        """
+        api_token = config.TIINGO_API_TOKEN
+        if not api_token:
+            raise ValueError("TIINGO_API_TOKEN not configured")
+        
+        # Calculate date range
+        end_date = datetime.now().date()
+        if period == '1y':
+            start_date = end_date - timedelta(days=365)
+        elif period == '3y':
+            start_date = end_date - timedelta(days=1095)
+        elif period == '5y':
+            start_date = end_date - timedelta(days=1825)
+        else:  # max
+            start_date = end_date - timedelta(days=3650)  # 10 years max
+        
+        # Tiingo API request
+        url = f"https://api.tiingo.com/tiingo/daily/{symbol}/prices"
+        params = {
+            'token': api_token,
+            'startDate': start_date.strftime('%Y-%m-%d'),
+            'endDate': end_date.strftime('%Y-%m-%d'),
+            'format': 'json'
+        }
+        
+        self.logger.info(f"Fetching from Tiingo API: {symbol} from {start_date} to {end_date}")
+        
+        response = requests.get(url, params=params, timeout=30)
+        response.raise_for_status()
+        
+        tiingo_data = response.json()
+        
+        if not tiingo_data:
+            raise ValueError(f"No data returned for {symbol}")
+        
+        # Process the data
+        return self._process_tiingo_data(symbol, tiingo_data)
 
     def calculate_metrics(self, ticker_symbol: str, period: str = "5y") -> Tuple[Dict[str, Any], int]:
         """
@@ -144,7 +145,7 @@ class StockService:
                 cached_data = None
             else:
                 # Check cache first (1 hour cache)
-                cache_hours = int(os.getenv("CACHE_HOURS", 1))
+                cache_hours = config.CACHE_HOURS
                 cached_data = self.db_manager.get_fresh_cache(
                     ticker_symbol, max_age_hours=cache_hours
                 )
@@ -196,7 +197,7 @@ class StockService:
 
             # Fetch fresh data from Tiingo API
             try:
-                complete_data = self.fetch_tiingo_data(ticker_symbol)
+                complete_data = self._fetch_from_tiingo(ticker_symbol, period)
 
                 if complete_data is None or complete_data.empty:
                     return {"error": "No data available for this ticker symbol"}, 404
