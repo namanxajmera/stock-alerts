@@ -64,13 +64,20 @@ def require_admin_auth(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         auth_header = request.headers.get('Authorization')
+        
+        def authenticate():
+            """Send a 401 response with WWW-Authenticate header to trigger browser popup."""
+            return ('Authentication required', 401, {
+                'WWW-Authenticate': 'Basic realm="Admin Panel"'
+            })
+        
         if not auth_header:
-            return jsonify({"error": "Authentication required"}), 401
+            return authenticate()
         
         try:
             # Parse Basic Auth header
             if not auth_header.startswith('Basic '):
-                return jsonify({"error": "Invalid authentication format"}), 401
+                return authenticate()
             
             encoded_credentials = auth_header.split(' ', 1)[1]
             decoded_credentials = base64.b64decode(encoded_credentials).decode('utf-8')
@@ -86,13 +93,13 @@ def require_admin_auth(f):
             
             if username != admin_username or password != admin_password:
                 logger.warning(f"Failed admin authentication attempt from {request.remote_addr}")
-                return jsonify({"error": "Invalid credentials"}), 401
+                return authenticate()
             
             return f(*args, **kwargs)
             
         except Exception as e:
             logger.error(f"Authentication error: {e}")
-            return jsonify({"error": "Authentication failed"}), 401
+            return authenticate()
     
     return decorated_function
 
