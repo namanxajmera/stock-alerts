@@ -31,7 +31,7 @@ If your changes require a modification to the database schema, you must create a
 2.  **Name the file** using a sequential number and a descriptive name (e.g., `002_add_user_preferences.sql`).
 3.  **Write the SQL `ALTER TABLE` or `CREATE TABLE` statements** in the file. Make sure your changes are idempotent or safe to run multiple times if possible.
 
-The application's migration runner in [`db_manager.py`](./db_manager.py) will automatically apply new migrations in order.
+The application's migration runner in [`db_manager.py`](../db_manager.py) will automatically apply new migrations in order.
 
 ## Documentation
 

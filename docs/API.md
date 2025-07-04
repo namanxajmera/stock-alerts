@@ -10,7 +10,7 @@ This API is used by the frontend to fetch and display stock data.
 
 Fetches historical stock data, moving averages, and percentile analysis for a given stock ticker and time period.
 
-*   **File Reference:** [`app.py:get_stock_data()`](./app.py)
+*   **File Reference:** [`app.py:get_stock_data()`](../app.py)
 *   **URL Parameters:**
     *   `ticker` (string, required): The stock symbol (e.g., `AAPL`, `TSLA`).
     *   `period` (string, required): The time period to display. Valid options: `1y`, `3y`, `5y`, `max`.
@@ -56,7 +56,7 @@ This endpoint acts as the webhook for the Telegram Bot API.
 
 Receives updates from Telegram whenever a user interacts with the bot.
 
-*   **File Reference:** [`app.py:telegram_webhook()`](./app.py) and [`webhook_handler.py`](./webhook_handler.py)
+*   **File Reference:** [`app.py:telegram_webhook()`](../app.py) and [`webhook_handler.py`](../webhook_handler.py)
 *   **Request Body:** A JSON object sent by Telegram, containing the update information. See [Telegram Bot API Docs](https://core.telegram.org/bots/api#update) for the full structure.
 *   **Authentication:** The request must include a secret token in the `X-Telegram-Bot-Api-Secret-Token` header, which is validated against the `TELEGRAM_WEBHOOK_SECRET` environment variable. This validation occurs in `webhook_handler.py:validate_webhook()`.
 
@@ -73,7 +73,7 @@ These endpoints are for administrative, health-checking, and automation purposes
 
 A health check endpoint to verify that the application and its database connection are operational.
 
-*   **File Reference:** [`app.py:health_check()`](./app.py)
+*   **File Reference:** [`app.py:health_check()`](../app.py)
 *   **Authentication:** None.
 
 *   **Success Response (200 OK):**
@@ -94,8 +94,8 @@ A health check endpoint to verify that the application and its database connecti
 
 A simple HTML admin panel to view data from the database tables.
 
-*   **File Reference:** [`app.py:admin_panel()`](./app.py)
-*   **Authentication:** HTTP Basic Authentication. Credentials must match `ADMIN_USERNAME` and `ADMIN_PASSWORD` from the environment variables. The auth logic is implemented in the `require_admin_auth` decorator in [`app.py`](./app.py).
+*   **File Reference:** [`app.py:admin_panel()`](../app.py)
+*   **Authentication:** HTTP Basic Authentication. Credentials must match `ADMIN_USERNAME` and `ADMIN_PASSWORD` from the environment variables. The auth logic is implemented in the `require_admin_auth` decorator in [`app.py`](../app.py).
 
 *   **Response:** Returns an HTML page with tables for `users`, `watchlist_items`, `alert_history`, etc.
 
@@ -103,9 +103,9 @@ A simple HTML admin panel to view data from the database tables.
 
 An endpoint designed to be triggered by an external scheduler (like a cron job or GitHub Action) to run the periodic stock check.
 
-*   **File Reference:** [`app.py:trigger_stock_check()`](./app.py)
+*   **File Reference:** [`app.py:trigger_stock_check()`](../app.py)
 *   **Authentication:** None by default in the provided code, but it is implicitly protected by being an obscure POST endpoint. **Recommendation:** This endpoint should be protected, for example, by requiring a secret API key.
-*   **Use Case:** The GitHub Action defined in [`.github/workflows/stock-alerts.yml`](./.github/workflows/stock-alerts.yml) calls this endpoint to kick off the daily alert process.
+*   **Use Case:** The GitHub Action defined in [`.github/workflows/stock-alerts.yml`](../.github/workflows/stock-alerts.yml) calls this endpoint to kick off the daily alert process.
 
 *   **Success Response (200 OK):**
     ```json

@@ -1,10 +1,10 @@
 # Local Development Setup Guide
 
-This guide provides step-by-step instructions to set up and run the StockViz application on a local machine. For a production environment, see [DEPLOYMENT.md](./DEPLOYMENT.md).
+This guide provides step-by-step instructions to set up and run the StockViz application on a local machine. For a production environment, see [DEPLOYMENT.md](DEPLOYMENT.md).
 
 The project includes one-click startup scripts for convenience:
-*   For Windows: [`start.bat`](./start.bat)
-*   For Linux/macOS: [`start.sh`](./start.sh)
+*   For Windows: [`start.bat`](../start.bat)
+*   For Linux/macOS: [`start.sh`](../start.sh)
 
 These scripts automate the steps below. For manual setup or troubleshooting, follow these instructions.
 
@@ -26,7 +26,7 @@ cd <repository-name>
 
 ## 3. Environment Configuration
 
-The application uses environment variables for configuration. All required variables are listed in [`.env.example`](./.env.example).
+The application uses environment variables for configuration. All required variables are listed in [`.env.example`](../.env.example).
 
 1.  **Create a `.env` file:**
     ```sh
@@ -64,7 +64,7 @@ The application uses environment variables for configuration. All required varia
     ADMIN_PASSWORD=your_secure_password_here
     ```
 
-**IMPORTANT:** The `DATABASE_URL` is required for the application to connect to PostgreSQL. The default file-based database path in [`.env.example`](./.env.example) is for a SQLite setup which is not supported by the current `psycopg2` driver in [`requirements.txt`](./requirements.txt).
+**IMPORTANT:** The `DATABASE_URL` is required for the application to connect to PostgreSQL. The default file-based database path in [`.env.example`](../.env.example) is for a SQLite setup which is not supported by the current `psycopg2` driver in [`requirements.txt`](../requirements.txt).
 
 ## 4. Virtual Environment and Dependencies
 
@@ -86,7 +86,7 @@ It is highly recommended to use a Python virtual environment to manage dependenc
         ```
 
 3.  **Install the required Python packages:**
-    The project's dependencies are listed in [`requirements.txt`](./requirements.txt).
+    The project's dependencies are listed in [`requirements.txt`](../requirements.txt).
     ```sh
     pip install --upgrade pip
     pip install -r requirements.txt
@@ -94,12 +94,12 @@ It is highly recommended to use a Python virtual environment to manage dependenc
 
 ## 5. Database Initialization
 
-The application can initialize the database schema automatically on the first run. The schema is defined in the migration files located in the [`migrations/`](./migrations/) directory.
+The application can initialize the database schema automatically on the first run. The schema is defined in the migration files located in the [`migrations/`](../migrations/) directory.
 
-*   [`migrations/000_migrations_table.sql`](./migrations/000_migrations_table.sql): Creates the table to track which migrations have been applied.
-*   [`migrations/001_initial.sql`](./migrations/001_initial.sql): Defines the core application schema (`users`, `watchlist_items`, `stock_cache`, etc.).
+*   [`migrations/000_migrations_table.sql`](../migrations/000_migrations_table.sql): Creates the table to track which migrations have been applied.
+*   [`migrations/001_initial.sql`](../migrations/001_initial.sql): Defines the core application schema (`users`, `watchlist_items`, `stock_cache`, etc.).
 
-The initialization logic is handled by the `initialize_database()` function in [`db_manager.py`](./db_manager.py). When you run the application, it will connect to the PostgreSQL database specified in your `DATABASE_URL` and apply any pending migrations.
+The initialization logic is handled by the `initialize_database()` function in [`db_manager.py`](../db_manager.py). When you run the application, it will connect to the PostgreSQL database specified in your `DATABASE_URL` and apply any pending migrations.
 
 **Ensure your PostgreSQL server is running before proceeding.**
 

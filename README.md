@@ -25,6 +25,6 @@ This tool is built for investors and analysts who want to make data-driven decis
 
 ## Getting Started
 
-*   **To set up your local development environment**, follow the detailed instructions in the [**SETUP.md**](./SETUP.md) guide.
-*   **To understand the system's components and data flow**, please review the [**ARCHITECTURE.md**](./ARCHITECTURE.md) document.
-*   **To learn about the available API endpoints**, see the [**API.md**](./API.md) documentation.
+*   **To set up your local development environment**, follow the detailed instructions in the [**SETUP.md**](./docs/SETUP.md) guide.
+*   **To understand the system's components and data flow**, please review the [**ARCHITECTURE.md**](./docs/ARCHITECTURE.md) document.
+*   **To learn about the available API endpoints**, see the [**API.md**](./docs/API.md) documentation.
