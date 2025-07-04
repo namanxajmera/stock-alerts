@@ -10,4 +10,5 @@ Jinja2
 tiingo
 gunicorn
 termcolor
-psycopg2-binary 
+psycopg2-binary
+APScheduler 

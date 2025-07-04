@@ -40,6 +40,9 @@ from db_manager import DatabaseManager
 from webhook_handler import WebhookHandler
 import logging
 import psycopg2.extras
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+import atexit
 
 
 def setup_logging():
@@ -200,6 +203,47 @@ except Exception as e:
     import traceback
     traceback.print_exc()
     # Don't raise - let the app start but show errors in health check
+
+
+def scheduled_stock_check():
+    """Function to run scheduled stock checks."""
+    try:
+        logger.info("Starting scheduled stock check...")
+        
+        # Import and run the periodic checker
+        from periodic_checker import PeriodicChecker
+        
+        checker = PeriodicChecker()
+        checker.check_watchlists()
+        
+        logger.info("Scheduled stock check completed successfully")
+        
+    except Exception as e:
+        logger.error(f"Error in scheduled stock check: {e}", exc_info=True)
+
+
+# Initialize APScheduler
+scheduler = BackgroundScheduler()
+
+# Add the scheduled job - runs daily at 1 AM UTC (same as GitHub Actions)
+scheduler.add_job(
+    func=scheduled_stock_check,
+    trigger=CronTrigger(hour=1, minute=0, timezone=pytz.UTC),
+    id='stock_check',
+    name='Daily Stock Check',
+    replace_existing=True
+)
+
+# Start the scheduler
+try:
+    scheduler.start()
+    logger.info("APScheduler started successfully - daily stock checks scheduled for 1 AM UTC")
+    
+    # Ensure scheduler stops when the app shuts down
+    atexit.register(lambda: scheduler.shutdown())
+    
+except Exception as e:
+    logger.error(f"Failed to start scheduler: {e}", exc_info=True)
 
 
 def fetch_tiingo_data(ticker_symbol):
@@ -647,9 +691,21 @@ def admin_panel():
 
 @app.route("/admin/check", methods=["POST"])
 def trigger_stock_check():
-    """Endpoint to trigger periodic stock checking for GitHub Actions."""
+    """Endpoint to manually trigger stock checking (secured with API key)."""
+    # Simple API key authentication
+    api_key = request.headers.get('X-API-Key')
+    expected_key = os.getenv('ADMIN_API_KEY')
+    
+    if not expected_key:
+        logger.warning("ADMIN_API_KEY not configured - admin endpoint disabled")
+        return jsonify({"status": "error", "message": "Admin endpoint not configured"}), 503
+    
+    if not api_key or api_key != expected_key:
+        logger.warning("Unauthorized access attempt to admin endpoint")
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    
     try:
-        logger.info("Stock check triggered via /admin/check endpoint")
+        logger.info("Stock check triggered manually via /admin/check endpoint")
         
         # Import and run the periodic checker
         from periodic_checker import PeriodicChecker
