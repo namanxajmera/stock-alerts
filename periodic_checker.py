@@ -12,18 +12,22 @@ import pandas as pd
 import requests
 from requests.exceptions import RequestException, HTTPError, Timeout, ConnectionError
 import random
+from typing import Dict, List, Optional, Union, Any, Tuple
+from type_definitions.stock_types import DataFrameType, StockSymbol
+from type_definitions.user_types import UserId
+# from type_definitions.api_types import TiingoResponse  # Not needed for type hints
 
 logger = logging.getLogger('StockAlerts.PeriodicChecker')
 
 class PeriodicChecker:
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the periodic checker."""
         self.db = DatabaseManager()
         bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
-        self.webhook_handler = WebhookHandler(self.db, bot_token)
+        self.webhook_handler = WebhookHandler(self.db, bot_token or "")
         logger.info("Periodic checker initialized")
 
-    def check_watchlists(self):
+    def check_watchlists(self) -> None:
         """Check all active watchlists for alerts efficiently."""
         try:
             logger.info("Starting watchlist check")
@@ -36,12 +40,12 @@ class PeriodicChecker:
             # Group users by symbol to fetch data only once per symbol
             symbol_user_map = defaultdict(list)
             for item in watchlists:
-                symbol_user_map[item['symbol']].append(item['user_id'])
+                symbol_user_map[item['symbol']].append(str(item['user_id']))
             
             logger.info(f"Found {len(watchlists)} total watchlist items for {len(symbol_user_map)} unique symbols.")
             
             for symbol, user_ids in symbol_user_map.items():
-                self._process_symbol(symbol, user_ids)
+                self._process_symbol(str(symbol), user_ids)
                 # Longer delay between symbols to be more respectful
                 symbol_delay = float(os.getenv('YF_REQUEST_DELAY', 3.0))
                 time.sleep(symbol_delay)
@@ -53,7 +57,7 @@ class PeriodicChecker:
             logger.error(error_msg, exc_info=True)
             self.db.log_event('error', f"{error_msg}\n{traceback.format_exc()}")
 
-    def _fetch_symbol_data_tiingo(self, symbol, max_retries=3):
+    def _fetch_symbol_data_tiingo(self, symbol: str, max_retries: int = 3) -> Optional[DataFrameType]:
         """Fetch symbol data from Tiingo API using direct REST calls with retry logic."""
         api_token = os.getenv('TIINGO_API_TOKEN')
         if not api_token:
@@ -157,7 +161,7 @@ class PeriodicChecker:
         logger.error(f"Failed to fetch data for {symbol} after {max_retries} attempts")
         return None
 
-    def _process_symbol(self, symbol, user_ids):
+    def _process_symbol(self, symbol: str, user_ids: List[str]) -> None:
         """Process a single symbol for all interested users."""
         logger.info(f"Processing {symbol} for {len(user_ids)} user(s)")
         try:
@@ -242,7 +246,7 @@ class PeriodicChecker:
             logger.error(error_msg, exc_info=True)
             self.db.log_event('error', error_msg, symbol=symbol)
 
-def main():
+def main() -> None:
     """Main function to run the periodic checker."""
     # This script is intended to be run by a scheduler like cron.
     # The infinite loop is removed in favor of single-run execution.

@@ -1,0 +1,228 @@
+[tool.mypy]
+# Basic mypy configuration
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+
+# Strictness settings
+strict_optional = true
+strict_equality = true
+extra_checks = true
+
+# Error reporting
+show_error_codes = true
+show_column_numbers = true
+show_error_context = true
+color_output = true
+
+# Module discovery
+mypy_path = "$MYPY_CONFIG_FILE_DIR"
+namespace_packages = true
+explicit_package_bases = true
+
+# Import handling
+follow_imports = "normal"
+ignore_missing_imports = false
+
+# Third-party library configurations
+# Ignore type errors for specific third-party libraries
+[[tool.mypy.overrides]]
+module = [
+    "psycopg2.*",
+    "tiingo.*",
+    "pandas.*",
+    "numpy.*",
+    "flask_cors.*",
+    "termcolor.*",
+    "apscheduler.*",
+    "pytz.*",
+    "requests.*",
+    "dotenv.*",
+]
+ignore_missing_imports = true
+
+# Allow untyped calls for specific modules where type stubs are incomplete
+[[tool.mypy.overrides]]
+module = [
+    "flask.*",
+    "werkzeug.*",
+]
+ignore_missing_imports = true
+disallow_untyped_calls = false
+
+# Specific module configurations
+[[tool.mypy.overrides]]
+module = "tests.*"
+ignore_errors = true
+
+# Allow dynamic typing for certain modules
+[[tool.mypy.overrides]]
+module = [
+    "migrations.*",
+    "scripts.*",
+]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+# Configuration for generated or legacy code
+[[tool.mypy.overrides]]
+module = [
+    "venv.*",
+    "*.migrations.*",
+]
+ignore_errors = true
+
+# Specific module overrides for strict checking
+[[tool.mypy.overrides]]
+module = [
+    "app",
+    "db_manager",
+    "webhook_handler", 
+    "periodic_checker",
+]
+strict = true
+
+[[tool.mypy.overrides]]
+module = [
+    "type_definitions.*",
+]
+strict = true
+warn_return_any = true
+
+[[tool.mypy.overrides]]
+module = [
+    "services.*",
+    "routes.*",
+    "utils.*",
+]
+strict = true
+
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stock-alerts"
+dynamic = ["version"]
+description = "Stock price alerts system with Telegram integration"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Stock Alerts Team"},
+]
+keywords = ["stock", "alerts", "telegram", "finance"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+dependencies = [
+    "flask>=2.0.0",
+    "flask-cors>=3.0.0",
+    "psycopg2-binary>=2.9.0",
+    "requests>=2.25.0",
+    "pandas>=1.3.0",
+    "numpy>=1.21.0",
+    "tiingo>=0.14.0",
+    "python-dotenv>=0.19.0",
+    "apscheduler>=3.8.0",
+    "pytz>=2021.1",
+    "termcolor>=1.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy>=1.0.0",
+    "black>=22.0.0",
+    "flake8>=4.0.0",
+    "isort>=5.10.0",
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pre-commit>=2.17.0",
+]
+
+type-check = [
+    "mypy>=1.0.0",
+    "types-requests>=2.25.0",
+    "types-python-dateutil>=2.8.0",
+    "types-pytz>=2021.1.0",
+    "types-termcolor>=1.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/stock-alerts"
+Documentation = "https://github.com/yourusername/stock-alerts/blob/main/docs"
+Repository = "https://github.com/yourusername/stock-alerts"
+Issues = "https://github.com/yourusername/stock-alerts/issues"
+
+[tool.setuptools_scm]
+write_to = "stock_alerts/_version.py"
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = '''
+(
+  /(
+      \.eggs
+    | \.git
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | venv
+    | migrations
+  )/
+)
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["stock_alerts", "types", "services", "routes", "utils"]
+known_third_party = ["flask", "pandas", "numpy", "requests", "psycopg2"]
+skip_glob = ["venv/*", "migrations/*"]
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "venv",
+    "migrations",
+    "build",
+    "dist",
+    ".mypy_cache",
+    ".pytest_cache",
+]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]

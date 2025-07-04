@@ -7,11 +7,14 @@ import os
 import json
 import requests
 import logging
+from typing import Dict, List, Optional, Union, Any, Tuple
+from type_definitions.api_types import TelegramMessage, TelegramUser, WebhookUpdate, TelegramAPIResponse
+from type_definitions.user_types import UserId
 
 logger = logging.getLogger('StockAlerts.WebhookHandler')
 
 class WebhookHandler:
-    def __init__(self, db_manager, bot_token, secret_token=None):
+    def __init__(self, db_manager: DatabaseManager, bot_token: str, secret_token: Optional[str] = None) -> None:
         logger.info("WebhookHandler __init__ starting...")
         self.db = db_manager
         self.token = bot_token
@@ -24,7 +27,7 @@ class WebhookHandler:
         self.api_url = f"https://api.telegram.org/bot{self.token}"
         logger.info("WebhookHandler initialized successfully")
 
-    def validate_webhook(self, request_data, secret_token_header):
+    def validate_webhook(self, request_data: bytes, secret_token_header: Optional[str]) -> bool:
         """Validate that the webhook request is from Telegram."""
         if self.secret_token:
             if not secret_token_header or not hmac.compare_digest(self.secret_token, secret_token_header):
@@ -46,7 +49,7 @@ class WebhookHandler:
             logger.error(f"Invalid JSON in webhook request: {e}")
             return False
 
-    def process_update(self, update_data):
+    def process_update(self, update_data: bytes) -> bool:
         """Process an update from Telegram."""
         try:
             update = json.loads(update_data)
@@ -81,7 +84,7 @@ class WebhookHandler:
             self.db.log_event('error', f"Error processing update: {e}", user_id=user_id_for_log)
             return False
 
-    def _handle_command(self, message):
+    def _handle_command(self, message: Dict[str, Any]) -> None:
         """Handle bot commands."""
         command, *args = message['text'].split()
         command = command.lower()
@@ -103,7 +106,7 @@ class WebhookHandler:
             self.db.log_event('error', f"Error handling command '{command}': {e}", user_id=user_id)
             self._send_message(user_id, "An internal error occurred. Please try again later.")
 
-    def _get_welcome_message(self):
+    def _get_welcome_message(self) -> str:
         """Get the welcome message text."""
         return (
             "Welcome to Stock Alerts Bot! 📈\n\n"
@@ -114,7 +117,7 @@ class WebhookHandler:
             "/list - Show your watchlist\n"
         )
 
-    def _send_message(self, chat_id, text, parse_mode='HTML'):
+    def _send_message(self, chat_id: Union[str, int], text: str, parse_mode: str = 'HTML') -> bool:
         """Send a message to a Telegram chat."""
         payload = {'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode}
         try:
@@ -124,10 +127,10 @@ class WebhookHandler:
             return True
         except requests.RequestException as e:
             logger.error(f"Error sending message to {chat_id}: {e}")
-            self.db.log_event('error', f"Error sending message: {e}", user_id=chat_id)
+            self.db.log_event('error', f"Error sending message: {e}", user_id=str(chat_id))
             return False
 
-    def send_alert(self, user_id, symbol, price, percentile, percentile_16, percentile_84):
+    def send_alert(self, user_id: str, symbol: str, price: float, percentile: float, percentile_16: float, percentile_84: float) -> bool:
         """Send a stock alert to a user."""
         try:
             message = (
@@ -164,11 +167,12 @@ class WebhookHandler:
             )
             return False
 
-    def _handle_list_command(self, user_id):
+    def _handle_list_command(self, user_id: str) -> None:
         """Handle the /list command."""
         watchlist = self.db.get_watchlist(user_id)
         if not watchlist:
-            return self._send_message(user_id, "Your watchlist is empty. Add stocks using /add <TICKER>")
+            self._send_message(user_id, "Your watchlist is empty. Add stocks using /add <TICKER>")
+            return
         
         message_lines = ["📋 <b>Your Watchlist:</b>"]
         for item in watchlist:
@@ -176,10 +180,11 @@ class WebhookHandler:
         
         self._send_message(user_id, "\n".join(message_lines))
 
-    def _handle_add_command(self, user_id, tickers):
+    def _handle_add_command(self, user_id: str, tickers: List[str]) -> None:
         """Handle the /add command."""
         if not tickers:
-            return self._send_message(user_id, "Please provide at least one ticker. Usage: /add AAPL TSLA")
+            self._send_message(user_id, "Please provide at least one ticker. Usage: /add AAPL TSLA")
+            return
         
         added = []
         errors = []
@@ -198,10 +203,11 @@ class WebhookHandler:
         
         self._send_message(user_id, response.strip())
 
-    def _handle_remove_command(self, user_id, tickers):
+    def _handle_remove_command(self, user_id: str, tickers: List[str]) -> None:
         """Handle the /remove command."""
         if not tickers:
-            return self._send_message(user_id, "Please provide at least one ticker. Usage: /remove AAPL TSLA")
+            self._send_message(user_id, "Please provide at least one ticker. Usage: /remove AAPL TSLA")
+            return
 
         removed_count = 0
         for ticker in tickers:

@@ -6,12 +6,15 @@ import traceback
 import logging
 from contextlib import contextmanager
 from urllib.parse import urlparse
+from typing import Dict, List, Optional, Union, Any, Tuple, Generator
+from type_definitions.user_types import User, WatchlistItem, AlertHistory, WatchlistItemWithPrice, UserRow, WatchlistItemRow, AlertHistoryRow
+from type_definitions.stock_types import StockCache, StockCacheRow
 
 logger = logging.getLogger("StockAlerts.DB")
 
 
 class DatabaseManager:
-    def __init__(self, db_url=None):
+    def __init__(self, db_url: Optional[str] = None) -> None:
         """Initialize the database manager."""
         logger.info("DatabaseManager __init__ starting...")
         self.db_url = db_url or os.getenv("DATABASE_URL")
@@ -23,13 +26,13 @@ class DatabaseManager:
         self.initialize_database()
         logger.info("DatabaseManager __init__ completed successfully")
 
-    def _get_connection(self):
+    def _get_connection(self) -> psycopg2.extensions.connection:
         """Get a database connection with proper configuration."""
         conn = psycopg2.connect(self.db_url)
         return conn
 
     @contextmanager
-    def _managed_cursor(self, commit=False):
+    def _managed_cursor(self, commit: bool = False) -> Generator[psycopg2.extras.RealDictCursor, None, None]:
         """A context manager for database connections and cursors."""
         conn = self._get_connection()
         cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
@@ -44,7 +47,7 @@ class DatabaseManager:
         finally:
             conn.close()
 
-    def initialize_database(self):
+    def initialize_database(self) -> None:
         """Initialize the database schema if it doesn't exist."""
         try:
             logger.info("Initializing database...")
@@ -123,7 +126,7 @@ class DatabaseManager:
         except Exception as e:
             logger.error(f"Error initializing database: {e}", exc_info=True)
 
-    def add_user(self, user_id, name):
+    def add_user(self, user_id: str, name: str) -> bool:
         """Add a new user or update their name."""
         sql = """
             INSERT INTO users (id, name) VALUES (%s, %s)
@@ -138,7 +141,7 @@ class DatabaseManager:
             logger.error(f"Error adding/updating user {user_id}")
             return False
 
-    def add_to_watchlist(self, user_id, symbol):
+    def add_to_watchlist(self, user_id: str, symbol: str) -> Tuple[bool, Optional[str]]:
         """Add a stock to user's watchlist."""
         try:
             with self._managed_cursor(commit=True) as cursor:
@@ -167,7 +170,7 @@ class DatabaseManager:
             logger.error(f"Error adding to watchlist for user {user_id}: {e}")
             return False, str(e)
 
-    def remove_from_watchlist(self, user_id, symbol):
+    def remove_from_watchlist(self, user_id: str, symbol: str) -> bool:
         """Remove a stock from user's watchlist."""
         try:
             with self._managed_cursor(commit=True) as cursor:
@@ -183,7 +186,7 @@ class DatabaseManager:
             logger.error(f"Error removing from watchlist for user {user_id}: {e}")
             return False
 
-    def get_watchlist(self, user_id):
+    def get_watchlist(self, user_id: str) -> List[WatchlistItemWithPrice]:
         """Get user's watchlist with current prices."""
         sql = """
             SELECT w.symbol, w.alert_threshold_low, w.alert_threshold_high, sc.last_price, sc.ma_200
@@ -194,12 +197,19 @@ class DatabaseManager:
         try:
             with self._managed_cursor() as cursor:
                 cursor.execute(sql, (user_id,))
-                return [dict(row) for row in cursor.fetchall()]
+                rows = cursor.fetchall()
+                return [WatchlistItemWithPrice(
+                    symbol=row['symbol'],
+                    alert_threshold_low=row['alert_threshold_low'],
+                    alert_threshold_high=row['alert_threshold_high'],
+                    last_price=row['last_price'],
+                    ma_200=row['ma_200']
+                ) for row in rows]
         except Exception:
             logger.error(f"Error getting watchlist for user {user_id}")
             return []
 
-    def update_stock_cache(self, symbol, price, ma_200, data_json):
+    def update_stock_cache(self, symbol: str, price: float, ma_200: Optional[float], data_json: str) -> bool:
         """Update or insert stock data in cache."""
         sql = """
             INSERT INTO stock_cache (symbol, last_check, last_price, ma_200, data_json)
@@ -218,7 +228,7 @@ class DatabaseManager:
             logger.error(f"Error updating stock cache for {symbol}")
             return False
 
-    def log_event(self, log_type, message, user_id=None, symbol=None):
+    def log_event(self, log_type: str, message: str, user_id: Optional[str] = None, symbol: Optional[str] = None) -> None:
         """Log an event to the database."""
         sql = "INSERT INTO logs (timestamp, log_type, message, user_id, symbol) VALUES (NOW(), %s, %s, %s, %s)"
         try:
@@ -229,7 +239,7 @@ class DatabaseManager:
             logger.error(f"CRITICAL: Failed to write log to database: {e}")
             logger.error(f"Original log message: [{log_type}] {message}")
 
-    def get_config(self, key):
+    def get_config(self, key: str) -> Optional[str]:
         """Get configuration value."""
         try:
             with self._managed_cursor() as cursor:
@@ -241,8 +251,8 @@ class DatabaseManager:
             return None
 
     def add_alert_history(
-        self, user_id, symbol, price, percentile, status="sent", error_message=None
-    ):
+        self, user_id: str, symbol: str, price: float, percentile: float, status: str = "sent", error_message: Optional[str] = None
+    ) -> bool:
         """Add an alert to the history."""
         sql = """
             INSERT INTO alert_history (user_id, symbol, price, percentile, status, error_message)
@@ -260,7 +270,7 @@ class DatabaseManager:
             logger.error(f"Error adding alert history for {symbol} user {user_id}")
             return False
 
-    def get_active_watchlists(self):
+    def get_active_watchlists(self) -> List[Dict[str, Union[str, int]]]:
         """Get all active watchlists."""
         sql = """
             SELECT w.user_id, w.symbol
@@ -276,7 +286,7 @@ class DatabaseManager:
             logger.error(f"Error getting active watchlists: {e}")
             return []
 
-    def update_user_notification_time(self, user_id):
+    def update_user_notification_time(self, user_id: str) -> bool:
         """Update the last notification time for a user."""
         sql = "UPDATE users SET last_notified = NOW() WHERE id = %s"
         try:
@@ -287,7 +297,7 @@ class DatabaseManager:
             logger.error(f"Error updating notification time for user {user_id}")
             return False
 
-    def get_fresh_cache(self, symbol, max_age_hours=1):
+    def get_fresh_cache(self, symbol: str, max_age_hours: int = 1) -> Optional[StockCacheRow]:
         """Get cached stock data if it's recent enough."""
         sql = """
             SELECT symbol, last_check, last_price, ma_200, data_json
