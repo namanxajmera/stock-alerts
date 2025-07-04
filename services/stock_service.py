@@ -66,10 +66,46 @@ class StockService:
             
             # Fetch from Tiingo API
             return self._fetch_from_tiingo(symbol, period)
+    
+    def _filter_data_by_period(self, data: Dict[str, Any], period: str) -> Dict[str, Any]:
+        """
+        Filter cached data by the requested period.
+        
+        Args:
+            data: Complete cached data
+            period: Requested time period
             
-        except Exception as e:
-            self.logger.error(f"Error fetching stock data for {symbol}: {e}", exc_info=True)
-            raise
+        Returns:
+            Filtered data dictionary
+        """
+        if period == "max" or "time_series" not in data:
+            return data
+        
+        # Calculate cutoff date
+        years = int(period[:-1])
+        cutoff_date = datetime.now() - timedelta(days=years * 365)
+        
+        # Filter time series data
+        time_series = data["time_series"]
+        filtered_series = {
+            date: series_data for date, series_data in time_series.items()
+            if pd.to_datetime(date) >= cutoff_date
+        }
+        
+        # Convert to the expected format
+        dates = sorted(filtered_series.keys())
+        prices = [filtered_series[date]["price"] for date in dates]
+        ma_200 = [filtered_series[date]["ma_200"] for date in dates]
+        pct_diff = [filtered_series[date]["pct_diff"] for date in dates]
+        
+        return {
+            "dates": dates,
+            "prices": prices,
+            "ma_200": ma_200,
+            "pct_diff": pct_diff,
+            "percentiles": data["percentiles"],
+            "previous_close": data.get("previous_close"),
+        }
     
     def _fetch_from_tiingo(self, symbol: str, period: str) -> Dict[str, Any]:
         """
@@ -118,6 +154,54 @@ class StockService:
         
         # Process the data
         return self._process_tiingo_data(symbol, tiingo_data)
+    
+    def _process_tiingo_data(self, symbol: str, tiingo_data: List[Dict[str, Any]]) -> pd.DataFrame:
+        """
+        Process raw Tiingo API data into a pandas DataFrame.
+        
+        Args:
+            symbol: Stock symbol
+            tiingo_data: Raw data from Tiingo API
+            
+        Returns:
+            Processed pandas DataFrame with OHLC data
+        """
+        if not tiingo_data:
+            raise ValueError(f"No data received for {symbol}")
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(tiingo_data)
+        
+        # Ensure we have the required columns
+        required_columns = ['date', 'close']
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        if missing_columns:
+            raise ValueError(f"Missing required columns: {missing_columns}")
+        
+        # Set date as index
+        df['date'] = pd.to_datetime(df['date'])
+        df.set_index('date', inplace=True)
+        
+        # Rename columns to match expected format
+        column_mapping = {
+            'open': 'Open',
+            'high': 'High', 
+            'low': 'Low',
+            'close': 'Close',
+            'volume': 'Volume'
+        }
+        
+        df.rename(columns=column_mapping, inplace=True)
+        
+        # Ensure we have Close column
+        if 'Close' not in df.columns:
+            raise ValueError("Close price data not available")
+        
+        # Sort by date
+        df.sort_index(inplace=True)
+        
+        self.logger.info(f"Processed {len(df)} data points for {symbol}")
+        return df
 
     def calculate_metrics(self, ticker_symbol: str, period: str = "5y") -> Tuple[Dict[str, Any], int]:
         """
@@ -197,7 +281,7 @@ class StockService:
 
             # Fetch fresh data from Tiingo API
             try:
-                complete_data = self._fetch_from_tiingo(ticker_symbol, period)
+                complete_data = self._fetch_from_tiingo(ticker_symbol, "max")  # Always fetch max data for complete analysis
 
                 if complete_data is None or complete_data.empty:
                     return {"error": "No data available for this ticker symbol"}, 404
