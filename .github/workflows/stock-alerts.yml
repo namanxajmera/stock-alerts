@@ -8,4 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Stock Check
-        run: curl -X POST https://web-production-59017.up.railway.app/admin/check
+        run: |
+          curl -X POST https://web-production-59017.up.railway.app/admin/check \
+            -H "X-API-Key: ${{ secrets.API_SECRET_KEY }}" \
+            -H "Content-Type: application/json"

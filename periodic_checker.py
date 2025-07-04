@@ -9,6 +9,9 @@ import logging
 from collections import defaultdict
 import os
 import pandas as pd
+import requests
+from requests.exceptions import RequestException, HTTPError, Timeout, ConnectionError
+import random
 
 logger = logging.getLogger('StockAlerts.PeriodicChecker')
 
@@ -50,69 +53,109 @@ class PeriodicChecker:
             logger.error(error_msg, exc_info=True)
             self.db.log_event('error', f"{error_msg}\n{traceback.format_exc()}")
 
-    def _fetch_symbol_data_tiingo(self, symbol):
-        """Fetch symbol data from Tiingo API using direct REST calls."""
-        try:
-            # Get API token from environment
-            api_token = os.getenv('TIINGO_API_TOKEN')
-            if not api_token:
-                raise ValueError("TIINGO_API_TOKEN not found in environment variables")
-            
-            logger.info(f"Fetching Tiingo data for {symbol}")
-            
-            # Calculate start date for sufficient historical data
-            end_date = datetime.now()
-            start_date = end_date - timedelta(days=2*365)  # 2 years should be enough for periodic checks
-            
-            # Build the REST API URL as per Tiingo docs
-            url = f"https://api.tiingo.com/tiingo/daily/{symbol}/prices"
-            
-            headers = {
-                'Content-Type': 'application/json',
-                'Authorization': f'Token {api_token}'
-            }
-            
-            params = {
-                'startDate': start_date.strftime('%Y-%m-%d'),
-                'endDate': end_date.strftime('%Y-%m-%d')
-            }
-            
-            # Make the API request
-            import requests
-            response = requests.get(url, headers=headers, params=params)
-            response.raise_for_status()
-            
-            data = response.json()
-            
-            if not data:
-                logger.warning(f"No data available for {symbol}")
+    def _fetch_symbol_data_tiingo(self, symbol, max_retries=3):
+        """Fetch symbol data from Tiingo API using direct REST calls with retry logic."""
+        api_token = os.getenv('TIINGO_API_TOKEN')
+        if not api_token:
+            raise ValueError("TIINGO_API_TOKEN not found in environment variables")
+        
+        # Calculate start date for sufficient historical data
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=2*365)  # 2 years should be enough for periodic checks
+        
+        # Build the REST API URL as per Tiingo docs
+        url = f"https://api.tiingo.com/tiingo/daily/{symbol}/prices"
+        
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Token {api_token}'
+        }
+        
+        params = {
+            'startDate': start_date.strftime('%Y-%m-%d'),
+            'endDate': end_date.strftime('%Y-%m-%d')
+        }
+        
+        # Retry logic with exponential backoff
+        for attempt in range(max_retries):
+            try:
+                logger.info(f"Fetching Tiingo data for {symbol} (attempt {attempt + 1}/{max_retries})")
+                
+                # Add timeout to prevent hanging
+                response = requests.get(url, headers=headers, params=params, timeout=30)
+                response.raise_for_status()
+                
+                data = response.json()
+                
+                if not data:
+                    logger.warning(f"No data available for {symbol}")
+                    return None
+                
+                # Convert JSON response to DataFrame
+                df = pd.DataFrame(data)
+                
+                # Rename columns to match expected format
+                column_mapping = {
+                    'date': 'Date',
+                    'adjClose': 'Close',
+                }
+                
+                # Select and rename only the columns we need
+                df_filtered = df[list(column_mapping.keys())].rename(columns=column_mapping)
+                
+                # Convert date string to datetime and set as index
+                df_filtered['Date'] = pd.to_datetime(df_filtered['Date'])
+                df_filtered.set_index('Date', inplace=True)
+                
+                # Sort by date (oldest first)
+                df_filtered = df_filtered.sort_index()
+                
+                logger.info(f"Successfully fetched {len(df_filtered)} data points for {symbol} from Tiingo")
+                return df_filtered
+                
+            except HTTPError as e:
+                if e.response.status_code == 429:
+                    # Rate limit exceeded
+                    logger.warning(f"Rate limit exceeded for {symbol}, attempt {attempt + 1}/{max_retries}")
+                    if attempt < max_retries - 1:
+                        backoff_time = (2 ** attempt) + random.uniform(0, 1)
+                        logger.info(f"Backing off for {backoff_time:.2f} seconds")
+                        time.sleep(backoff_time)
+                        continue
+                elif e.response.status_code == 404:
+                    logger.error(f"Symbol {symbol} not found in Tiingo")
+                    return None
+                elif e.response.status_code >= 500:
+                    # Server error, retry
+                    logger.warning(f"Server error for {symbol}: {e.response.status_code}, attempt {attempt + 1}/{max_retries}")
+                    if attempt < max_retries - 1:
+                        backoff_time = (2 ** attempt) + random.uniform(0, 1)
+                        logger.info(f"Backing off for {backoff_time:.2f} seconds")
+                        time.sleep(backoff_time)
+                        continue
+                else:
+                    # Client error, don't retry
+                    logger.error(f"Client error for {symbol}: {e.response.status_code} - {e}")
+                    return None
+                    
+            except (ConnectionError, Timeout) as e:
+                logger.warning(f"Network error for {symbol}: {e}, attempt {attempt + 1}/{max_retries}")
+                if attempt < max_retries - 1:
+                    backoff_time = (2 ** attempt) + random.uniform(0, 1)
+                    logger.info(f"Backing off for {backoff_time:.2f} seconds")
+                    time.sleep(backoff_time)
+                    continue
+                    
+            except RequestException as e:
+                logger.error(f"Request exception for {symbol}: {e}")
                 return None
-            
-            # Convert JSON response to DataFrame
-            df = pd.DataFrame(data)
-            
-            # Rename columns to match expected format
-            column_mapping = {
-                'date': 'Date',
-                'adjClose': 'Close',
-            }
-            
-            # Select and rename only the columns we need
-            df_filtered = df[list(column_mapping.keys())].rename(columns=column_mapping)
-            
-            # Convert date string to datetime and set as index
-            df_filtered['Date'] = pd.to_datetime(df_filtered['Date'])
-            df_filtered.set_index('Date', inplace=True)
-            
-            # Sort by date (oldest first)
-            df_filtered = df_filtered.sort_index()
-            
-            logger.info(f"Successfully fetched {len(df_filtered)} data points for {symbol} from Tiingo")
-            return df_filtered
-            
-        except Exception as e:
-            logger.error(f"Error fetching data from Tiingo for {symbol}: {e}")
-            return None
+                
+            except Exception as e:
+                logger.error(f"Unexpected error fetching data for {symbol}: {e}")
+                return None
+        
+        logger.error(f"Failed to fetch data for {symbol} after {max_retries} attempts")
+        return None
 
     def _process_symbol(self, symbol, user_ids):
         """Process a single symbol for all interested users."""

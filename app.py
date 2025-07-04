@@ -23,6 +23,9 @@ from flask import (
     abort,
     g,
 )
+from functools import wraps
+import base64
+import re
 from flask_cors import CORS
 from tiingo import TiingoClient
 import pandas as pd
@@ -54,6 +57,85 @@ def setup_logging():
 
 logger = setup_logging()
 mimetypes.add_type("application/javascript", ".js")
+
+
+def require_admin_auth(f):
+    """Decorator to require admin authentication for sensitive endpoints."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({"error": "Authentication required"}), 401
+        
+        try:
+            # Parse Basic Auth header
+            if not auth_header.startswith('Basic '):
+                return jsonify({"error": "Invalid authentication format"}), 401
+            
+            encoded_credentials = auth_header.split(' ', 1)[1]
+            decoded_credentials = base64.b64decode(encoded_credentials).decode('utf-8')
+            username, password = decoded_credentials.split(':', 1)
+            
+            # Get admin credentials from environment
+            admin_username = os.getenv('ADMIN_USERNAME')
+            admin_password = os.getenv('ADMIN_PASSWORD')
+            
+            if not admin_username or not admin_password:
+                logger.error("Admin credentials not configured in environment")
+                return jsonify({"error": "Admin authentication not configured"}), 500
+            
+            if username != admin_username or password != admin_password:
+                logger.warning(f"Failed admin authentication attempt from {request.remote_addr}")
+                return jsonify({"error": "Invalid credentials"}), 401
+            
+            return f(*args, **kwargs)
+            
+        except Exception as e:
+            logger.error(f"Authentication error: {e}")
+            return jsonify({"error": "Authentication failed"}), 401
+    
+    return decorated_function
+
+
+def require_api_key(f):
+    """Decorator to require API key authentication for automated endpoints."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        api_key = request.headers.get('X-API-Key')
+        if not api_key:
+            return jsonify({"error": "API key required"}), 401
+        
+        expected_api_key = os.getenv('API_SECRET_KEY')
+        if not expected_api_key:
+            logger.error("API secret key not configured in environment")
+            return jsonify({"error": "API authentication not configured"}), 500
+        
+        if api_key != expected_api_key:
+            logger.warning(f"Failed API key authentication attempt from {request.remote_addr}")
+            return jsonify({"error": "Invalid API key"}), 401
+        
+        return f(*args, **kwargs)
+    
+    return decorated_function
+
+
+def validate_ticker_symbol(ticker):
+    """Validate that the ticker symbol is in a valid format."""
+    if not ticker:
+        return False, "Ticker symbol cannot be empty"
+    
+    # Remove whitespace and convert to uppercase
+    ticker = ticker.strip().upper()
+    
+    # Basic validation: 1-5 characters, letters and numbers only
+    if not re.match(r'^[A-Z0-9]{1,5}$', ticker):
+        return False, "Ticker symbol must be 1-5 characters, letters and numbers only"
+    
+    # Check for common invalid patterns
+    if ticker.isdigit():
+        return False, "Ticker symbol cannot be all numbers"
+    
+    return True, ticker
 
 
 class CustomJSONEncoder(json.JSONEncoder):
@@ -212,25 +294,46 @@ def calculate_metrics(ticker_symbol, period="5y"):
             )
 
         if cached_data and cached_data.get("data_json"):
-            logger.info(f"Using cached data for {ticker_symbol}")
+            logger.info(f"Cache hit for {ticker_symbol}")
             try:
                 cache_data = json.loads(cached_data["data_json"])
-                # Use cached percentiles if available
-                if "percentiles" in cache_data:
-                    percentile_16th = cache_data["percentiles"]["p16"]
-                    percentile_84th = cache_data["percentiles"]["p84"]
+                
+                # Check if we have complete time series data in cache
+                if "time_series" in cache_data and cache_data["time_series"]:
+                    logger.info(f"Using complete cached time series data for {ticker_symbol}")
+                    time_series = cache_data["time_series"]
+                    
+                    # Filter cached data by period
+                    if period != "max":
+                        years = int(period[:-1])
+                        start_date = datetime.now(pytz.utc) - timedelta(days=years * 365)
+                        # Filter time series data by date
+                        filtered_series = {
+                            date: data for date, data in time_series.items()
+                            if pd.to_datetime(date).tz_localize('UTC') >= start_date
+                        }
+                    else:
+                        filtered_series = time_series
+                    
+                    # Convert back to the expected format
+                    dates = sorted(filtered_series.keys())
+                    prices = [filtered_series[date]["price"] for date in dates]
+                    ma_200 = [filtered_series[date]["ma_200"] for date in dates]
+                    pct_diff = [filtered_series[date]["pct_diff"] for date in dates]
+                    
+                    result = {
+                        "dates": dates,
+                        "prices": prices,
+                        "ma_200": ma_200,
+                        "pct_diff": pct_diff,
+                        "percentiles": cache_data["percentiles"],
+                        "previous_close": cache_data.get("previous_close"),
+                    }
+                    
+                    return result, 200
                 else:
-                    # Fallback percentiles
-                    percentile_16th = -6.0
-                    percentile_84th = 6.0
-
-                # For now, fetch fresh data but note it was in cache
-                # In a full implementation, we'd store the complete time series data in cache
-                logger.info(
-                    f"Cache hit for {ticker_symbol}, but fetching fresh data for complete time series"
-                )
-                # Fall through to fetch fresh data, but we'll use the cached price info
-
+                    logger.info(f"Cached data for {ticker_symbol} missing time series, fetching fresh data")
+                    
             except (json.JSONDecodeError, KeyError) as e:
                 logger.warning(f"Invalid cached data for {ticker_symbol}: {e}")
                 # Continue to fetch fresh data
@@ -296,11 +399,21 @@ def calculate_metrics(ticker_symbol, period="5y"):
             "previous_close": previous_close,
         }
 
-        # Update cache with fresh data
+        # Update cache with fresh data including complete time series
+        time_series_data = {}
+        for i, date in enumerate(complete_data.index):
+            time_series_data[date.strftime("%Y-%m-%d")] = {
+                "price": float(complete_data["Close"].iloc[i]) if not pd.isna(complete_data["Close"].iloc[i]) else None,
+                "ma_200": float(complete_data["MA200"].iloc[i]) if not pd.isna(complete_data["MA200"].iloc[i]) else None,
+                "pct_diff": float(complete_data["pct_diff"].iloc[i]) if not pd.isna(complete_data["pct_diff"].iloc[i]) else None,
+            }
+        
         cache_data = {
             "price": float(current_price),
             "ma_200": float(current_ma_200) if not pd.isna(current_ma_200) else None,
             "percentiles": {"p16": percentile_16th, "p84": percentile_84th},
+            "previous_close": previous_close,
+            "time_series": time_series_data,
             "last_updated": datetime.now().isoformat(),
         }
 
@@ -342,7 +455,13 @@ def serve_js(filename):
 @app.route("/data/<ticker>/<period>")
 def get_stock_data(ticker, period):
     logger.info(f"Request for ticker: {ticker}, period: {period}")
-    result, status_code = calculate_metrics(ticker.upper(), period)
+    
+    # Validate ticker symbol
+    is_valid, validated_ticker = validate_ticker_symbol(ticker)
+    if not is_valid:
+        return jsonify({"error": validated_ticker}), 400
+    
+    result, status_code = calculate_metrics(validated_ticker, period)
     return jsonify(result), status_code
 
 
@@ -378,6 +497,7 @@ def health_check():
 
 
 @app.route("/admin", methods=["GET"])
+@require_admin_auth
 def admin_panel():
     try:
         if db_manager is None:
@@ -519,6 +639,7 @@ def admin_panel():
 
 
 @app.route("/admin/check", methods=["POST"])
+@require_api_key
 def trigger_stock_check():
     """Endpoint to trigger periodic stock checking for GitHub Actions."""
     try:
