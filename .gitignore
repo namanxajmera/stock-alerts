@@ -22,6 +22,11 @@ share/python-wheels/
 *.egg
 PIPFILE.lock
 
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
 # Virtual Environment
 venv/
 env/
@@ -37,7 +42,7 @@ venv.bak/
 .env.production.local
 
 # Logs
-logs/*.log
+logs/
 *.log
 
 # Database
