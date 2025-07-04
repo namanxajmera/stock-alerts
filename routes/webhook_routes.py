@@ -1,5 +1,6 @@
 """Webhook routes for Telegram bot integration."""
 import logging
+from typing import Tuple
 from flask import Blueprint, request, abort
 from flask import current_app
 
@@ -9,7 +10,7 @@ webhook_bp = Blueprint('webhook', __name__)
 
 
 @webhook_bp.route("/webhook", methods=["POST"])
-def telegram_webhook():
+def telegram_webhook() -> Tuple[str, int]:
     """Handle incoming webhook requests from Telegram."""
     # Get webhook handler from app context
     webhook_handler = getattr(current_app, 'webhook_handler', None)

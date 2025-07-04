@@ -11,7 +11,7 @@ import os
 import base64
 import logging
 from functools import wraps
-from typing import Any, Callable, Tuple
+from typing import Any, Callable, Tuple, Dict
 
 from flask import request, jsonify
 
@@ -19,11 +19,11 @@ from flask import request, jsonify
 class AuthService:
     """Service class for authentication operations."""
     
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the AuthService."""
         self.logger = logging.getLogger("StockAlerts.AuthService")
         
-    def require_admin_auth(self, f: Callable) -> Callable:
+    def require_admin_auth(self, f: Callable[..., Any]) -> Callable[..., Any]:
         """
         Decorator to require admin authentication for sensitive endpoints.
         
@@ -34,10 +34,10 @@ class AuthService:
             Decorated function that requires admin authentication
         """
         @wraps(f)
-        def decorated_function(*args, **kwargs):
+        def decorated_function(*args: Any, **kwargs: Any) -> Any:
             auth_header = request.headers.get('Authorization')
             
-            def authenticate():
+            def authenticate() -> Tuple[str, int, Dict[str, str]]:
                 """Send a 401 response with WWW-Authenticate header to trigger browser popup."""
                 return ('Authentication required', 401, {
                     'WWW-Authenticate': 'Basic realm="Admin Panel"'
@@ -75,7 +75,7 @@ class AuthService:
         
         return decorated_function
     
-    def require_api_key(self, f: Callable) -> Callable:
+    def require_api_key(self, f: Callable[..., Any]) -> Callable[..., Any]:
         """
         Decorator to require API key authentication for automated endpoints.
         
@@ -86,7 +86,7 @@ class AuthService:
             Decorated function that requires API key authentication
         """
         @wraps(f)
-        def decorated_function(*args, **kwargs):
+        def decorated_function(*args: Any, **kwargs: Any) -> Any:
             api_key = request.headers.get('X-API-Key')
             if not api_key:
                 return jsonify({"error": "API key required"}), 401

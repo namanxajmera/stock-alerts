@@ -16,7 +16,7 @@ import psycopg2.extras
 class AdminService:
     """Service class for admin operations."""
     
-    def __init__(self, db_manager):
+    def __init__(self, db_manager: Any) -> None:
         """
         Initialize the AdminService.
         

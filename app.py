@@ -1,11 +1,12 @@
 import os
+from typing import Tuple, Any
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv(".env")
 
 
-def setup_directories():
+def setup_directories() -> None:
     """Create necessary directories if they don't exist."""
     os.makedirs("logs", exist_ok=True)
     os.makedirs("db", exist_ok=True)
@@ -39,7 +40,7 @@ from routes.health_routes import health_bp
 from services import StockService, AuthService, AdminService
 
 
-def setup_logging():
+def setup_logging() -> Any:
     """Configure logging for the application."""
     logging.basicConfig(
         level=logging.INFO,
@@ -58,7 +59,7 @@ mimetypes.add_type("application/javascript", ".js")
 
 # Create Flask app first so gunicorn can always find it
 app = Flask(__name__)
-app.json_encoder = CustomJSONEncoder
+app.json = CustomJSONEncoder(app)  # type: ignore
 CORS(app)
 
 # Initialize other components
@@ -89,7 +90,7 @@ try:
     logger.info("Initializing webhook handler...")
     webhook_handler = WebhookHandler(
         db_manager,
-        bot_token,
+        bot_token or "",
         webhook_secret,
     )
     logger.info("Webhook handler initialized successfully")
@@ -109,11 +110,11 @@ except Exception as e:
     # Don't raise - let the app start but show errors in health check
 
 # Store components in app context for blueprints to access
-app.db_manager = db_manager
-app.webhook_handler = webhook_handler
-app.stock_service = stock_service
-app.auth_service = auth_service
-app.admin_service = admin_service
+app.db_manager = db_manager  # type: ignore
+app.webhook_handler = webhook_handler  # type: ignore
+app.stock_service = stock_service  # type: ignore
+app.auth_service = auth_service  # type: ignore
+app.admin_service = admin_service  # type: ignore
 
 # Setup scheduler
 scheduler = setup_scheduler()
@@ -126,30 +127,30 @@ app.register_blueprint(health_bp)
 
 
 @app.route("/")
-def index():
+def index() -> str:
     return render_template("index.html")
 
 
 @app.route("/static/js/<path:filename>")
-def serve_js(filename):
+def serve_js(filename: str) -> Any:
     return send_from_directory("static/js", filename, mimetype="application/javascript")
 
 
 @app.errorhandler(404)
-def not_found(error):
+def not_found(error: Any) -> Tuple[Any, int]:
     from flask import jsonify
     return jsonify({"error": "Not Found"}), 404
 
 
 @app.errorhandler(500)
-def server_error(error):
+def server_error(error: Any) -> Tuple[Any, int]:
     from flask import jsonify
     logger.error(f"Server Error: {error}", exc_info=True)
     return jsonify({"error": "Internal Server Error"}), 500
 
 
 @app.errorhandler(403)
-def forbidden(error):
+def forbidden(error: Any) -> Tuple[Any, int]:
     from flask import jsonify
     return jsonify({"error": "Forbidden"}), 403
 

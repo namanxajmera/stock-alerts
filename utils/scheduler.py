@@ -2,13 +2,14 @@
 import logging
 import pytz
 import atexit
+from typing import Optional
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 logger = logging.getLogger("StockAlerts.Scheduler")
 
 
-def scheduled_stock_check():
+def scheduled_stock_check() -> None:
     """Function to run scheduled stock checks."""
     try:
         logger.info("Starting scheduled stock check...")
@@ -25,7 +26,7 @@ def scheduled_stock_check():
         logger.error(f"Error in scheduled stock check: {e}", exc_info=True)
 
 
-def setup_scheduler():
+def setup_scheduler() -> Optional[BackgroundScheduler]:
     """Setup and start the APScheduler for periodic tasks."""
     # Initialize APScheduler
     scheduler = BackgroundScheduler()

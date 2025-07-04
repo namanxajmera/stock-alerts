@@ -1,6 +1,7 @@
 """Health check routes for monitoring application status."""
 import logging
-from flask import Blueprint, jsonify, current_app
+from typing import Tuple
+from flask import Blueprint, jsonify, current_app, Response
 
 logger = logging.getLogger("StockAlerts.Health")
 
@@ -8,7 +9,7 @@ health_bp = Blueprint('health', __name__)
 
 
 @health_bp.route("/health", methods=["GET"])
-def health_check():
+def health_check() -> Tuple[Response, int]:
     """Health check endpoint for monitoring application status."""
     try:
         logger.info("Health check endpoint called")

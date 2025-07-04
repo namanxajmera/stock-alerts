@@ -12,7 +12,7 @@ import json
 import time
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, Any, Tuple, Optional
+from typing import Dict, Any, Tuple, Optional, List
 
 import pandas as pd
 import numpy as np
@@ -23,7 +23,7 @@ import requests
 class StockService:
     """Service class for stock data operations."""
     
-    def __init__(self, db_manager=None):
+    def __init__(self, db_manager: Any = None) -> None:
         """
         Initialize the StockService.
         
@@ -238,7 +238,7 @@ class StockService:
                 data = complete_data
 
             # Prepare result - convert NaN to None for valid JSON
-            def clean_for_json(series):
+            def clean_for_json(series: Any) -> List[Any]:
                 """Convert pandas series to list with NaN/inf converted to None"""
                 # Replace inf/-inf with NaN, then convert to list and replace NaN with None
                 cleaned = series.replace([np.inf, -np.inf], np.nan)
