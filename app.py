@@ -59,7 +59,7 @@ mimetypes.add_type("application/javascript", ".js")
 
 # Create Flask app first so gunicorn can always find it
 app = Flask(__name__)
-app.json = CustomJSONEncoder(app)  # type: ignore
+app.json_encoder = CustomJSONEncoder  # type: ignore
 CORS(app)
 
 # Initialize other components

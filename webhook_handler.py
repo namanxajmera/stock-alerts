@@ -136,26 +136,77 @@ class WebhookHandler:
             return False
 
     def _handle_command(self, message: Dict[str, Any]) -> None:
-        """Handle bot commands."""
-        command, *args = message['text'].split()
-        command = command.lower()
-        user_id = str(message['from']['id'])
-        
+        """Handle bot commands with enhanced validation and security."""
         try:
-            if command == '/start':
-                self._send_message(user_id, self._get_welcome_message())
-            elif command == '/list':
-                self._handle_list_command(user_id)
-            elif command == '/add':
-                self._handle_add_command(user_id, args)
-            elif command == '/remove':
-                self._handle_remove_command(user_id, args)
+            # Extract and validate user ID first
+            user_id_raw = message.get('from', {}).get('id')
+            if not user_id_raw:
+                logger.warning("Message missing user ID")
+                return
+            
+            # Import validation functions
+            from utils.validators import validate_user_id, validate_command_args, ValidationError
+            
+            # Validate user ID
+            is_valid_user, validated_user_id = validate_user_id(str(user_id_raw))
+            if not is_valid_user:
+                logger.warning(f"Invalid user ID: {user_id_raw} - {validated_user_id}")
+                return
+            
+            # Extract and validate command text
+            command_text = message.get('text', '').strip()
+            if not command_text:
+                logger.warning(f"Empty command from user {validated_user_id}")
+                return
+            
+            # Parse command and arguments
+            parts = command_text.split()
+            if not parts:
+                return
+            
+            command = parts[0].lower()
+            args = parts[1:] if len(parts) > 1 else []
+            
+            # Remove leading slash and validate command
+            if command.startswith('/'):
+                command = command[1:]
+            
+            # Validate command and arguments
+            is_valid_cmd, validated_args = validate_command_args(command, args)
+            if not is_valid_cmd:
+                logger.warning(f"Invalid command from user {validated_user_id}: {command} - {validated_args}")
+                self._send_message(validated_user_id, f"❌ {validated_args}")
+                return
+            
+            # Log command execution for security monitoring
+            logger.info(f"Executing command /{command} for user {validated_user_id} with {len(validated_args)} args")
+            
+            # Execute validated commands
+            if command == 'start':
+                self._send_message(validated_user_id, self._get_welcome_message())
+            elif command == 'list':
+                self._handle_list_command(validated_user_id)
+            elif command == 'add':
+                self._handle_add_command(validated_user_id, validated_args)
+            elif command == 'remove':
+                self._handle_remove_command(validated_user_id, validated_args)
             else:
-                self._send_message(user_id, "Unknown command. Type /start for help.")
+                # This shouldn't happen due to validation, but handle it gracefully
+                logger.warning(f"Unhandled validated command: {command}")
+                self._send_message(validated_user_id, "Unknown command. Type /start for help.")
+                
+        except ValidationError as e:
+            # Handle validation errors gracefully
+            user_id = str(message.get('from', {}).get('id', 'unknown'))
+            logger.warning(f"Command validation error from user {user_id}: {e.message}")
+            self._send_message(user_id, f"❌ {e.message}")
         except Exception as e:
-            logger.error(f"Error handling command '{command}': {e}", exc_info=True)
+            # Handle unexpected errors
+            user_id = str(message.get('from', {}).get('id', 'unknown'))
+            command = message.get('text', 'unknown')[:50]  # Limit log length
+            logger.error(f"Error handling command '{command}' from user {user_id}: {e}", exc_info=True)
             self.db.log_event('error', f"Error handling command '{command}': {e}", user_id=user_id)
-            self._send_message(user_id, "An internal error occurred. Please try again later.")
+            self._send_message(user_id, "⚠️ An internal error occurred. Please try again later.")
 
     def _get_welcome_message(self) -> str:
         """Get the welcome message text."""
@@ -231,41 +282,79 @@ class WebhookHandler:
         
         self._send_message(user_id, "\n".join(message_lines))
 
-    def _handle_add_command(self, user_id: str, tickers: List[str]) -> None:
-        """Handle the /add command."""
-        if not tickers:
-            self._send_message(user_id, "Please provide at least one ticker. Usage: /add AAPL TSLA")
-            return
+    def _handle_add_command(self, user_id: str, validated_tickers: List[str]) -> None:
+        """
+        Handle the /add command with pre-validated ticker symbols.
         
+        Args:
+            user_id: Validated Telegram user ID
+            validated_tickers: List of validated ticker symbols
+        """
+        # At this point, tickers are already validated by validate_command_args
         added = []
         errors = []
-        for ticker in tickers:
-            success, err_msg = self.db.add_to_watchlist(user_id, ticker.upper())
-            if success:
-                added.append(ticker.upper())
-            else:
-                errors.append(f"{ticker.upper()}: {err_msg}")
+        
+        for ticker in validated_tickers:
+            try:
+                success, err_msg = self.db.add_to_watchlist(user_id, ticker)
+                if success:
+                    added.append(ticker)
+                    logger.info(f"Added ticker {ticker} to watchlist for user {user_id}")
+                else:
+                    errors.append(f"{ticker}: {err_msg}")
+                    logger.warning(f"Failed to add ticker {ticker} for user {user_id}: {err_msg}")
+            except Exception as e:
+                logger.error(f"Database error adding ticker {ticker} for user {user_id}: {e}")
+                errors.append(f"{ticker}: Database error")
 
-        response = ""
+        # Build response message
+        response_parts = []
         if added:
-            response += f"✅ Added {', '.join(added)} to your watchlist.\n"
+            response_parts.append(f"✅ Added {', '.join(added)} to your watchlist.")
         if errors:
-            response += f"❌ Could not add:\n" + "\n".join(errors)
+            response_parts.append("❌ Could not add:")
+            response_parts.extend(f"  • {error}" for error in errors)
         
-        self._send_message(user_id, response.strip())
+        response = "\n".join(response_parts)
+        self._send_message(user_id, response)
 
-    def _handle_remove_command(self, user_id: str, tickers: List[str]) -> None:
-        """Handle the /remove command."""
-        if not tickers:
-            self._send_message(user_id, "Please provide at least one ticker. Usage: /remove AAPL TSLA")
-            return
-
-        removed_count = 0
-        for ticker in tickers:
-            if self.db.remove_from_watchlist(user_id, ticker.upper()):
-                removed_count += 1
+    def _handle_remove_command(self, user_id: str, validated_tickers: List[str]) -> None:
+        """
+        Handle the /remove command with pre-validated ticker symbols.
         
-        if removed_count > 0:
-            self._send_message(user_id, f"✅ Removed {removed_count} stock(s) from your watchlist.")
-        else:
-            self._send_message(user_id, "None of the specified stocks were found in your watchlist.") 
+        Args:
+            user_id: Validated Telegram user ID
+            validated_tickers: List of validated ticker symbols
+        """
+        removed = []
+        not_found = []
+        errors = []
+        
+        for ticker in validated_tickers:
+            try:
+                success = self.db.remove_from_watchlist(user_id, ticker)
+                if success:
+                    removed.append(ticker)
+                    logger.info(f"Removed ticker {ticker} from watchlist for user {user_id}")
+                else:
+                    not_found.append(ticker)
+                    logger.info(f"Ticker {ticker} not found in watchlist for user {user_id}")
+            except Exception as e:
+                logger.error(f"Database error removing ticker {ticker} for user {user_id}: {e}")
+                errors.append(f"{ticker}: Database error")
+
+        # Build response message
+        response_parts = []
+        if removed:
+            response_parts.append(f"✅ Removed {', '.join(removed)} from your watchlist.")
+        if not_found:
+            response_parts.append(f"ℹ️ Not found in watchlist: {', '.join(not_found)}")
+        if errors:
+            response_parts.append("❌ Errors occurred:")
+            response_parts.extend(f"  • {error}" for error in errors)
+        
+        if not response_parts:
+            response_parts.append("ℹ️ No changes made to your watchlist.")
+        
+        response = "\n".join(response_parts)
+        self._send_message(user_id, response) 

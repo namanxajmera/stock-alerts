@@ -8,7 +8,6 @@ secret token configuration.
 import os
 import sys
 import requests
-import json
 from webhook_handler import WebhookHandler
 
 
