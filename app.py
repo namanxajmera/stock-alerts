@@ -646,7 +646,6 @@ def admin_panel():
 
 
 @app.route("/admin/check", methods=["POST"])
-@require_api_key
 def trigger_stock_check():
     """Endpoint to trigger periodic stock checking for GitHub Actions."""
     try:
