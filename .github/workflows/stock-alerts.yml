@@ -8,7 +8,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Stock Check
+        env:
+          API_SECRET_KEY: ${{ secrets.API_SECRET_KEY }}
         run: |
-          curl -X POST https://web-production-59017.up.railway.app/admin/check \
-            -H "X-API-Key: ${{ secrets.API_SECRET_KEY }}" \
-            -H "Content-Type: application/json"
+          if [ -z "$API_SECRET_KEY" ]; then
+            echo "ERROR: API_SECRET_KEY secret not configured in GitHub repository"
+            echo "Please add API_SECRET_KEY to your repository secrets"
+            exit 1
+          fi
+          
+          echo "Triggering stock check..."
+          response=$(curl -s -w "\n%{http_code}" -X POST https://web-production-59017.up.railway.app/admin/check \
+            -H "X-API-Key: $API_SECRET_KEY" \
+            -H "Content-Type: application/json")
+          
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | head -n -1)
+          
+          echo "HTTP Status: $http_code"
+          echo "Response: $body"
+          
+          if [ "$http_code" -eq 200 ]; then
+            echo "✅ Stock check completed successfully"
+          else
+            echo "❌ Stock check failed with status $http_code"
+            exit 1
+          fi
