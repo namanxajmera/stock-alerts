@@ -5,12 +5,13 @@ This module contains all type definitions related to users, watchlists,
 alerts, and user management functionality.
 """
 
-from typing import Dict, List, Optional, Union, Any, TypedDict
 from datetime import datetime
+from typing import Any, Dict, List, Optional, TypedDict, Union
 
 
 class User(TypedDict):
     """User data structure."""
+
     id: str  # Telegram user ID as string
     name: str
     joined_at: datetime
@@ -21,6 +22,7 @@ class User(TypedDict):
 
 class UserProfile(TypedDict):
     """Extended user profile information."""
+
     id: str
     name: str
     username: Optional[str]
@@ -36,6 +38,7 @@ class UserProfile(TypedDict):
 
 class NotificationSettings(TypedDict):
     """User notification preferences."""
+
     enabled: bool
     last_notified: Optional[datetime]
     frequency_limit: int  # Minutes between notifications
@@ -44,6 +47,7 @@ class NotificationSettings(TypedDict):
 
 class WatchlistItem(TypedDict):
     """Watchlist item data structure."""
+
     user_id: str
     symbol: str
     added_at: datetime
@@ -53,6 +57,7 @@ class WatchlistItem(TypedDict):
 
 class AlertHistory(TypedDict):
     """Alert history data structure."""
+
     id: int
     user_id: str
     symbol: str
@@ -65,6 +70,7 @@ class AlertHistory(TypedDict):
 
 class WatchlistItemWithPrice(TypedDict):
     """Watchlist item with current price information."""
+
     symbol: str
     alert_threshold_low: Optional[float]
     alert_threshold_high: Optional[float]
@@ -74,6 +80,7 @@ class WatchlistItemWithPrice(TypedDict):
 
 class UserStats(TypedDict):
     """User statistics."""
+
     total_users: int
     active_users: int
     total_watchlist_items: int
@@ -83,6 +90,7 @@ class UserStats(TypedDict):
 
 class AlertSummary(TypedDict):
     """Alert summary for user."""
+
     total_alerts: int
     successful_alerts: int
     failed_alerts: int

@@ -1,8 +1,10 @@
 """Custom JSON encoder for handling NumPy and pandas data types."""
+
 import json
+from typing import Any
+
 import numpy as np
 import pandas as pd
-from typing import Any
 
 
 class CustomJSONEncoder(json.JSONEncoder):

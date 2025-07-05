@@ -1,7 +1,33 @@
-import os
+"""
+Stock Alerts Flask Application.
+
+This module contains the main Flask application that provides:
+- Web interface for stock alerts
+- API endpoints for stock data
+- Webhook handling for Telegram bot
+- Admin panel for system management
+"""
+
 import atexit
-from typing import Tuple, Any
+import logging
+import mimetypes
+import os
+from typing import Any, Tuple
+
 from dotenv import load_dotenv
+from flask import Flask, render_template, send_from_directory
+from flask_cors import CORS
+
+from db_manager import DatabaseManager
+from routes.admin_routes import admin_bp
+from routes.api_routes import api_bp
+from routes.health_routes import health_bp
+from routes.webhook_routes import webhook_bp
+from services import AdminService, AuthService, StockService
+from utils.config import config
+from utils.json_encoder import CustomJSONEncoder
+from utils.scheduler import setup_scheduler
+from webhook_handler import WebhookHandler
 
 # Load environment variables from .env file
 load_dotenv(".env")
@@ -15,31 +41,6 @@ def setup_directories() -> None:
 
 
 setup_directories()
-
-from flask import (
-    Flask,
-    render_template,
-    send_from_directory,
-)
-from flask_cors import CORS
-from db_manager import DatabaseManager
-from webhook_handler import WebhookHandler
-import logging
-import mimetypes
-
-# Import utilities
-from utils.json_encoder import CustomJSONEncoder
-from utils.scheduler import setup_scheduler
-from utils.config import config
-
-# Import route blueprints
-from routes.api_routes import api_bp
-from routes.webhook_routes import webhook_bp
-from routes.admin_routes import admin_bp
-from routes.health_routes import health_bp
-
-# Import services
-from services import StockService, AuthService, AdminService
 
 
 def setup_logging() -> Any:
@@ -85,6 +86,10 @@ atexit.register(lambda: db_manager.close_pool() if db_manager else None)
 logger.info("Database manager initialized successfully with connection pooling")
 
 logger.info("Initializing webhook handler...")
+# These tokens are validated to be non-None during config initialization
+assert (
+    config.TELEGRAM_BOT_TOKEN is not None
+), "TELEGRAM_BOT_TOKEN should be validated during config init"
 webhook_handler = WebhookHandler(
     db_manager,
     config.TELEGRAM_BOT_TOKEN,
@@ -119,40 +124,51 @@ app.register_blueprint(health_bp)
 
 @app.route("/")
 def index() -> str:
+    """Render the main index page."""
     return render_template("index.html")
 
 
 @app.route("/static/js/<path:filename>")
 def serve_js(filename: str) -> Any:
+    """Serve JavaScript files with correct MIME type."""
     return send_from_directory("static/js", filename, mimetype="application/javascript")
 
 
 @app.errorhandler(404)
 def not_found(error: Any) -> Tuple[Any, int]:
+    """Handle 404 errors."""
     from flask import jsonify
+
     return jsonify({"error": "Not Found"}), 404
 
 
 @app.errorhandler(500)
 def server_error(error: Any) -> Tuple[Any, int]:
+    """Handle 500 errors."""
     from flask import jsonify
+
     logger.error(f"Server Error: {error}", exc_info=True)
     return jsonify({"error": "Internal Server Error"}), 500
 
 
 @app.errorhandler(403)
 def forbidden(error: Any) -> Tuple[Any, int]:
+    """Handle 403 errors."""
     from flask import jsonify
+
     return jsonify({"error": "Forbidden"}), 403
 
 
 if __name__ == "__main__":
     try:
-        logger.info(f"Starting Stock Analytics Dashboard server on port {config.PORT}...")
+        logger.info(
+            f"Starting Stock Analytics Dashboard server on port " f"{config.PORT}..."
+        )
         logger.info("Flask app routes registered successfully")
         app.run(debug=config.DEBUG, host="0.0.0.0", port=config.PORT)
     except Exception as e:
         logger.critical(f"Failed to start server: {e}", exc_info=True)
         import traceback
+
         traceback.print_exc()
         raise

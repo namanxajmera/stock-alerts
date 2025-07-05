@@ -5,12 +5,13 @@ This module contains all type definitions related to API requests, responses,
 Telegram webhook handling, and external service integrations.
 """
 
-from typing import Dict, List, Optional, Union, Any, TypedDict, Tuple
 from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple, TypedDict, Union
 
 
 class APIResponse(TypedDict):
     """Base API response structure."""
+
     status: str
     message: Optional[str]
     data: Optional[Any]
@@ -18,6 +19,7 @@ class APIResponse(TypedDict):
 
 class ErrorResponse(TypedDict):
     """Error response structure."""
+
     error: str
     details: Optional[str]
     code: Optional[int]
@@ -25,6 +27,7 @@ class ErrorResponse(TypedDict):
 
 class SuccessResponse(TypedDict):
     """Success response structure."""
+
     status: str
     message: str
     data: Optional[Any]
@@ -32,12 +35,14 @@ class SuccessResponse(TypedDict):
 
 class StockDataRequest(TypedDict):
     """Stock data request parameters."""
+
     symbol: str
     period: str  # '1y', '3y', '5y', 'max'
 
 
 class StockDataResponse(TypedDict):
     """Stock data API response."""
+
     dates: List[str]
     prices: List[Optional[float]]
     ma_200: List[Optional[float]]
@@ -48,6 +53,7 @@ class StockDataResponse(TypedDict):
 
 class HealthCheckResponse(TypedDict):
     """Health check response structure."""
+
     status: str
     timestamp: str
     services: Dict[str, str]
@@ -56,6 +62,7 @@ class HealthCheckResponse(TypedDict):
 
 class TelegramUser(TypedDict):
     """Telegram user data structure."""
+
     id: int
     is_bot: bool
     first_name: str
@@ -66,6 +73,7 @@ class TelegramUser(TypedDict):
 
 class TelegramChat(TypedDict):
     """Telegram chat data structure."""
+
     id: int
     type: str
     title: Optional[str]
@@ -76,6 +84,7 @@ class TelegramChat(TypedDict):
 
 class TelegramMessage(TypedDict):
     """Telegram message data structure."""
+
     message_id: int
     from_user: TelegramUser  # 'from' is a reserved keyword
     chat: TelegramChat
@@ -86,6 +95,7 @@ class TelegramMessage(TypedDict):
 
 class WebhookUpdate(TypedDict):
     """Telegram webhook update structure."""
+
     update_id: int
     message: Optional[TelegramMessage]
     edited_message: Optional[TelegramMessage]
@@ -95,6 +105,7 @@ class WebhookUpdate(TypedDict):
 
 class TelegramSendMessagePayload(TypedDict):
     """Telegram send message API payload."""
+
     chat_id: Union[int, str]
     text: str
     parse_mode: Optional[str]
@@ -105,6 +116,7 @@ class TelegramSendMessagePayload(TypedDict):
 
 class TelegramAPIResponse(TypedDict):
     """Telegram API response structure."""
+
     ok: bool
     result: Optional[Any]
     description: Optional[str]
@@ -113,6 +125,7 @@ class TelegramAPIResponse(TypedDict):
 
 class AdminPanelData(TypedDict):
     """Admin panel data structure."""
+
     users: List[Dict[str, Any]]
     watchlist: List[Dict[str, Any]]
     alerts: List[Dict[str, Any]]
@@ -122,6 +135,7 @@ class AdminPanelData(TypedDict):
 
 class LogEntry(TypedDict):
     """Log entry structure."""
+
     timestamp: datetime
     log_type: str
     message: str
@@ -131,6 +145,7 @@ class LogEntry(TypedDict):
 
 class DatabaseConfig(TypedDict):
     """Database configuration."""
+
     key: str
     value: str
     description: Optional[str]
@@ -140,6 +155,7 @@ class DatabaseConfig(TypedDict):
 
 class ValidationResult(TypedDict):
     """Validation result structure."""
+
     is_valid: bool
     message: str
     validated_value: Optional[str]
@@ -147,6 +163,7 @@ class ValidationResult(TypedDict):
 
 class AlertContext(TypedDict):
     """Alert context information."""
+
     user_id: str
     symbol: str
     current_price: float
@@ -158,6 +175,7 @@ class AlertContext(TypedDict):
 
 class CacheHit(TypedDict):
     """Cache hit information."""
+
     symbol: str
     last_check: datetime
     data_age_hours: float
@@ -166,6 +184,7 @@ class CacheHit(TypedDict):
 
 class APIError(TypedDict):
     """API error details."""
+
     error_type: str
     error_code: Optional[int]
     error_message: str
@@ -175,6 +194,7 @@ class APIError(TypedDict):
 
 class RateLimitInfo(TypedDict):
     """Rate limit information."""
+
     limit: int
     remaining: int
     reset_time: datetime
@@ -183,6 +203,7 @@ class RateLimitInfo(TypedDict):
 
 class ExternalAPIConfig(TypedDict):
     """External API configuration."""
+
     service_name: str
     api_key: str
     base_url: str

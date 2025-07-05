@@ -1,41 +1,56 @@
+"""
+Database management module for Stock Alerts application.
+
+This module provides database operations for managing users, watchlists,
+stock cache, and alert history using PostgreSQL with connection pooling.
+"""
+
+import logging
+import os
+from contextlib import contextmanager
+from typing import Dict, Generator, List, Optional, Tuple, Union
+
 import psycopg2
 import psycopg2.extras
 import psycopg2.pool
-import os
-from datetime import datetime
-import traceback
-import logging
-from contextlib import contextmanager
-from urllib.parse import urlparse
-from typing import Dict, List, Optional, Union, Any, Tuple, Generator
-from type_definitions.user_types import User, WatchlistItem, AlertHistory, WatchlistItemWithPrice, UserRow, WatchlistItemRow, AlertHistoryRow
-from type_definitions.stock_types import StockCache, StockCacheRow
+
+from type_definitions.stock_types import StockCacheRow
+from type_definitions.user_types import WatchlistItemWithPrice
 
 logger = logging.getLogger("StockAlerts.DB")
 
 
 class DatabaseManager:
-    def __init__(self, db_url: Optional[str] = None, pool_min_conn: int = 1, pool_max_conn: int = 20) -> None:
+    """Database manager with connection pooling for PostgreSQL operations."""
+
+    def __init__(
+        self,
+        db_url: Optional[str] = None,
+        pool_min_conn: int = 1,
+        pool_max_conn: int = 20,
+    ) -> None:
         """Initialize the database manager with connection pooling."""
         logger.info("DatabaseManager __init__ starting...")
         self.db_url = db_url or os.getenv("DATABASE_URL")
         if not self.db_url:
             logger.error("DATABASE_URL environment variable is missing")
             raise ValueError("DATABASE_URL environment variable is required")
-        
+
         logger.info(f"DATABASE_URL configured: {self.db_url[:50]}...")
         logger.info("Initializing connection pool...")
-        
+
         # Initialize connection pool
         try:
             self.connection_pool = psycopg2.pool.SimpleConnectionPool(
                 pool_min_conn, pool_max_conn, self.db_url
             )
-            logger.info(f"Connection pool created successfully (min: {pool_min_conn}, max: {pool_max_conn})")
+            logger.info(
+                f"Connection pool created successfully (min: {pool_min_conn}, max: {pool_max_conn})"
+            )
         except Exception as e:
             logger.error(f"Failed to create connection pool: {e}", exc_info=True)
             raise
-        
+
         logger.info("Starting database initialization...")
         self.initialize_database()
         logger.info("DatabaseManager __init__ completed successfully")
@@ -59,7 +74,9 @@ class DatabaseManager:
             logger.error(f"Error returning connection to pool: {e}", exc_info=True)
 
     @contextmanager
-    def _managed_cursor(self, commit: bool = False) -> Generator[psycopg2.extras.RealDictCursor, None, None]:
+    def _managed_cursor(
+        self, commit: bool = False
+    ) -> Generator[psycopg2.extras.RealDictCursor, None, None]:
         """A context manager for database connections and cursors using connection pool."""
         conn = None
         try:
@@ -80,7 +97,7 @@ class DatabaseManager:
     def close_pool(self) -> None:
         """Close all connections in the pool."""
         try:
-            if hasattr(self, 'connection_pool') and self.connection_pool:
+            if hasattr(self, "connection_pool") and self.connection_pool:
                 self.connection_pool.closeall()
                 logger.info("Connection pool closed successfully")
         except Exception as e:
@@ -237,18 +254,23 @@ class DatabaseManager:
             with self._managed_cursor() as cursor:
                 cursor.execute(sql, (user_id,))
                 rows = cursor.fetchall()
-                return [WatchlistItemWithPrice(
-                    symbol=row['symbol'],
-                    alert_threshold_low=row['alert_threshold_low'],
-                    alert_threshold_high=row['alert_threshold_high'],
-                    last_price=row['last_price'],
-                    ma_200=row['ma_200']
-                ) for row in rows]
+                return [
+                    WatchlistItemWithPrice(
+                        symbol=row["symbol"],
+                        alert_threshold_low=row["alert_threshold_low"],
+                        alert_threshold_high=row["alert_threshold_high"],
+                        last_price=row["last_price"],
+                        ma_200=row["ma_200"],
+                    )
+                    for row in rows
+                ]
         except Exception:
             logger.error(f"Error getting watchlist for user {user_id}")
             return []
 
-    def update_stock_cache(self, symbol: str, price: float, ma_200: Optional[float], data_json: str) -> bool:
+    def update_stock_cache(
+        self, symbol: str, price: float, ma_200: Optional[float], data_json: str
+    ) -> bool:
         """Update or insert stock data in cache."""
         sql = """
             INSERT INTO stock_cache (symbol, last_check, last_price, ma_200, data_json)
@@ -267,7 +289,13 @@ class DatabaseManager:
             logger.error(f"Error updating stock cache for {symbol}")
             return False
 
-    def log_event(self, log_type: str, message: str, user_id: Optional[str] = None, symbol: Optional[str] = None) -> None:
+    def log_event(
+        self,
+        log_type: str,
+        message: str,
+        user_id: Optional[str] = None,
+        symbol: Optional[str] = None,
+    ) -> None:
         """Log an event to the database."""
         sql = "INSERT INTO logs (timestamp, log_type, message, user_id, symbol) VALUES (NOW(), %s, %s, %s, %s)"
         try:
@@ -290,7 +318,13 @@ class DatabaseManager:
             return None
 
     def add_alert_history(
-        self, user_id: str, symbol: str, price: float, percentile: float, status: str = "sent", error_message: Optional[str] = None
+        self,
+        user_id: str,
+        symbol: str,
+        price: float,
+        percentile: float,
+        status: str = "sent",
+        error_message: Optional[str] = None,
     ) -> bool:
         """Add an alert to the history."""
         sql = """
@@ -336,7 +370,9 @@ class DatabaseManager:
             logger.error(f"Error updating notification time for user {user_id}")
             return False
 
-    def get_fresh_cache(self, symbol: str, max_age_hours: int = 1) -> Optional[StockCacheRow]:
+    def get_fresh_cache(
+        self, symbol: str, max_age_hours: int = 1
+    ) -> Optional[StockCacheRow]:
         """Get cached stock data if it's recent enough."""
         sql = """
             SELECT symbol, last_check, last_price, ma_200, data_json

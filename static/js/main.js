@@ -413,9 +413,11 @@ const StockAnalyzer = (() => {
         DOM.periodButtons.forEach(btn => {
             if (btn.dataset.period === newPeriod) {
                 btn.classList.add('selected');
+                btn.setAttribute('aria-pressed', 'true');
             }
             else {
                 btn.classList.remove('selected');
+                btn.setAttribute('aria-pressed', 'false');
             }
         });
     }

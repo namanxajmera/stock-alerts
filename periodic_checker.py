@@ -1,37 +1,45 @@
-from db_manager import DatabaseManager
-from webhook_handler import WebhookHandler
-from tiingo import TiingoClient
-import time
-from datetime import datetime, timedelta
+"""
+Periodic stock price checker for Stock Alerts application.
+
+This module handles periodic checking of stock prices for all users'
+watchlists and sends alerts when price conditions are met.
+"""
+
 import json
-import traceback
 import logging
-from collections import defaultdict
 import os
-import pandas as pd
-import requests
-from requests.exceptions import RequestException, HTTPError, Timeout, ConnectionError
-import random
-from typing import Dict, List, Optional, Union, Any, Tuple
-from type_definitions.stock_types import DataFrameType, StockSymbol
-from type_definitions.user_types import UserId
+import time
+import traceback
+from collections import defaultdict
+from typing import List, Optional
+
+from db_manager import DatabaseManager
+from type_definitions.stock_types import DataFrameType
+from utils.config import config
+from utils.tiingo_client import TiingoClient
+from webhook_handler import WebhookHandler
+
 # from type_definitions.api_types import TiingoResponse  # Not needed for type hints
 
-logger = logging.getLogger('StockAlerts.PeriodicChecker')
+logger = logging.getLogger("StockAlerts.PeriodicChecker")
+
 
 class PeriodicChecker:
+    """Periodic checker for stock prices and alert generation."""
+
     def __init__(self) -> None:
         """Initialize the periodic checker."""
         self.db = DatabaseManager()
-        bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+        bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
         self.webhook_handler = WebhookHandler(self.db, bot_token or "")
+        self.tiingo_client = TiingoClient()
         logger.info("Periodic checker initialized")
 
     def check_watchlists(self) -> None:
         """Check all active watchlists for alerts efficiently."""
         try:
             logger.info("Starting watchlist check")
-            
+
             watchlists = self.db.get_active_watchlists()
             if not watchlists:
                 logger.info("No active watchlists to check.")
@@ -40,211 +48,150 @@ class PeriodicChecker:
             # Group users by symbol to fetch data only once per symbol
             symbol_user_map = defaultdict(list)
             for item in watchlists:
-                symbol_user_map[item['symbol']].append(str(item['user_id']))
-            
-            logger.info(f"Found {len(watchlists)} total watchlist items for {len(symbol_user_map)} unique symbols.")
-            
+                symbol_user_map[item["symbol"]].append(str(item["user_id"]))
+
+            logger.info(
+                f"Found {len(watchlists)} total watchlist items for {len(symbol_user_map)} unique symbols."
+            )
+
             for symbol, user_ids in symbol_user_map.items():
                 self._process_symbol(str(symbol), user_ids)
                 # Longer delay between symbols to be more respectful
-                symbol_delay = float(os.getenv('YF_REQUEST_DELAY', 3.0))
-                time.sleep(symbol_delay)
+                time.sleep(config.YF_REQUEST_DELAY)
 
             logger.info("Watchlist check completed")
-            
+
         except Exception as e:
             error_msg = f"Error checking watchlists: {e}"
             logger.error(error_msg, exc_info=True)
-            self.db.log_event('error', f"{error_msg}\n{traceback.format_exc()}")
+            self.db.log_event("error", f"{error_msg}\n{traceback.format_exc()}")
 
-    def _fetch_symbol_data_tiingo(self, symbol: str, max_retries: int = 3) -> Optional[DataFrameType]:
-        """Fetch symbol data from Tiingo API using direct REST calls with retry logic."""
-        api_token = os.getenv('TIINGO_API_TOKEN')
-        if not api_token:
-            raise ValueError("TIINGO_API_TOKEN not found in environment variables")
-        
-        # Calculate start date for sufficient historical data
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=2*365)  # 2 years should be enough for periodic checks
-        
-        # Build the REST API URL as per Tiingo docs
-        url = f"https://api.tiingo.com/tiingo/daily/{symbol}/prices"
-        
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Token {api_token}'
-        }
-        
-        params = {
-            'startDate': start_date.strftime('%Y-%m-%d'),
-            'endDate': end_date.strftime('%Y-%m-%d')
-        }
-        
-        # Retry logic with exponential backoff
-        for attempt in range(max_retries):
-            try:
-                logger.info(f"Fetching Tiingo data for {symbol} (attempt {attempt + 1}/{max_retries})")
-                
-                # Add timeout to prevent hanging
-                response = requests.get(url, headers=headers, params=params, timeout=30)
-                response.raise_for_status()
-                
-                data = response.json()
-                
-                if not data:
-                    logger.warning(f"No data available for {symbol}")
-                    return None
-                
-                # Convert JSON response to DataFrame
-                df = pd.DataFrame(data)
-                
-                # Rename columns to match expected format
-                column_mapping = {
-                    'date': 'Date',
-                    'adjClose': 'Close',
-                }
-                
-                # Select and rename only the columns we need
-                df_filtered = df[list(column_mapping.keys())].rename(columns=column_mapping)
-                
-                # Convert date string to datetime and set as index
-                df_filtered['Date'] = pd.to_datetime(df_filtered['Date'])
-                df_filtered.set_index('Date', inplace=True)
-                
-                # Sort by date (oldest first)
-                df_filtered = df_filtered.sort_index()
-                
-                logger.info(f"Successfully fetched {len(df_filtered)} data points for {symbol} from Tiingo")
-                return df_filtered
-                
-            except HTTPError as e:
-                if e.response.status_code == 429:
-                    # Rate limit exceeded
-                    logger.warning(f"Rate limit exceeded for {symbol}, attempt {attempt + 1}/{max_retries}")
-                    if attempt < max_retries - 1:
-                        backoff_time = (2 ** attempt) + random.uniform(0, 1)
-                        logger.info(f"Backing off for {backoff_time:.2f} seconds")
-                        time.sleep(backoff_time)
-                        continue
-                elif e.response.status_code == 404:
-                    logger.error(f"Symbol {symbol} not found in Tiingo")
-                    return None
-                elif e.response.status_code >= 500:
-                    # Server error, retry
-                    logger.warning(f"Server error for {symbol}: {e.response.status_code}, attempt {attempt + 1}/{max_retries}")
-                    if attempt < max_retries - 1:
-                        backoff_time = (2 ** attempt) + random.uniform(0, 1)
-                        logger.info(f"Backing off for {backoff_time:.2f} seconds")
-                        time.sleep(backoff_time)
-                        continue
-                else:
-                    # Client error, don't retry
-                    logger.error(f"Client error for {symbol}: {e.response.status_code} - {e}")
-                    return None
-                    
-            except (ConnectionError, Timeout) as e:
-                logger.warning(f"Network error for {symbol}: {e}, attempt {attempt + 1}/{max_retries}")
-                if attempt < max_retries - 1:
-                    backoff_time = (2 ** attempt) + random.uniform(0, 1)
-                    logger.info(f"Backing off for {backoff_time:.2f} seconds")
-                    time.sleep(backoff_time)
-                    continue
-                    
-            except RequestException as e:
-                logger.error(f"Request exception for {symbol}: {e}")
-                return None
-                
-            except Exception as e:
-                logger.error(f"Unexpected error fetching data for {symbol}: {e}")
-                return None
-        
-        logger.error(f"Failed to fetch data for {symbol} after {max_retries} attempts")
-        return None
+    def _fetch_symbol_data_tiingo(
+        self, symbol: str, max_retries: int = 3
+    ) -> Optional[DataFrameType]:
+        """Fetch symbol data from Tiingo API using the centralized client."""
+        return self.tiingo_client.fetch_historical_data(symbol, "2y", max_retries)
 
     def _process_symbol(self, symbol: str, user_ids: List[str]) -> None:
         """Process a single symbol for all interested users."""
         logger.info(f"Processing {symbol} for {len(user_ids)} user(s)")
         try:
             # Check cache first
-            cached_data = self.db.get_fresh_cache(symbol, max_age_hours=2)  # Longer cache for periodic checker
-            
+            cached_data = self.db.get_fresh_cache(
+                symbol, max_age_hours=config.CACHE_HOURS
+            )
+
             if cached_data:
                 logger.info(f"Using cached data for {symbol} in periodic check")
                 try:
-                    cache_data = json.loads(cached_data['data_json'])
-                    current_price = cached_data['last_price']
-                    current_ma_200 = cached_data['ma_200']
-                    
-                    if 'percentiles' in cache_data:
-                        percentile_16 = cache_data['percentiles']['p16']
-                        percentile_84 = cache_data['percentiles']['p84']
-                        current_pct_diff = ((current_price - current_ma_200) / current_ma_200) * 100
-                        
+                    cache_data = json.loads(cached_data["data_json"])
+                    current_price = cached_data["last_price"]
+                    current_ma_200 = cached_data["ma_200"]
+
+                    if "percentiles" in cache_data:
+                        percentile_16 = cache_data["percentiles"]["p16"]
+                        percentile_84 = cache_data["percentiles"]["p84"]
+                        current_pct_diff = (
+                            (current_price - current_ma_200) / current_ma_200
+                        ) * 100
+
                         # Check if alert should be sent
-                        if current_pct_diff <= percentile_16 or current_pct_diff >= percentile_84:
-                            logger.info(f"ALERT TRIGGERED for {symbol} at {current_pct_diff:.2f}% (cached data)")
+                        if (
+                            current_pct_diff <= percentile_16
+                            or current_pct_diff >= percentile_84
+                        ):
+                            logger.info(
+                                f"ALERT TRIGGERED for {symbol} at {current_pct_diff:.2f}% (cached data)"
+                            )
                             for user_id in user_ids:
                                 self.webhook_handler.send_alert(
-                                    user_id=user_id, symbol=symbol, price=current_price,
-                                    percentile=current_pct_diff, percentile_16=percentile_16, percentile_84=percentile_84
+                                    user_id=user_id,
+                                    symbol=symbol,
+                                    price=current_price,
+                                    percentile=current_pct_diff,
+                                    percentile_16=percentile_16,
+                                    percentile_84=percentile_84,
                                 )
                         return
                 except (json.JSONDecodeError, KeyError) as e:
                     logger.warning(f"Invalid cached data for {symbol}: {e}")
-            
+
             # Fetch fresh data from Tiingo API
             historical_data = self._fetch_symbol_data_tiingo(symbol)
-            
+
             if historical_data is None:
                 logger.error(f"Failed to fetch data for {symbol} after retries")
                 return
-            
-            current_price = float(historical_data['Close'].iloc[-1])
-            
+
+            current_price = float(historical_data["Close"].iloc[-1])
+
             # Calculate metrics
-            historical_data['ma_200'] = historical_data['Close'].rolling(window=200).mean()
-            historical_data['pct_diff'] = ((historical_data['Close'] - historical_data['ma_200']) / historical_data['ma_200']) * 100
-            valid_diffs = historical_data['pct_diff'].dropna()
+            historical_data["ma_200"] = (
+                historical_data["Close"].rolling(window=200).mean()
+            )
+            historical_data["pct_diff"] = (
+                (historical_data["Close"] - historical_data["ma_200"])
+                / historical_data["ma_200"]
+            ) * 100
+            valid_diffs = historical_data["pct_diff"].dropna()
 
             if valid_diffs.empty:
                 logger.warning(f"Not enough data to calculate MA for {symbol}")
                 return
 
-            current_ma_200 = float(historical_data['ma_200'].iloc[-1])
+            current_ma_200 = float(historical_data["ma_200"].iloc[-1])
             current_pct_diff = ((current_price - current_ma_200) / current_ma_200) * 100
-            
+
             percentile_16 = float(valid_diffs.quantile(0.16))
             percentile_84 = float(valid_diffs.quantile(0.84))
-            
-            logger.debug(f"{symbol} | Price: ${current_price:.2f} | MA200: ${current_ma_200:.2f} | Diff: {current_pct_diff:.2f}%")
-            logger.debug(f"{symbol} | 16th Pct: {percentile_16:.2f}% | 84th Pct: {percentile_84:.2f}%")
-            
+
+            logger.debug(
+                f"{symbol} | Price: ${current_price:.2f} | MA200: ${current_ma_200:.2f} | Diff: {current_pct_diff:.2f}%"
+            )
+            logger.debug(
+                f"{symbol} | 16th Pct: {percentile_16:.2f}% | 84th Pct: {percentile_84:.2f}%"
+            )
+
             # Update stock cache
             cache_data = {
-                'price': current_price, 'ma_200': current_ma_200, 'pct_diff': current_pct_diff,
-                'percentile_16': percentile_16, 'percentile_84': percentile_84,
-                'historical_min': float(valid_diffs.min()), 'historical_max': float(valid_diffs.max())
+                "price": current_price,
+                "ma_200": current_ma_200,
+                "pct_diff": current_pct_diff,
+                "percentile_16": percentile_16,
+                "percentile_84": percentile_84,
+                "historical_min": float(valid_diffs.min()),
+                "historical_max": float(valid_diffs.max()),
             }
             self.db.update_stock_cache(
-                symbol=symbol, price=current_price, ma_200=current_ma_200, data_json=json.dumps(cache_data)
+                symbol=symbol,
+                price=current_price,
+                ma_200=current_ma_200,
+                data_json=json.dumps(cache_data),
             )
-            
+
             # Check if an alert should be sent
             if current_pct_diff <= percentile_16 or current_pct_diff >= percentile_84:
                 logger.info(f"ALERT TRIGGERED for {symbol} at {current_pct_diff:.2f}%")
                 for user_id in user_ids:
                     logger.info(f"Sending alert for {symbol} to user {user_id}")
                     self.webhook_handler.send_alert(
-                        user_id=user_id, symbol=symbol, price=current_price,
-                        percentile=current_pct_diff, percentile_16=percentile_16, percentile_84=percentile_84
+                        user_id=user_id,
+                        symbol=symbol,
+                        price=current_price,
+                        percentile=current_pct_diff,
+                        percentile_16=percentile_16,
+                        percentile_84=percentile_84,
                     )
             else:
-                logger.info(f"No alert for {symbol} (current diff: {current_pct_diff:.2f}%)")
+                logger.info(
+                    f"No alert for {symbol} (current diff: {current_pct_diff:.2f}%)"
+                )
 
         except Exception as e:
             error_msg = f"Error processing symbol {symbol}: {e}"
             logger.error(error_msg, exc_info=True)
-            self.db.log_event('error', error_msg, symbol=symbol)
+            self.db.log_event("error", error_msg, symbol=symbol)
+
 
 def main() -> None:
     """Main function to run the periodic checker."""
@@ -255,10 +202,11 @@ def main() -> None:
     checker.check_watchlists()
     logger.info("Periodic checker run finished.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[logging.StreamHandler()]
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        handlers=[logging.StreamHandler()],
     )
-    main() 
+    main()
