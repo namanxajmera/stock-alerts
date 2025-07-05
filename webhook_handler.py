@@ -51,7 +51,6 @@ class WebhookHandler:
             str: A secure random token (32 bytes encoded as base64)
         """
         # Generate 32 random bytes and encode as URL-safe base64
-        token_bytes = secrets.token_bytes(32)
         token = secrets.token_urlsafe(32)
         logger.info("Generated new webhook secret token")
         return token

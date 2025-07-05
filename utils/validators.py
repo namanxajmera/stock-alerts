@@ -272,7 +272,7 @@ def validate_user_id(user_id: str) -> Tuple[bool, str]:
 
         return True, str(user_id_int)
 
-    except (ValueError, ValidationError) as e:
+    except (ValueError, ValidationError):
         return False, "Invalid user ID format"
     except Exception as e:
         logger.error(f"Unexpected error validating user ID: {e}")

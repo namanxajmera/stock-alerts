@@ -11,7 +11,9 @@ import json
 import logging
 import time
 from datetime import datetime, timedelta
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
+
+import numpy as np
 
 import pandas as pd
 import pytz
