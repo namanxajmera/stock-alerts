@@ -1,5 +1,4 @@
-// Since we're using the CDN version of Plotly, we don't need to import it
-// The Plotly object is available globally from the CDN script
+// ApexCharts is available globally from the CDN script
 
 // Main application module to encapsulate state and behavior
 const StockAnalyzer = (() => {
@@ -25,30 +24,73 @@ const StockAnalyzer = (() => {
         showgrid: false,
         zeroline: false,
         tickfont: {
-            family: 'Arial',
-            size: 13,
-            color: 'black'
+            family: 'var(--font-family-main)',
+            size: 12,
+            color: 'var(--text-secondary)'
         },
         fixedrange: true,
     };
 
+    const commonLayout = {
+        showlegend: false,
+        margin: { t: 10, r: 10, l: 50, b: 40 },
+        plot_bgcolor: 'transparent',
+        paper_bgcolor: 'transparent',
+        hovermode: 'x unified',
+        dragmode: false,
+        autosize: true,
+        hoverlabel: {
+            bgcolor: 'rgba(255, 255, 255, 0.9)',
+            bordercolor: 'var(--border-primary)',
+            font: {
+                family: 'var(--font-family-main)',
+                size: 12,
+                color: 'var(--text-primary)'
+            },
+        },
+        xaxis: {
+            ...commonAxisStyle,
+            showspikes: true,
+            spikemode: 'across',
+            spikesnap: 'cursor',
+            showline: true,
+            showgrid: true,
+            spikecolor: 'var(--border-secondary)',
+            spikethickness: 1,
+            automargin: true,
+            tickangle: -45,
+        }
+    };
+
     // DOM Elements (cached for performance)
     const DOM = {
+        appContainer: document.querySelector('.app-container'),
+        initialView: document.querySelector('.initial-view'),
+        headerSearchControls: document.getElementById('header-search-controls'),
+        searchControls: document.querySelector('.search-controls'),
         tickerInput: document.getElementById('ticker-input'),
         periodButtons: document.querySelectorAll('.period-btn'),
         mainChart: document.getElementById('main-chart'),
         subChart: document.getElementById('sub-chart'),
-        loadingIndicator: document.querySelector('.loading-indicator'),
-        errorMessage: document.querySelector('.error-message'),
-        stockInfoPanel: document.getElementById('stock-info'),
-        stockNameEl: document.getElementById('stock-name'),
-        currentPriceEl: document.getElementById('current-price'),
-        priceChangeEl: document.getElementById('price-change'),
-        changeValueEl: document.getElementById('change-value'),
-        changePercentEl: document.getElementById('change-percent'),
-        customTooltip: document.getElementById('custom-tooltip'),
+        loadingIndicator: document.getElementById('loading-indicator'),
+        errorMessage: document.getElementById('error-message'),
         dashboard: document.querySelector('.dashboard'),
-        statsContainer: document.querySelector('.stats-container')
+        statsBanner: document.getElementById('stats-banner'),
+        
+        // Stock Info in Chart Header
+        stockNameTitle: document.getElementById('stock-name-title'),
+        currentPrice: document.getElementById('current-price'),
+        priceChange: document.getElementById('price-change'),
+
+        // Simplified Stats
+        fearDays: document.getElementById('fear-days'),
+        fearAvgPrice: document.getElementById('fear-avg-price'),
+        fearVsCurrent: document.getElementById('fear-vs-current'),
+
+        // Momentum Value
+        momentumValue: document.getElementById('momentum-value'),
+
+        customTooltip: document.getElementById('custom-tooltip'),
     };
 
     // Application state
@@ -56,8 +98,13 @@ const StockAnalyzer = (() => {
         selectedPeriod: '5y',
         currentTicker: '',
         isLoading: false,
-        chartDataCache: null,
-        resizeTimeout: null
+        mainChartInstance: null,
+        subChartInstance: null,
+        isDashboardActive: false, // Track if we have transitioned to dashboard view
+        // Cache for hover-off state restoration
+        lastPrice: null,
+        previousClose: null,
+        lastDiffValue: null,
     };
 
     // Initialize the application
@@ -66,6 +113,59 @@ const StockAnalyzer = (() => {
         setDefaultPeriod();
         DOM.tickerInput.focus();
         setupEventListeners();
+        setupMobileOptimizations();
+    }
+
+    // Mobile-specific optimizations
+    function setupMobileOptimizations() {
+        // Handle window resize for chart responsiveness
+        window.addEventListener('resize', debounce(() => {
+            if (state.mainChartInstance) {
+                state.mainChartInstance.updateOptions({
+                    chart: {
+                        height: window.innerWidth <= 768 ? 300 : 400
+                    }
+                });
+            }
+            if (state.subChartInstance) {
+                state.subChartInstance.updateOptions({
+                    chart: {
+                        height: window.innerWidth <= 768 ? 200 : 250
+                    }
+                });
+            }
+        }, 250));
+
+        // Disable chart animations on mobile for better performance
+        if (window.innerWidth <= 768) {
+            const mobileOptions = {
+                chart: {
+                    animations: {
+                        enabled: false
+                    }
+                }
+            };
+            
+            if (state.mainChartInstance) {
+                state.mainChartInstance.updateOptions(mobileOptions);
+            }
+            if (state.subChartInstance) {
+                state.subChartInstance.updateOptions(mobileOptions);
+            }
+        }
+    }
+
+    // Debounce utility function
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
     }
 
     // Set up all event listeners
@@ -74,610 +174,453 @@ const StockAnalyzer = (() => {
         DOM.periodButtons.forEach(btn => {
             btn.addEventListener('click', handlePeriodChange);
         });
-        window.addEventListener('resize', handleResize);
+    }
+
+    // Activates the main dashboard view after the first search
+    function activateDashboardView() {
+        if (state.isDashboardActive) return;
+        DOM.headerSearchControls.appendChild(DOM.searchControls);
+        DOM.appContainer.classList.add('dashboard-active');
+        DOM.dashboard.style.display = 'block';
+        state.isDashboardActive = true;
     }
 
     function setDefaultPeriod() {
-        // Set 5y as default period (lowercase to match server requirements)
         state.selectedPeriod = '5y';
         const defaultBtn = document.querySelector('[data-period="5y"]');
-        if (defaultBtn) {
-            defaultBtn.classList.add('selected');
-        }
+        if (defaultBtn) defaultBtn.classList.add('selected');
     }
 
-    // Initialize charts with empty data
+    // Initialize charts with ApexCharts
     function initializeCharts() {
-        const commonLayout = {
-            showlegend: false,
-            margin: { t: 10, r: 10, l: 50, b: 40 }, // Reduced right margin
-            plot_bgcolor: 'rgba(0,0,0,0)',
-            paper_bgcolor: 'rgba(0,0,0,0)',
-            hovermode: 'x unified',
-            hoverdistance: 50,
-            autosize: true, // Enable autosize
-            hoverlabel: {
-                bgcolor: 'rgba(255, 255, 255, 0.9)',
-                bordercolor: 'rgba(0, 0, 0, 0.1)',
-                font: {
-                    family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
-                    size: 12,
-                    color: '#1D1D1F'
-                },
-                padding: 8
+        const commonOptions = {
+            chart: {
+                type: 'line',
+                height: 350,
+                group: 'stock-charts', // Syncs tooltips and crosshairs
+                toolbar: { show: false },
+                zoom: { enabled: false },
+                events: {
+                    mouseMove: handleChartMouseMove,
+                    mouseLeave: handleChartMouseLeave,
+                }
             },
-            xaxis: Object.assign(Object.assign({}, commonAxisStyle), { showspikes: true, spikemode: 'across', spikesnap: 'cursor', showline: true, showgrid: true, spikecolor: '#8E8E93', spikethickness: 1, showticklabels: true, tickangle: -45, tickfont: {
-                    family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
-                    size: 10,
-                    color: '#8E8E93'
-                }, fixedrange: true, automargin: true, rangeslider: { visible: false } // Disable range slider if present
-             })
+            dataLabels: { enabled: false },
+            stroke: { width: 2, curve: 'straight' },
+            grid: {
+                borderColor: 'var(--border-primary)',
+                xaxis: { lines: { show: true } },
+                yaxis: { lines: { show: false } }
+            },
+            xaxis: {
+                type: 'datetime',
+                tickAmount: 6,
+                labels: {
+                    style: {
+                        colors: 'var(--text-secondary)',
+                        fontFamily: 'var(--font-family-main)',
+                    },
+                },
+                axisBorder: { show: false },
+                axisTicks: { show: false },
+                tooltip: { enabled: false }, // Hide x-axis tooltip line
+            },
+            yaxis: {
+                opposite: false,
+                labels: {
+                    style: {
+                        colors: 'var(--text-secondary)',
+                        fontFamily: 'var(--font-family-main)',
+                    },
+                    formatter: (val) => val.toFixed(0) // Default formatter
+                },
+            },
+            tooltip: {
+                x: { format: 'dd MMM yyyy' },
+                shared: true,
+                theme: 'light',
+                style: {
+                    fontFamily: 'var(--font-family-main)',
+                },
+                marker: { show: true },
+            },
+            legend: {
+                show: true,
+                position: 'top',
+                horizontalAlign: 'right',
+                floating: true,
+                offsetY: -5,
+                fontFamily: 'var(--font-family-main)',
+                markers: {
+                    width: 16,
+                    height: 2,
+                    radius: 0,
+                },
+                itemMargin: {
+                    horizontal: 10,
+                },
+            }
         };
-        const mainChartLayout = Object.assign(Object.assign({}, commonLayout), { height: 300, yaxis: Object.assign(Object.assign({}, commonAxisStyle), { title: {
-                    text: 'PRICE (USD)',
-                    font: {
-                        family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
-                        size: 12,
-                        weight: 500
-                    },
-                    standoff: 10
-                }, automargin: true, range: [null, null], rangemode: 'normal', autorange: true, fixedrange: true }), xaxis: Object.assign(Object.assign({}, commonAxisStyle), { showspikes: true, spikemode: 'across', spikesnap: 'cursor', showline: true, showgrid: true, spikecolor: '#8E8E93', spikethickness: 1, showticklabels: true, tickangle: -45, tickfont: {
-                    family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
-                    size: 10,
-                    color: '#8E8E93'
-                }, fixedrange: true, automargin: true, rangeslider: { visible: false } }) });
-        const subChartLayout = Object.assign(Object.assign({}, commonLayout), { height: 200, yaxis: Object.assign(Object.assign({}, commonAxisStyle), { title: {
-                    text: '% DIFFERENCE',
-                    font: {
-                        family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
-                        size: 12,
-                        weight: 500
-                    },
-                    standoff: 10
-                }, automargin: true, fixedrange: true }), xaxis: Object.assign(Object.assign({}, commonAxisStyle), { showspikes: true, spikemode: 'across', spikesnap: 'cursor', showline: true, showgrid: true, spikecolor: '#8E8E93', spikethickness: 1, showticklabels: true, tickangle: -45, tickfont: {
-                    family: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto',
-                    size: 10,
-                    color: '#8E8E93'
-                }, fixedrange: true, automargin: true, rangeslider: { visible: false } }) });
+
+        // Responsive chart heights
+        const isMobile = window.innerWidth <= 768;
+        const mainHeight = isMobile ? 300 : 400;
+        const subHeight = isMobile ? 200 : 250;
+
+        const mainChartOptions = {
+            ...commonOptions,
+            chart: { 
+                ...commonOptions.chart, 
+                type: 'line', 
+                height: mainHeight,
+                animations: {
+                    enabled: !isMobile
+                }
+            },
+            series: [],
+            colors: ['var(--green-primary)', 'var(--text-secondary)'],
+            yaxis: {
+                ...commonOptions.yaxis,
+                labels: {
+                    ...commonOptions.yaxis.labels,
+                    formatter: (val) => `$${val.toFixed(2)}`,
+                },
+                tooltip: {
+                    enabled: true,
+                    formatter: (val) => `$${val.toFixed(2)}`
+                }
+            },
+            legend: {
+                ...commonOptions.legend,
+                offsetY: isMobile ? -10 : -5,
+                fontSize: isMobile ? '12px' : '14px'
+            },
+            noData: { text: 'Enter a stock ticker to begin.' }
+        };
+
+        const subChartOptions = {
+            ...commonOptions,
+            chart: { 
+                ...commonOptions.chart, 
+                type: 'line', 
+                height: subHeight,
+                animations: {
+                    enabled: !isMobile
+                }
+            },
+            series: [],
+            colors: ['var(--green-primary)', 'var(--blue-primary)', 'var(--purple-primary)'],
+            yaxis: {
+                ...commonOptions.yaxis,
+                labels: {
+                    ...commonOptions.yaxis.labels,
+                    formatter: (val) => `${val.toFixed(1)}%`,
+                },
+            },
+            legend: {
+                ...commonOptions.legend,
+                offsetY: isMobile ? -10 : -5,
+                fontSize: isMobile ? '12px' : '14px'
+            },
+            annotations: {
+                yaxis: [{
+                    y: 0,
+                    borderColor: 'var(--text-secondary)',
+                    borderWidth: 1,
+                    strokeDashArray: 2,
+                }]
+            },
+            noData: { text: 'Loading momentum data...' }
+        };
+
         try {
-            window.Plotly.newPlot('main-chart', [], mainChartLayout, chartConfig);
-            window.Plotly.newPlot('sub-chart', [], subChartLayout, chartConfig);
-            // Add event listeners for synchronized hover
-            const mainChartEl = document.getElementById('main-chart');
-            const subChartEl = document.getElementById('sub-chart');
-            mainChartEl.on('plotly_hover', (data) => {
-                var _a;
-                if (!((_a = data.points) === null || _a === void 0 ? void 0 : _a[0]))
-                    return;
-                window.Plotly.Fx.hover(subChartEl, [
-                    { curveNumber: 0, pointNumber: data.points[0].pointNumber }
-                ]);
-                updateTooltip(data.points[0]);
-            });
-            subChartEl.on('plotly_hover', (data) => {
-                var _a;
-                if (!((_a = data.points) === null || _a === void 0 ? void 0 : _a[0]))
-                    return;
-                window.Plotly.Fx.hover(mainChartEl, [
-                    { curveNumber: 0, pointNumber: data.points[0].pointNumber }
-                ]);
-                updateTooltip(data.points[0]);
-            });
-            mainChartEl.on('plotly_unhover', () => {
-                window.Plotly.Fx.unhover(subChartEl);
-                hideTooltip();
-            });
-            subChartEl.on('plotly_unhover', () => {
-                window.Plotly.Fx.unhover(mainChartEl);
-                hideTooltip();
-            });
-        }
-        catch (error) {
+            state.mainChartInstance = new ApexCharts(DOM.mainChart, mainChartOptions);
+            state.subChartInstance = new ApexCharts(DOM.subChart, subChartOptions);
+            state.mainChartInstance.render();
+            state.subChartInstance.render();
+        } catch (error) {
             console.error('Error initializing charts:', error);
             showError('Failed to initialize charts');
         }
     }
 
-    // Filter out null values from data
-    function filterNullValues(dates, values) {
-        const filtered = dates.reduce((acc, date, i) => {
-            if (values[i] !== null) {
-                acc.dates.push(date);
-                acc.values.push(values[i]);
-            }
-            return acc;
-        }, { dates: [], values: [] });
-        return [filtered.dates, filtered.values];
+    // Transforms API data into ApexCharts series format
+    function transformToSeries(dates, values) {
+        return dates.map((date, i) => {
+            const timestamp = new Date(date).getTime();
+            return [timestamp, values[i]];
+        });
     }
 
     // Update charts with new data
     function updateCharts(data, ticker) {
         try {
-            // Store data for tooltip use
-            state.chartDataCache = data;
-            // Filter out null values
-            const [priceDates, priceValues] = filterNullValues(data.dates, data.prices);
-            const [maDates, maValues] = filterNullValues(data.dates, data.ma_200);
-            const [diffDates, diffValues] = filterNullValues(data.dates, data.pct_diff);
-            if (!priceDates.length || !priceValues.length) {
-                throw new Error('No data available');
-            }
-            // Show dashboard
-            DOM.dashboard.style.display = 'block';
-            // Update stock info panel with the latest data
-            updateStockInfo(ticker, priceValues[priceValues.length - 1], data.previous_close);
-            // Main chart traces
-            const mainTraces = [
-                {
-                    x: priceDates,
-                    y: priceValues,
-                    type: 'scatter',
-                    mode: 'lines',
-                    line: { color: '#00C805', width: 2 },
-                    name: 'Price',
-                    hovertemplate: '$%{y:.2f}<extra></extra>'
+            console.log('Updating charts with data:', data);
+            const priceSeries = transformToSeries(data.dates, data.prices);
+            const maSeries = transformToSeries(data.dates, data.ma_200);
+            const diffSeries = transformToSeries(data.dates, data.pct_diff);
+            console.log('Series created:', { priceSeries: priceSeries.length, maSeries: maSeries.length, diffSeries: diffSeries.length });
+            
+            // --- NEW: Create series for percentile lines ---
+            const p16Series = createConstantSeries(data.dates, data.percentiles.p16, '16th Percentile');
+            const p84Series = createConstantSeries(data.dates, data.percentiles.p84, '84th Percentile');
+
+            if (!priceSeries.length) throw new Error('No data available for charts.');
+            
+            // --- NEW: Cache latest values for hover-off restoration ---
+            state.lastPrice = data.prices[data.prices.length - 1];
+            state.firstPrice = data.prices[0]; // First price in timeframe for period-based change
+            state.previousClose = data.previous_close;
+            state.lastDiffValue = data.pct_diff[data.pct_diff.length - 1];
+
+            updateStockInfo(ticker, state.lastPrice, state.firstPrice);
+            updateMomentumInfo(state.lastDiffValue);
+
+            state.mainChartInstance.updateSeries([
+                { name: 'Price', data: priceSeries },
+                { name: '200-Day MA', data: maSeries }
+            ]);
+
+            const lastDiffValue = data.pct_diff[data.pct_diff.length - 1];
+            const diffColor = lastDiffValue >= 0 ? 'var(--green-primary)' : 'var(--red-primary)';
+            
+            state.subChartInstance.updateSeries([
+                { name: '% Deviation', data: diffSeries },
+                p16Series,
+                p84Series
+            ].filter(s => s.data.length > 0));
+            
+            // Update sub-chart colors
+            const newSubChartOptions = {
+                colors: [diffColor, 'var(--blue-primary)', 'var(--purple-primary)'],
+                stroke: {
+                    width: [2, 1.5, 1.5],
+                    dashArray: [0, 4, 4]
                 },
-                {
-                    x: maDates,
-                    y: maValues,
-                    type: 'scatter',
-                    mode: 'lines',
-                    line: { color: '#8E8E93', width: 2, dash: 'dot' },
-                    name: '200-Day MA',
-                    hovertemplate: '$%{y:.2f}<extra></extra>'
-                }
-            ];
-            // Determine color for percent difference line
-            let diffColor = '#00C805'; // green by default
-            if (diffValues.length > 0 && diffValues[diffValues.length - 1] < 0) {
-                diffColor = '#FF5000'; // red if negative
-            }
-            // Sub chart traces
-            const subTraces = [
-                {
-                    x: diffDates,
-                    y: diffValues,
-                    type: 'scatter',
-                    mode: 'lines',
-                    fill: 'tozeroy',
-                    fillcolor: diffValues[diffValues.length - 1] >= 0 ? 'rgba(0, 200, 5, 0.1)' : 'rgba(255, 80, 0, 0.1)',
-                    line: { color: diffColor, width: 2 },
-                    name: '% Difference',
-                    hovertemplate: '%{y:.1f}%<extra></extra>'
+                legend: {
+                    show: true,
+                    position: 'top',
+                    horizontalAlign: 'right',
+                    floating: true,
+                    offsetY: -5,
+                    fontFamily: 'var(--font-family-main)',
+                    markers: {
+                        width: 16,
+                        height: 2,
+                        radius: 0,
+                    },
+                    itemMargin: {
+                        horizontal: 10,
+                    },
                 },
-                {
-                    x: [data.dates[0], data.dates[data.dates.length - 1]],
-                    y: [0, 0],
-                    type: 'scatter',
-                    mode: 'lines',
-                    line: { color: '#8E8E93', width: 1, dash: 'dash' },
-                    name: 'Baseline',
-                    hoverinfo: 'skip'
-                }
-            ];
-            // Only add percentile lines if we have valid percentiles
-            if (data.percentiles && data.percentiles.p16 !== null && data.percentiles.p84 !== null) {
-                subTraces.push({
-                    x: [data.dates[0], data.dates[data.dates.length - 1]],
-                    y: [data.percentiles.p16, data.percentiles.p16],
-                    type: 'scatter',
-                    mode: 'lines',
-                    line: { color: '#007AFF', width: 1, dash: 'dash' },
-                    name: '16th Percentile',
-                    hoverinfo: 'skip',
-                    showlegend: false
-                }, {
-                    x: [data.dates[0], data.dates[data.dates.length - 1]],
-                    y: [data.percentiles.p84, data.percentiles.p84],
-                    type: 'scatter',
-                    mode: 'lines',
-                    line: { color: '#5856D6', width: 1, dash: 'dash' },
-                    name: '84th Percentile',
-                    hoverinfo: 'skip',
-                    showlegend: false
-                });
-            }
-            // Calculate y-axis range with padding
-            const prices = priceValues.filter(p => p !== null);
-            const minPrice = Math.min(...prices);
-            const maxPrice = Math.max(...prices);
-            const priceRange = maxPrice - minPrice;
-            const padding = priceRange * 0.1; // 10% padding
-            // Update main chart layout
-            const mainChartLayout = {
-                autosize: true,
-                margin: { t: 10, r: 10, l: 50, b: 40 },
-                yaxis: {
-                    range: [minPrice - padding, maxPrice + padding],
-                    automargin: true,
-                    fixedrange: true
-                },
-                xaxis: {
-                    automargin: true,
-                    fixedrange: true
-                }
             };
-            // Sub chart traces with proper layout
-            const subChartLayout = {
-                autosize: true,
-                margin: { t: 10, r: 10, l: 50, b: 40 },
-                yaxis: {
-                    automargin: true,
-                    fixedrange: true
-                },
-                xaxis: {
-                    automargin: true,
-                    fixedrange: true
-                }
-            };
-            // Update charts with proper config
-            window.Plotly.react('main-chart', mainTraces, mainChartLayout, chartConfig);
-            window.Plotly.react('sub-chart', subTraces, subChartLayout, chartConfig);
-            // Add window resize handler
-            const updateSize = () => {
-                window.Plotly.Plots.resize('main-chart');
-                window.Plotly.Plots.resize('sub-chart');
-            };
-            // Debounce resize handler
-            state.resizeTimeout = window.setTimeout(updateSize, 100);
-        }
-        catch (error) {
+            state.subChartInstance.updateOptions(newSubChartOptions);
+
+        } catch (error) {
             console.error('Error updating charts:', error);
-            showError('Failed to update charts');
+            showError('Failed to update charts with new data.');
         }
     }
 
-    // Function to update stock info panel
+    // --- NEW: Creates a data series with a constant value ---
+    function createConstantSeries(dates, value, name) {
+        if (value === null || value === undefined) return { name, data: [] };
+        const seriesData = dates.map(date => [new Date(date).getTime(), value]);
+        return { name, data: seriesData };
+    }
+
+    // Updates stock info in the main chart's header
     function updateStockInfo(ticker, currentPrice, previousClose) {
-        DOM.stockNameEl.textContent = ticker;
-        DOM.currentPriceEl.textContent = `$${currentPrice.toFixed(2)}`;
-        // Calculate price change
+        DOM.stockNameTitle.textContent = ticker;
+        if (currentPrice) {
+            DOM.currentPrice.textContent = `$${currentPrice.toFixed(2)}`;
+        }
+
         let priceChange = 0;
         let percentChange = 0;
-        if (previousClose !== null) {
+        if (currentPrice && previousClose) {
             priceChange = currentPrice - previousClose;
             percentChange = (priceChange / previousClose) * 100;
         }
-        // Update change elements
-        DOM.changeValueEl.textContent = `${priceChange >= 0 ? '+' : ''}$${priceChange.toFixed(2)}`;
-        DOM.changePercentEl.textContent = `(${percentChange.toFixed(2)}%)`;
-        // Set color based on change
-        if (priceChange >= 0) {
-            DOM.priceChangeEl.classList.remove('negative');
-            DOM.priceChangeEl.classList.add('positive');
-        }
-        else {
-            DOM.priceChangeEl.classList.remove('positive');
-            DOM.priceChangeEl.classList.add('negative');
-        }
-        // Show the panel
-        DOM.stockInfoPanel.style.display = 'flex';
+
+        const sign = priceChange >= 0 ? '+' : '';
+        DOM.priceChange.innerHTML = `
+            <span>${sign}${priceChange.toFixed(2)}</span>
+            <span>(${sign}${percentChange.toFixed(2)}%)</span>
+        `;
+        DOM.priceChange.className = `price-change ${priceChange >= 0 ? 'positive' : 'negative'}`;
     }
 
-    // Update tooltip content and position
-    function updateTooltip(point) {
-        if (!point || !point.x)
+    function updateMomentumInfo(lastValue) {
+        if (lastValue === null || lastValue === undefined) {
+            DOM.momentumValue.textContent = '--';
             return;
-        const date = new Date(point.x).toLocaleDateString();
-        let value = '';
-        if (point.data.name === 'Price' || point.data.name === '200-Day MA') {
-            value = `$${point.y.toFixed(2)}`;
         }
-        else if (point.data.name === '% Difference') {
-            value = `${point.y.toFixed(1)}%`;
-        }
-        else {
-            return; // Don't show tooltip for other traces
-        }
-        DOM.customTooltip.innerHTML = `<div>${date} · ${value}</div>`;
-        DOM.customTooltip.style.display = 'block';
-        // Position tooltip using the mouse event coordinates
-        const evt = point.event;
-        DOM.customTooltip.style.left = `${evt.pageX + 10}px`;
-        DOM.customTooltip.style.top = `${evt.pageY - 20}px`;
+        const sign = lastValue >= 0 ? '+' : '';
+        DOM.momentumValue.textContent = `${sign}${lastValue.toFixed(2)}%`;
+        DOM.momentumValue.className = `price-change ${lastValue >= 0 ? 'positive' : 'negative'}`;
     }
 
-    // Hide tooltip
-    function hideTooltip() {
-        DOM.customTooltip.style.display = 'none';
-    }
-
-    // Handle ticker input
     function handleTickerInput(event) {
         if (event.key === 'Enter' && !state.isLoading) {
             const ticker = DOM.tickerInput.value.trim().toUpperCase();
-            if (ticker && ticker !== state.currentTicker) {
+            if (ticker) {
                 state.currentTicker = ticker;
                 fetchData();
             }
         }
     }
 
-    // Handle period change
     function handlePeriodChange(event) {
-        var _a;
-        if (state.isLoading)
-            return;
+        if (state.isLoading) return;
         const button = event.target;
-        const newPeriod = ((_a = button.dataset.period) === null || _a === void 0 ? void 0 : _a.toLowerCase()) || '';
+        const newPeriod = button.dataset.period?.toLowerCase() || '';
         if (newPeriod && newPeriod !== state.selectedPeriod) {
             updateSelectedPeriod(newPeriod);
-            if (state.currentTicker) {
-                fetchData();
-            }
+            if (state.currentTicker) fetchData();
         }
     }
 
-    // Update UI for selected period
     function updateSelectedPeriod(newPeriod) {
         state.selectedPeriod = newPeriod;
         DOM.periodButtons.forEach(btn => {
-            if (btn.dataset.period === newPeriod) {
-                btn.classList.add('selected');
-                btn.setAttribute('aria-pressed', 'true');
-            }
-            else {
-                btn.classList.remove('selected');
-                btn.setAttribute('aria-pressed', 'false');
-            }
+            btn.classList.toggle('selected', btn.dataset.period === newPeriod);
         });
     }
 
-    // Set loading state
     function setLoading(loading) {
         state.isLoading = loading;
-        if (loading) {
-            DOM.loadingIndicator.classList.add('show');
-            DOM.tickerInput.disabled = true;
-            DOM.periodButtons.forEach(btn => btn.disabled = true);
-        }
-        else {
-            DOM.loadingIndicator.classList.remove('show');
-            DOM.tickerInput.disabled = false;
-            DOM.periodButtons.forEach(btn => btn.disabled = false);
-        }
+        DOM.loadingIndicator.classList.toggle('show', loading);
+        DOM.tickerInput.disabled = loading;
+        DOM.periodButtons.forEach(btn => btn.disabled = loading);
     }
 
-    // Show error message
     function showError(message) {
         DOM.errorMessage.textContent = message;
-        setTimeout(() => {
-            DOM.errorMessage.textContent = '';
-        }, 5000);
+        setTimeout(() => DOM.errorMessage.textContent = '', 5000);
     }
 
     // Fetch data from the server
     async function fetchData() {
-        if (state.isLoading)
-            return;
+        if (state.isLoading) return;
         setLoading(true);
         DOM.errorMessage.textContent = '';
         try {
             const response = await fetch(`/data/${state.currentTicker}/${state.selectedPeriod}`);
             const result = await response.json();
-            if (response.ok) {
-                updateCharts(result, state.currentTicker);
-                // Set loading to false BEFORE fetching trading stats
-                setLoading(false);
-                // Fetch trading stats after successful chart update
-                console.log('About to fetch trading stats for:', state.currentTicker);
-                fetchTradingStats();
-            }
-            else {
-                throw new Error(result.error || 'Failed to fetch data');
-            }
-        }
-        catch (error) {
+            if (!response.ok) throw new Error(result.error || 'Failed to fetch data');
+
+            activateDashboardView();
+            updateCharts(result, state.currentTicker);
+            fetchTradingStats();
+
+        } catch (error) {
             console.error('Error fetching data:', error);
-            const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-            showError(`Error: ${errorMessage}`);
+            showError(`Error: ${error.message}`);
             clearCharts();
+        } finally {
             setLoading(false);
         }
     }
 
-    // Clear charts
     function clearCharts() {
-        const mainChartEl = document.getElementById('main-chart');
-        const subChartEl = document.getElementById('sub-chart');
-        window.Plotly.react('main-chart', [], (mainChartEl === null || mainChartEl === void 0 ? void 0 : mainChartEl.layout) || {}, chartConfig);
-        window.Plotly.react('sub-chart', [], (subChartEl === null || subChartEl === void 0 ? void 0 : subChartEl.layout) || {}, chartConfig);
-        DOM.stockInfoPanel.style.display = 'none';
-        DOM.dashboard.style.display = 'none';
-        DOM.statsContainer.style.display = 'none';
-        // Hide insights banner
-        document.getElementById('insights-banner').style.display = 'none';
-    }
-
-    function handleResize() {
-        clearTimeout(state.resizeTimeout);
-        state.resizeTimeout = window.setTimeout(() => {
-            window.Plotly.Plots.resize('main-chart');
-            window.Plotly.Plots.resize('sub-chart');
-        }, 100);
-    }
-
-    // Fetch and display trading intelligence stats
-    async function fetchTradingStats() {
-        console.log('fetchTradingStats called with ticker:', state.currentTicker);
-        console.log('DOM.statsContainer exists:', !!DOM.statsContainer);
-        console.log('state.isLoading:', state.isLoading);
-        
-        if (!state.currentTicker || state.isLoading) {
-            console.log('Exiting early - ticker:', state.currentTicker, 'isLoading:', state.isLoading);
-            return;
+        if(state.mainChartInstance && state.subChartInstance) {
+            state.mainChartInstance.updateSeries([]);
+            state.subChartInstance.updateSeries([]);
         }
+        DOM.dashboard.style.display = 'none';
+        DOM.statsBanner.style.display = 'none';
+    }
+
+    // Fetch and display simplified trading stats
+    async function fetchTradingStats() {
+        if (!state.currentTicker) return;
         
         try {
-            // Add loading state to stats
-            console.log('Adding loading state to stats container');
-            
-            // FORCE show the stats container for debugging
-            if (DOM.statsContainer) {
-                DOM.statsContainer.style.display = 'block';
-                console.log('Forced stats container to display');
-            } else {
-                console.error('statsContainer element not found!');
-                return;
-            }
-            
-            DOM.statsContainer.classList.add('stats-loading');
-            
-            console.log('Making request to:', `/trading-stats/${state.currentTicker}/${state.selectedPeriod}`);
             const response = await fetch(`/trading-stats/${state.currentTicker}/${state.selectedPeriod}`);
-            console.log('Response status:', response.status);
             const result = await response.json();
-            console.log('Response data:', result);
             
             if (response.ok) {
-                console.log('About to update trading stats');
                 updateTradingStats(result);
             } else {
-                console.warn('Trading stats error:', result.error);
-                // Don't show error to user, just hide stats
-                DOM.statsContainer.style.display = 'none';
+                console.warn('Could not fetch trading stats:', result.error);
+                DOM.statsBanner.style.display = 'none';
             }
         } catch (error) {
             console.error('Error fetching trading stats:', error);
-            // Don't show error to user, just hide stats
-            DOM.statsContainer.style.display = 'none';
-        } finally {
-            DOM.statsContainer.classList.remove('stats-loading');
+            DOM.statsBanner.style.display = 'none';
         }
     }
 
-    // Update the trading stats display
+    // Update the new simplified stats banner
     function updateTradingStats(stats) {
         try {
-            // Show stats container
-            DOM.statsContainer.style.display = 'block';
+            const fearDays = stats.zone_analysis?.fear_zone?.days ?? 'N/A';
+            const fearPercentage = stats.zone_analysis?.fear_zone?.percentage ?? 'N/A';
+            DOM.fearDays.textContent = `${fearDays} (${fearPercentage})`;
             
-            // Update alert analysis
-            document.getElementById('alert-count').textContent = stats.alert_analysis.total_alerts;
-            document.getElementById('alert-frequency').textContent = `${stats.alert_analysis.alert_frequency} frequency`;
+            const fearAvgPrice = stats.zone_analysis?.fear_zone?.avg_price;
+            const currentPrice = stats.current_analysis?.price;
             
-            // Update fear zone stats
-            document.getElementById('fear-days').textContent = stats.zone_analysis.fear_zone.days;
-            document.getElementById('fear-percentage').textContent = stats.zone_analysis.fear_zone.percentage;
-            
-            // Update greed zone stats
-            document.getElementById('greed-days').textContent = stats.zone_analysis.greed_zone.days;
-            document.getElementById('greed-percentage').textContent = stats.zone_analysis.greed_zone.percentage;
-            
-            // Update opportunity score with color coding
-            const opportunityScore = stats.current_analysis.opportunity_score;
-            const opportunityElement = document.getElementById('opportunity-score');
-            opportunityElement.textContent = `${opportunityScore}/100`;
-            
-            // Color code opportunity score
-            const opportunityCard = document.querySelector('.opportunity-card');
-            opportunityCard.classList.remove('opportunity-excellent', 'opportunity-good', 'opportunity-neutral', 'opportunity-poor', 'opportunity-bad');
-            
-            if (opportunityScore >= 80) {
-                opportunityCard.classList.add('opportunity-excellent');
-            } else if (opportunityScore >= 60) {
-                opportunityCard.classList.add('opportunity-good');
-            } else if (opportunityScore >= 40) {
-                opportunityCard.classList.add('opportunity-neutral');
-            } else if (opportunityScore >= 20) {
-                opportunityCard.classList.add('opportunity-poor');
+            if (fearAvgPrice && currentPrice) {
+                const diff = ((currentPrice - fearAvgPrice) / fearAvgPrice * 100);
+                const diffText = `${diff >= 0 ? '+' : ''}${diff.toFixed(1)}%`;
+                DOM.fearAvgPrice.innerHTML = `$${fearAvgPrice.toFixed(2)} <span class="stat-value-small">(${diffText} vs current)</span>`;
             } else {
-                opportunityCard.classList.add('opportunity-bad');
+                DOM.fearAvgPrice.textContent = 'N/A';
             }
             
-            // Update current zone
-            const currentZone = stats.current_analysis.zone;
-            document.getElementById('current-zone').textContent = `Current zone: ${currentZone}`;
-            
-            // Update opportunity icon based on zone
-            const opportunityIcon = document.getElementById('opportunity-icon');
-            if (currentZone === 'fear') {
-                opportunityIcon.textContent = '🔥'; // Fire - buying opportunity
-            } else if (currentZone === 'greed') {
-                opportunityIcon.textContent = '💰'; // Money - selling opportunity
-            } else {
-                opportunityIcon.textContent = '💡'; // Neutral
-            }
-            
-            // Update fear average price
-            const fearAvgPrice = stats.zone_analysis.fear_zone.avg_price;
-            if (fearAvgPrice) {
-                document.getElementById('fear-avg-price').textContent = `$${fearAvgPrice}`;
-                
-                // Calculate difference vs current
-                const currentPrice = stats.current_analysis.price;
-                const priceDiff = ((currentPrice - fearAvgPrice) / fearAvgPrice * 100);
-                const diffText = priceDiff >= 0 ? `+${priceDiff.toFixed(1)}%` : `${priceDiff.toFixed(1)}%`;
-                document.getElementById('fear-vs-current').textContent = `${diffText} vs current`;
-            } else {
-                document.getElementById('fear-avg-price').textContent = 'N/A';
-                document.getElementById('fear-vs-current').textContent = 'Insufficient data';
-            }
-            
-            // Update fear duration
-            const fearDuration = stats.zone_analysis.fear_zone.avg_duration;
-            document.getElementById('fear-duration').textContent = `${fearDuration} days`;
-            
-            // Generate and show insights
-            const insights = generateInsights(stats);
-            if (insights) {
-                const insightsEl = document.getElementById('insights-text');
-                const bannerEl = document.getElementById('insights-banner');
-                insightsEl.textContent = insights;
-                bannerEl.style.display = 'block';
-            }
-            
+            DOM.statsBanner.style.display = 'flex';
         } catch (error) {
-            console.error('Error updating trading stats:', error);
+            console.error('Error updating trading stats display:', error);
+            DOM.statsBanner.style.display = 'none';
         }
     }
 
-    // Generate actionable insights based on the data
-    function generateInsights(stats) {
-        const currentZone = stats.current_analysis.zone;
-        const opportunityScore = stats.current_analysis.opportunity_score;
-        const fearDays = stats.zone_analysis.fear_zone.days;
-        const fearPercentage = parseFloat(stats.zone_analysis.fear_zone.percentage);
+    // --- NEW: Event handler for chart hover ---
+    function handleChartMouseMove(event, chartContext, config) {
+        const { dataPointIndex } = config;
+        if (dataPointIndex === -1) return; // Not hovering over a data point
+
+        // Get data from the internal chart state
+        const mainSeries = state.mainChartInstance.w.globals.initialSeries;
+
+        if (!mainSeries.length) return;
+
+        const timestamp = mainSeries[0].data[dataPointIndex][0];
+        const currentPrice = mainSeries[0].data[dataPointIndex][1];
         
-        if (currentZone === 'fear' && opportunityScore >= 70) {
-            return `🔥 Strong buying opportunity! This stock hits extreme fear levels only ${fearPercentage.toFixed(1)}% of the time. Historical data suggests good entry point.`;
-        } else if (currentZone === 'fear' && opportunityScore >= 50) {
-            return `📈 Moderate buying opportunity. Stock is in fear zone with decent value compared to historical averages.`;
-        } else if (currentZone === 'greed' && opportunityScore >= 70) {
-            return `💰 Consider taking profits. Stock is in extreme greed territory with high valuation relative to historical norms.`;
-        } else if (fearDays === 0) {
-            return `📊 This stock rarely hits extreme fear levels in the selected period. Consider waiting for better entry opportunities.`;
-        } else if (fearPercentage < 5) {
-            return `⏰ Rare opportunity alert! This stock spends only ${fearPercentage.toFixed(1)}% of time in extreme fear. Current levels worth monitoring.`;
-        } else if (currentZone === 'neutral') {
-            return `⚖️ Stock is in neutral territory. Consider waiting for extreme fear or greed levels for better risk/reward.`;
-        }
-        
-        return null; // No specific insight to show
+        // Find previous day's price for change calculation
+        const previousPrice = dataPointIndex > 0 ? mainSeries[0].data[dataPointIndex - 1][1] : currentPrice;
+
+        // Get data from the sub-chart (momentum chart)
+        const subSeries = state.subChartInstance.w.globals.initialSeries;
+        if (!subSeries.length) return;
+
+        const momentumValue = subSeries[0].data[dataPointIndex][1];
+
+        // Update headers with hovered data
+        const date = new Date(timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        DOM.stockNameTitle.textContent = date;
+
+        updateStockInfo(state.currentTicker, currentPrice, previousPrice);
+        updateMomentumInfo(momentumValue);
+    }
+
+    // --- NEW: Event handler to restore headers on mouse leave ---
+    function handleChartMouseLeave() {
+        // Restore the header to show the latest data
+        updateStockInfo(state.currentTicker, state.lastPrice, state.firstPrice);
+        updateMomentumInfo(state.lastDiffValue);
     }
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', init);
 
+    // Public API (for potential debugging or extensions)
     return {
-        init: init,
-        setDefaultPeriod: setDefaultPeriod,
-        initializeCharts: initializeCharts,
-        filterNullValues: filterNullValues,
-        updateCharts: updateCharts,
-        updateStockInfo: updateStockInfo,
-        updateTooltip: updateTooltip,
-        hideTooltip: hideTooltip,
-        handleTickerInput: handleTickerInput,
-        handlePeriodChange: handlePeriodChange,
-        updateSelectedPeriod: updateSelectedPeriod,
-        setLoading: setLoading,
-        showError: showError,
-        fetchData: fetchData,
-        clearCharts: clearCharts,
-        handleResize: handleResize,
-        fetchTradingStats: fetchTradingStats,
-        updateTradingStats: updateTradingStats,
-        generateInsights: generateInsights
+        init,
+        fetchData,
+        fetchTradingStats,
     };
 })();
