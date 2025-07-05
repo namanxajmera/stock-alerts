@@ -47,7 +47,8 @@ const StockAnalyzer = (() => {
         changeValueEl: document.getElementById('change-value'),
         changePercentEl: document.getElementById('change-percent'),
         customTooltip: document.getElementById('custom-tooltip'),
-        dashboard: document.querySelector('.dashboard')
+        dashboard: document.querySelector('.dashboard'),
+        statsContainer: document.querySelector('.stats-container')
     };
 
     // Application state
@@ -456,6 +457,8 @@ const StockAnalyzer = (() => {
             const result = await response.json();
             if (response.ok) {
                 updateCharts(result, state.currentTicker);
+                // Fetch trading stats after successful chart update
+                fetchTradingStats();
             }
             else {
                 throw new Error(result.error || 'Failed to fetch data');
@@ -480,6 +483,9 @@ const StockAnalyzer = (() => {
         window.Plotly.react('sub-chart', [], (subChartEl === null || subChartEl === void 0 ? void 0 : subChartEl.layout) || {}, chartConfig);
         DOM.stockInfoPanel.style.display = 'none';
         DOM.dashboard.style.display = 'none';
+        DOM.statsContainer.style.display = 'none';
+        // Hide insights banner
+        document.getElementById('insights-banner').style.display = 'none';
     }
 
     function handleResize() {
@@ -488,6 +494,143 @@ const StockAnalyzer = (() => {
             window.Plotly.Plots.resize('main-chart');
             window.Plotly.Plots.resize('sub-chart');
         }, 100);
+    }
+
+    // Fetch and display trading intelligence stats
+    async function fetchTradingStats() {
+        if (!state.currentTicker || state.isLoading) return;
+        
+        try {
+            // Add loading state to stats
+            DOM.statsContainer.classList.add('stats-loading');
+            
+            const response = await fetch(`/trading-stats/${state.currentTicker}/${state.selectedPeriod}`);
+            const result = await response.json();
+            
+            if (response.ok) {
+                updateTradingStats(result);
+            } else {
+                console.warn('Trading stats error:', result.error);
+                // Don't show error to user, just hide stats
+                DOM.statsContainer.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error fetching trading stats:', error);
+            // Don't show error to user, just hide stats
+            DOM.statsContainer.style.display = 'none';
+        } finally {
+            DOM.statsContainer.classList.remove('stats-loading');
+        }
+    }
+
+    // Update the trading stats display
+    function updateTradingStats(stats) {
+        try {
+            // Show stats container
+            DOM.statsContainer.style.display = 'block';
+            
+            // Update alert analysis
+            document.getElementById('alert-count').textContent = stats.alert_analysis.total_alerts;
+            document.getElementById('alert-frequency').textContent = `${stats.alert_analysis.alert_frequency} frequency`;
+            
+            // Update fear zone stats
+            document.getElementById('fear-days').textContent = stats.zone_analysis.fear_zone.days;
+            document.getElementById('fear-percentage').textContent = stats.zone_analysis.fear_zone.percentage;
+            
+            // Update greed zone stats
+            document.getElementById('greed-days').textContent = stats.zone_analysis.greed_zone.days;
+            document.getElementById('greed-percentage').textContent = stats.zone_analysis.greed_zone.percentage;
+            
+            // Update opportunity score with color coding
+            const opportunityScore = stats.current_analysis.opportunity_score;
+            const opportunityElement = document.getElementById('opportunity-score');
+            opportunityElement.textContent = `${opportunityScore}/100`;
+            
+            // Color code opportunity score
+            const opportunityCard = document.querySelector('.opportunity-card');
+            opportunityCard.classList.remove('opportunity-excellent', 'opportunity-good', 'opportunity-neutral', 'opportunity-poor', 'opportunity-bad');
+            
+            if (opportunityScore >= 80) {
+                opportunityCard.classList.add('opportunity-excellent');
+            } else if (opportunityScore >= 60) {
+                opportunityCard.classList.add('opportunity-good');
+            } else if (opportunityScore >= 40) {
+                opportunityCard.classList.add('opportunity-neutral');
+            } else if (opportunityScore >= 20) {
+                opportunityCard.classList.add('opportunity-poor');
+            } else {
+                opportunityCard.classList.add('opportunity-bad');
+            }
+            
+            // Update current zone
+            const currentZone = stats.current_analysis.zone;
+            document.getElementById('current-zone').textContent = `Current zone: ${currentZone}`;
+            
+            // Update opportunity icon based on zone
+            const opportunityIcon = document.getElementById('opportunity-icon');
+            if (currentZone === 'fear') {
+                opportunityIcon.textContent = '🔥'; // Fire - buying opportunity
+            } else if (currentZone === 'greed') {
+                opportunityIcon.textContent = '💰'; // Money - selling opportunity
+            } else {
+                opportunityIcon.textContent = '💡'; // Neutral
+            }
+            
+            // Update fear average price
+            const fearAvgPrice = stats.zone_analysis.fear_zone.avg_price;
+            if (fearAvgPrice) {
+                document.getElementById('fear-avg-price').textContent = `$${fearAvgPrice}`;
+                
+                // Calculate difference vs current
+                const currentPrice = stats.current_analysis.price;
+                const priceDiff = ((currentPrice - fearAvgPrice) / fearAvgPrice * 100);
+                const diffText = priceDiff >= 0 ? `+${priceDiff.toFixed(1)}%` : `${priceDiff.toFixed(1)}%`;
+                document.getElementById('fear-vs-current').textContent = `${diffText} vs current`;
+            } else {
+                document.getElementById('fear-avg-price').textContent = 'N/A';
+                document.getElementById('fear-vs-current').textContent = 'Insufficient data';
+            }
+            
+            // Update fear duration
+            const fearDuration = stats.zone_analysis.fear_zone.avg_duration;
+            document.getElementById('fear-duration').textContent = `${fearDuration} days`;
+            
+            // Generate and show insights
+            const insights = generateInsights(stats);
+            if (insights) {
+                const insightsEl = document.getElementById('insights-text');
+                const bannerEl = document.getElementById('insights-banner');
+                insightsEl.textContent = insights;
+                bannerEl.style.display = 'block';
+            }
+            
+        } catch (error) {
+            console.error('Error updating trading stats:', error);
+        }
+    }
+
+    // Generate actionable insights based on the data
+    function generateInsights(stats) {
+        const currentZone = stats.current_analysis.zone;
+        const opportunityScore = stats.current_analysis.opportunity_score;
+        const fearDays = stats.zone_analysis.fear_zone.days;
+        const fearPercentage = parseFloat(stats.zone_analysis.fear_zone.percentage);
+        
+        if (currentZone === 'fear' && opportunityScore >= 70) {
+            return `🔥 Strong buying opportunity! This stock hits extreme fear levels only ${fearPercentage.toFixed(1)}% of the time. Historical data suggests good entry point.`;
+        } else if (currentZone === 'fear' && opportunityScore >= 50) {
+            return `📈 Moderate buying opportunity. Stock is in fear zone with decent value compared to historical averages.`;
+        } else if (currentZone === 'greed' && opportunityScore >= 70) {
+            return `💰 Consider taking profits. Stock is in extreme greed territory with high valuation relative to historical norms.`;
+        } else if (fearDays === 0) {
+            return `📊 This stock rarely hits extreme fear levels in the selected period. Consider waiting for better entry opportunities.`;
+        } else if (fearPercentage < 5) {
+            return `⏰ Rare opportunity alert! This stock spends only ${fearPercentage.toFixed(1)}% of time in extreme fear. Current levels worth monitoring.`;
+        } else if (currentZone === 'neutral') {
+            return `⚖️ Stock is in neutral territory. Consider waiting for extreme fear or greed levels for better risk/reward.`;
+        }
+        
+        return null; // No specific insight to show
     }
 
     // Initialize on page load
@@ -509,6 +652,9 @@ const StockAnalyzer = (() => {
         showError: showError,
         fetchData: fetchData,
         clearCharts: clearCharts,
-        handleResize: handleResize
+        handleResize: handleResize,
+        fetchTradingStats: fetchTradingStats,
+        updateTradingStats: updateTradingStats,
+        generateInsights: generateInsights
     };
 })();

@@ -337,3 +337,258 @@ class StockService:
             return {
                 "error": "An unexpected error occurred. Please try again later."
             }, 500
+
+    def calculate_trading_stats(
+        self, ticker_symbol: str, period: str = "5y"
+    ) -> Tuple[Dict[str, Any], int]:
+        """
+        Calculate trading intelligence statistics for a stock.
+
+        This includes:
+        - Alert frequency (how often price hits extreme levels)
+        - Fear/Greed zones (days spent in different percentiles)
+        - Opportunity analysis (average prices during different conditions)
+        - Time analysis (duration of oversold/overbought periods)
+
+        Args:
+            ticker_symbol: Stock ticker symbol
+            period: Time period for analysis (1y, 3y, 5y, max)
+
+        Returns:
+            Tuple of (stats_dict, status_code)
+        """
+        try:
+            self.logger.info(
+                f"Calculating trading stats for {ticker_symbol} with period {period}"
+            )
+
+            # First get the stock data
+            stock_data, status = self.calculate_metrics(ticker_symbol, period)
+            if status != 200:
+                return stock_data, status
+
+            # Extract data for analysis
+            dates = stock_data["dates"]
+            prices = [p for p in stock_data["prices"] if p is not None]
+            pct_diff = [p for p in stock_data["pct_diff"] if p is not None]
+            percentiles = stock_data["percentiles"]
+
+            if not prices or not pct_diff:
+                return {"error": "Insufficient data for trading analysis"}, 400
+
+            # Calculate trading intelligence metrics
+            p16 = percentiles["p16"]
+            p84 = percentiles["p84"]
+            current_price = prices[-1] if prices else 0
+
+            # 1. Alert Analysis - Count extreme movements
+            extreme_fear_count = sum(1 for p in pct_diff if p <= p16)
+            extreme_greed_count = sum(1 for p in pct_diff if p >= p84)
+            total_alerts = extreme_fear_count + extreme_greed_count
+
+            # 2. Fear/Greed Zone Analysis
+            total_days = len(pct_diff)
+            fear_days = extreme_fear_count
+            greed_days = extreme_greed_count
+            neutral_days = total_days - fear_days - greed_days
+
+            fear_percentage = (fear_days / total_days * 100) if total_days > 0 else 0
+            greed_percentage = (greed_days / total_days * 100) if total_days > 0 else 0
+
+            # 3. Opportunity Analysis - Average prices during different conditions
+            fear_prices = []
+            greed_prices = []
+            neutral_prices = []
+
+            for i, p in enumerate(pct_diff):
+                if i < len(prices):
+                    price = prices[i]
+                    if p <= p16:
+                        fear_prices.append(price)
+                    elif p >= p84:
+                        greed_prices.append(price)
+                    else:
+                        neutral_prices.append(price)
+
+            avg_fear_price = np.mean(fear_prices) if fear_prices else 0
+            avg_greed_price = np.mean(greed_prices) if greed_prices else 0
+            avg_neutral_price = np.mean(neutral_prices) if neutral_prices else 0
+
+            # 4. Time Analysis - Calculate streaks
+            fear_streaks = self._calculate_streaks(pct_diff, lambda x: x <= p16)
+            greed_streaks = self._calculate_streaks(pct_diff, lambda x: x >= p84)
+
+            avg_fear_duration = np.mean(fear_streaks) if fear_streaks else 0
+            avg_greed_duration = np.mean(greed_streaks) if greed_streaks else 0
+            max_fear_duration = max(fear_streaks) if fear_streaks else 0
+            max_greed_duration = max(greed_streaks) if greed_streaks else 0
+
+            # 5. Current Analysis
+            current_pct_diff = pct_diff[-1] if pct_diff else 0
+            current_zone = "neutral"
+            if current_pct_diff <= p16:
+                current_zone = "fear"
+            elif current_pct_diff >= p84:
+                current_zone = "greed"
+
+            # 6. Opportunity Score (how good the current opportunity is)
+            # Lower prices relative to fear zone average = higher opportunity
+            opportunity_score = 0
+            if avg_fear_price > 0:
+                if current_zone == "fear":
+                    # In fear zone - calculate how good this opportunity is
+                    opportunity_score = min(
+                        100,
+                        max(
+                            0,
+                            (avg_fear_price - current_price) / avg_fear_price * 100
+                            + 50,
+                        ),
+                    )
+                elif current_zone == "greed":
+                    # In greed zone - selling opportunity
+                    opportunity_score = (
+                        min(
+                            100,
+                            max(
+                                0,
+                                (current_price - avg_greed_price)
+                                / avg_greed_price
+                                * 100
+                                + 50,
+                            ),
+                        )
+                        if avg_greed_price > 0
+                        else 0
+                    )
+                else:
+                    # Neutral zone
+                    opportunity_score = 50
+
+            # Prepare results
+            result = {
+                "symbol": ticker_symbol,
+                "period": period,
+                "analysis_period": {
+                    "start_date": dates[0] if dates else None,
+                    "end_date": dates[-1] if dates else None,
+                    "total_days": total_days,
+                },
+                "alert_analysis": {
+                    "total_alerts": total_alerts,
+                    "extreme_fear_alerts": extreme_fear_count,
+                    "extreme_greed_alerts": extreme_greed_count,
+                    "alert_frequency": (
+                        f"{total_alerts / total_days * 100:.1f}%"
+                        if total_days > 0
+                        else "0%"
+                    ),
+                },
+                "zone_analysis": {
+                    "fear_zone": {
+                        "days": fear_days,
+                        "percentage": f"{fear_percentage:.1f}%",
+                        "avg_price": (
+                            round(avg_fear_price, 2) if avg_fear_price > 0 else None
+                        ),
+                        "avg_duration": (
+                            round(avg_fear_duration, 1) if avg_fear_duration > 0 else 0
+                        ),
+                        "max_duration": max_fear_duration,
+                    },
+                    "greed_zone": {
+                        "days": greed_days,
+                        "percentage": f"{greed_percentage:.1f}%",
+                        "avg_price": (
+                            round(avg_greed_price, 2) if avg_greed_price > 0 else None
+                        ),
+                        "avg_duration": (
+                            round(avg_greed_duration, 1)
+                            if avg_greed_duration > 0
+                            else 0
+                        ),
+                        "max_duration": max_greed_duration,
+                    },
+                    "neutral_zone": {
+                        "days": neutral_days,
+                        "percentage": f"{100 - fear_percentage - greed_percentage:.1f}%",
+                        "avg_price": (
+                            round(avg_neutral_price, 2)
+                            if avg_neutral_price > 0
+                            else None
+                        ),
+                    },
+                },
+                "current_analysis": {
+                    "price": round(current_price, 2),
+                    "zone": current_zone,
+                    "pct_from_ma200": round(current_pct_diff, 2),
+                    "opportunity_score": round(opportunity_score, 1),
+                },
+                "opportunity_insights": {
+                    "vs_fear_avg": (
+                        round(
+                            (current_price - avg_fear_price) / avg_fear_price * 100, 1
+                        )
+                        if avg_fear_price > 0
+                        else None
+                    ),
+                    "vs_greed_avg": (
+                        round(
+                            (current_price - avg_greed_price) / avg_greed_price * 100, 1
+                        )
+                        if avg_greed_price > 0
+                        else None
+                    ),
+                    "vs_neutral_avg": (
+                        round(
+                            (current_price - avg_neutral_price)
+                            / avg_neutral_price
+                            * 100,
+                            1,
+                        )
+                        if avg_neutral_price > 0
+                        else None
+                    ),
+                },
+            }
+
+            self.logger.info(
+                f"Successfully calculated trading stats for {ticker_symbol}"
+            )
+            return result, 200
+
+        except Exception as e:
+            error_msg = f"Error calculating trading stats for {ticker_symbol}: {e}"
+            self.logger.error(error_msg, exc_info=True)
+            return {
+                "error": "Failed to calculate trading statistics. Please try again later."
+            }, 500
+
+    def _calculate_streaks(self, data: List[float], condition_func) -> List[int]:
+        """
+        Calculate consecutive streaks where condition is true.
+
+        Args:
+            data: List of values to analyze
+            condition_func: Function that returns True/False for each value
+
+        Returns:
+            List of streak lengths
+        """
+        streaks = []
+        current_streak = 0
+
+        for value in data:
+            if condition_func(value):
+                current_streak += 1
+            else:
+                if current_streak > 0:
+                    streaks.append(current_streak)
+                    current_streak = 0
+
+        # Don't forget the last streak if it ends at the data end
+        if current_streak > 0:
+            streaks.append(current_streak)
+
+        return streaks

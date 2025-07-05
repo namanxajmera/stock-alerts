@@ -76,6 +76,84 @@
                 <div id="sub-chart" class="chart"></div>
             </div>
 
+            <!-- Trading Intelligence Stats Panel -->
+            <div class="stats-container">
+                <div class="stats-header">
+                    <div class="stats-title">Trading Intelligence</div>
+                    <div class="stats-subtitle">Historical patterns and opportunity analysis</div>
+                </div>
+                
+                <div class="stats-grid">
+                    <!-- Alert History -->
+                    <div class="stat-card alert-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <div class="stat-label">Alert History</div>
+                            <div class="stat-value" id="alert-count">--</div>
+                            <div class="stat-detail" id="alert-frequency">-- alerts in past period</div>
+                        </div>
+                    </div>
+
+                    <!-- Fear Zone Analysis -->
+                    <div class="stat-card fear-card">
+                        <div class="stat-icon">📉</div>
+                        <div class="stat-content">
+                            <div class="stat-label">Extreme Fear Days</div>
+                            <div class="stat-value" id="fear-days">--</div>
+                            <div class="stat-detail" id="fear-percentage">-- of all days</div>
+                        </div>
+                    </div>
+
+                    <!-- Greed Zone Analysis -->
+                    <div class="stat-card greed-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-content">
+                            <div class="stat-label">Extreme Greed Days</div>
+                            <div class="stat-value" id="greed-days">--</div>
+                            <div class="stat-detail" id="greed-percentage">-- of all days</div>
+                        </div>
+                    </div>
+
+                    <!-- Current Opportunity -->
+                    <div class="stat-card opportunity-card">
+                        <div class="stat-icon" id="opportunity-icon">💡</div>
+                        <div class="stat-content">
+                            <div class="stat-label">Opportunity Score</div>
+                            <div class="stat-value" id="opportunity-score">--</div>
+                            <div class="stat-detail" id="current-zone">Current zone: --</div>
+                        </div>
+                    </div>
+
+                    <!-- Fear Zone Price Analysis -->
+                    <div class="stat-card price-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-content">
+                            <div class="stat-label">Avg Fear Price</div>
+                            <div class="stat-value" id="fear-avg-price">$--</div>
+                            <div class="stat-detail" id="fear-vs-current">-- vs current</div>
+                        </div>
+                    </div>
+
+                    <!-- Duration Analysis -->
+                    <div class="stat-card duration-card">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-content">
+                            <div class="stat-label">Avg Fear Duration</div>
+                            <div class="stat-value" id="fear-duration">--</div>
+                            <div class="stat-detail" id="fear-duration-detail">days per episode</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insights Banner -->
+                <div class="insights-banner" id="insights-banner" style="display: none;">
+                    <div class="insights-content">
+                        <div class="insights-icon">💡</div>
+                        <div class="insights-text" id="insights-text"></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Custom tooltip -->
             <div id="custom-tooltip" class="custom-tooltip"></div>
         </section>
