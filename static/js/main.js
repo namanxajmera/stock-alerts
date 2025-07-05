@@ -457,7 +457,10 @@ const StockAnalyzer = (() => {
             const result = await response.json();
             if (response.ok) {
                 updateCharts(result, state.currentTicker);
+                // Set loading to false BEFORE fetching trading stats
+                setLoading(false);
                 // Fetch trading stats after successful chart update
+                console.log('About to fetch trading stats for:', state.currentTicker);
                 fetchTradingStats();
             }
             else {
@@ -469,8 +472,6 @@ const StockAnalyzer = (() => {
             const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
             showError(`Error: ${errorMessage}`);
             clearCharts();
-        }
-        finally {
             setLoading(false);
         }
     }
@@ -498,16 +499,38 @@ const StockAnalyzer = (() => {
 
     // Fetch and display trading intelligence stats
     async function fetchTradingStats() {
-        if (!state.currentTicker || state.isLoading) return;
+        console.log('fetchTradingStats called with ticker:', state.currentTicker);
+        console.log('DOM.statsContainer exists:', !!DOM.statsContainer);
+        console.log('state.isLoading:', state.isLoading);
+        
+        if (!state.currentTicker || state.isLoading) {
+            console.log('Exiting early - ticker:', state.currentTicker, 'isLoading:', state.isLoading);
+            return;
+        }
         
         try {
             // Add loading state to stats
+            console.log('Adding loading state to stats container');
+            
+            // FORCE show the stats container for debugging
+            if (DOM.statsContainer) {
+                DOM.statsContainer.style.display = 'block';
+                console.log('Forced stats container to display');
+            } else {
+                console.error('statsContainer element not found!');
+                return;
+            }
+            
             DOM.statsContainer.classList.add('stats-loading');
             
+            console.log('Making request to:', `/trading-stats/${state.currentTicker}/${state.selectedPeriod}`);
             const response = await fetch(`/trading-stats/${state.currentTicker}/${state.selectedPeriod}`);
+            console.log('Response status:', response.status);
             const result = await response.json();
+            console.log('Response data:', result);
             
             if (response.ok) {
+                console.log('About to update trading stats');
                 updateTradingStats(result);
             } else {
                 console.warn('Trading stats error:', result.error);
