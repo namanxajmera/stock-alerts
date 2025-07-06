@@ -6,6 +6,7 @@
     <title>Stock Alerts · Intelligent Stock Analytics</title>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -35,8 +36,16 @@
         <!-- This header becomes visible and sticky at the top after the first search -->
         <header class="app-header">
             <div class="header-content">
+                <div class="header-left">
+                    <div class="app-title">📈 Stock Alerts</div>
+                </div>
                 <div id="header-search-controls" class="search-controls">
                     <!-- Search controls will be moved here by JavaScript -->
+                </div>
+                <div class="header-right">
+                    <a href="#" id="telegram-link" class="telegram-link" title="Open Telegram Bot">
+                        <i class="fab fa-telegram"></i>
+                    </a>
                 </div>
             </div>
         </header>
