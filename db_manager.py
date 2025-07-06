@@ -8,7 +8,7 @@ stock cache, and alert history using PostgreSQL with connection pooling.
 import logging
 import os
 from contextlib import contextmanager
-from typing import Dict, Generator, List, Optional, Tuple, Union
+from typing import Any, Dict, Generator, List, Optional, Tuple, Union
 
 import psycopg2
 import psycopg2.extras
@@ -394,3 +394,58 @@ class DatabaseManager:
         except Exception as e:
             logger.error(f"Error getting cached data for {symbol}: {e}")
             return None
+
+    def get_fresh_trading_stats_cache(
+        self, symbol: str, period: str, max_age_hours: int = 1
+    ) -> Optional[Dict[str, Any]]:
+        """Get cached trading stats if recent enough."""
+        sql = """
+            SELECT symbol, period, stats_json, last_updated
+            FROM trading_stats_cache
+            WHERE symbol = %s AND period = %s
+            AND last_updated > NOW() - INTERVAL '%s hours'
+        """
+
+        try:
+            with self._managed_cursor() as cursor:
+                cursor.execute(sql, (symbol.upper(), period, max_age_hours))
+                row = cursor.fetchone()
+                if row:
+                    logger.info(
+                        f"Using cached trading stats for {symbol}/{period} (age: {row['last_updated']})"
+                    )
+                    return {
+                        "symbol": row["symbol"],
+                        "period": row["period"],
+                        "stats_json": row["stats_json"],
+                        "last_updated": row["last_updated"],
+                    }
+                return None
+        except Exception as e:
+            logger.error(
+                f"Error getting cached trading stats for {symbol}/{period}: {e}"
+            )
+            return None
+
+    def update_trading_stats_cache(
+        self, symbol: str, period: str, stats_json: str
+    ) -> bool:
+        """Update or insert trading stats cache."""
+        sql = """
+            INSERT INTO trading_stats_cache (symbol, period, stats_json, last_updated)
+            VALUES (%s, %s, %s, NOW())
+            ON CONFLICT (symbol, period) DO UPDATE SET
+                stats_json = EXCLUDED.stats_json,
+                last_updated = EXCLUDED.last_updated
+        """
+
+        try:
+            with self._managed_cursor(commit=True) as cursor:
+                cursor.execute(sql, (symbol.upper(), period, stats_json))
+                logger.info(f"Updated trading stats cache for {symbol}/{period}")
+                return True
+        except Exception as e:
+            logger.error(
+                f"Error updating trading stats cache for {symbol}/{period}: {e}"
+            )
+            return False

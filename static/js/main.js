@@ -105,7 +105,22 @@ const StockAnalyzer = (() => {
         lastPrice: null,
         previousClose: null,
         lastDiffValue: null,
+        // Debounce tracking
+        debounceTimer: null,
+        // Chart optimization tracking
+        lastDiffColor: null,
     };
+
+    // Utility function for debouncing
+    function debounce(func, delay) {
+        return function(...args) {
+            clearTimeout(state.debounceTimer);
+            state.debounceTimer = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    // Debounced version of fetchData with 200ms delay
+    const debouncedFetchData = debounce(fetchData, 200);
 
     // Initialize the application
     function init() {
@@ -390,31 +405,34 @@ const StockAnalyzer = (() => {
                 p84Series
             ].filter(s => s.data.length > 0));
             
-            // Update sub-chart colors
-            const newSubChartOptions = {
-                colors: [diffColor, 'var(--blue-primary)', 'var(--purple-primary)'],
-                stroke: {
-                    width: [2, 1.5, 1.5],
-                    dashArray: [0, 4, 4]
-                },
-                legend: {
-                    show: true,
-                    position: 'top',
-                    horizontalAlign: 'right',
-                    floating: true,
-                    offsetY: -5,
-                    fontFamily: 'var(--font-family-main)',
-                    markers: {
-                        width: 16,
-                        height: 2,
-                        radius: 0,
+            // Only update chart options if the color changed (performance optimization)
+            if (state.lastDiffColor !== diffColor) {
+                const newSubChartOptions = {
+                    colors: [diffColor, 'var(--blue-primary)', 'var(--purple-primary)'],
+                    stroke: {
+                        width: [2, 1.5, 1.5],
+                        dashArray: [0, 4, 4]
                     },
-                    itemMargin: {
-                        horizontal: 10,
+                    legend: {
+                        show: true,
+                        position: 'top',
+                        horizontalAlign: 'right',
+                        floating: true,
+                        offsetY: -5,
+                        fontFamily: 'var(--font-family-main)',
+                        markers: {
+                            width: 16,
+                            height: 2,
+                            radius: 0,
+                        },
+                        itemMargin: {
+                            horizontal: 10,
+                        },
                     },
-                },
-            };
-            state.subChartInstance.updateOptions(newSubChartOptions);
+                };
+                state.subChartInstance.updateOptions(newSubChartOptions);
+                state.lastDiffColor = diffColor;
+            }
 
         } catch (error) {
             console.error('Error updating charts:', error);
@@ -477,7 +495,7 @@ const StockAnalyzer = (() => {
         const newPeriod = button.dataset.period?.toLowerCase() || '';
         if (newPeriod && newPeriod !== state.selectedPeriod) {
             updateSelectedPeriod(newPeriod);
-            if (state.currentTicker) fetchData();
+            if (state.currentTicker) debouncedFetchData();
         }
     }
 
@@ -511,8 +529,16 @@ const StockAnalyzer = (() => {
             if (!response.ok) throw new Error(result.error || 'Failed to fetch data');
 
             activateDashboardView();
-            updateCharts(result, state.currentTicker);
-            fetchTradingStats();
+            // Handle combined response structure
+            if (result.stock_data && result.trading_stats) {
+                // New combined response format
+                updateCharts(result.stock_data, state.currentTicker);
+                updateTradingStats(result.trading_stats);
+            } else {
+                // Fallback to old format if not combined
+                updateCharts(result, state.currentTicker);
+                fetchTradingStats();
+            }
 
         } catch (error) {
             console.error('Error fetching data:', error);

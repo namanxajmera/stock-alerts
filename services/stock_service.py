@@ -362,6 +362,18 @@ class StockService:
                 f"Calculating trading stats for {ticker_symbol} with period {period}"
             )
 
+            # Check cache first
+            cache_hours = config.CACHE_HOURS
+            cached_stats = self.db_manager.get_fresh_trading_stats_cache(
+                ticker_symbol, period, cache_hours
+            )
+
+            if cached_stats:
+                self.logger.info(
+                    f"Using cached trading stats for {ticker_symbol}/{period}"
+                )
+                return json.loads(cached_stats["stats_json"]), 200
+
             # First get the stock data
             stock_data, status = self.calculate_metrics(ticker_symbol, period)
             if status != 200:
@@ -418,10 +430,10 @@ class StockService:
             fear_streaks = self._calculate_streaks(pct_diff, lambda x: x <= p16)
             greed_streaks = self._calculate_streaks(pct_diff, lambda x: x >= p84)
 
-            avg_fear_duration = np.mean(fear_streaks) if fear_streaks else 0
-            avg_greed_duration = np.mean(greed_streaks) if greed_streaks else 0
-            max_fear_duration = max(fear_streaks) if fear_streaks else 0
-            max_greed_duration = max(greed_streaks) if greed_streaks else 0
+            avg_fear_duration = float(np.mean(fear_streaks)) if fear_streaks else 0.0
+            avg_greed_duration = float(np.mean(greed_streaks)) if greed_streaks else 0.0
+            max_fear_duration = int(max(fear_streaks)) if fear_streaks else 0
+            max_greed_duration = int(max(greed_streaks)) if greed_streaks else 0
 
             # 5. Current Analysis
             current_pct_diff = pct_diff[-1] if pct_diff else 0
@@ -437,17 +449,19 @@ class StockService:
             if avg_fear_price > 0:
                 if current_zone == "fear":
                     # In fear zone - calculate how good this opportunity is
-                    opportunity_score = min(
-                        100,
-                        max(
-                            0,
-                            (avg_fear_price - current_price) / avg_fear_price * 100
-                            + 50,
-                        ),
+                    opportunity_score = int(
+                        min(
+                            100,
+                            max(
+                                0,
+                                (avg_fear_price - current_price) / avg_fear_price * 100
+                                + 50,
+                            ),
+                        )
                     )
                 elif current_zone == "greed":
                     # In greed zone - selling opportunity
-                    opportunity_score = (
+                    opportunity_score = int(
                         min(
                             100,
                             max(
@@ -556,6 +570,18 @@ class StockService:
             self.logger.info(
                 f"Successfully calculated trading stats for {ticker_symbol}"
             )
+
+            # Cache the computed results
+            try:
+                result_json = json.dumps(result)
+                self.db_manager.update_trading_stats_cache(
+                    ticker_symbol, period, result_json
+                )
+            except Exception as cache_error:
+                self.logger.warning(
+                    f"Failed to cache trading stats for {ticker_symbol}/{period}: {cache_error}"
+                )
+
             return result, 200
 
         except Exception as e:
@@ -565,7 +591,7 @@ class StockService:
                 "error": "Failed to calculate trading statistics. Please try again later."
             }, 500
 
-    def _calculate_streaks(self, data: List[float], condition_func) -> List[int]:
+    def _calculate_streaks(self, data: List[float], condition_func: Any) -> List[int]:
         """
         Calculate consecutive streaks where condition is true.
 
@@ -592,3 +618,226 @@ class StockService:
             streaks.append(current_streak)
 
         return streaks
+
+    def get_combined_data(
+        self, ticker_symbol: str, period: str
+    ) -> Tuple[Dict[str, Any], int]:
+        """
+        Get combined stock data and trading stats in a single call.
+
+        This method eliminates the need for separate API calls by returning
+        both chart data and trading intelligence in one response.
+        It optimizes performance by sharing computation between stock data and trading stats.
+
+        Args:
+            ticker_symbol: Stock ticker symbol
+            period: Time period ('1y', '3y', '5y', 'max')
+
+        Returns:
+            Tuple of (combined_data_dict, status_code)
+        """
+        try:
+            # Check if we have cached trading stats first
+            cache_hours = config.CACHE_HOURS
+            cached_stats = self.db_manager.get_fresh_trading_stats_cache(
+                ticker_symbol, period, cache_hours
+            )
+
+            # Get stock metrics
+            stock_data, status_code = self.calculate_metrics(ticker_symbol, period)
+
+            if status_code != 200:
+                return stock_data, status_code
+
+            # Use cached trading stats if available, otherwise compute
+            if cached_stats:
+                self.logger.info(
+                    f"Using cached trading stats for combined data {ticker_symbol}/{period}"
+                )
+                trading_stats = json.loads(cached_stats["stats_json"])
+            else:
+                # Compute trading stats using the same stock data we already have
+                trading_stats, stats_status_code = (
+                    self._compute_trading_stats_from_stock_data(
+                        ticker_symbol, period, stock_data
+                    )
+                )
+
+                if stats_status_code != 200:
+                    return trading_stats, stats_status_code
+
+                # Cache the computed stats
+                try:
+                    result_json = json.dumps(trading_stats)
+                    self.db_manager.update_trading_stats_cache(
+                        ticker_symbol, period, result_json
+                    )
+                except Exception as cache_error:
+                    self.logger.warning(
+                        f"Failed to cache trading stats for {ticker_symbol}/{period}: {cache_error}"
+                    )
+
+            # Combine both datasets
+            combined_data = {"stock_data": stock_data, "trading_stats": trading_stats}
+
+            return combined_data, 200
+
+        except Exception as e:
+            self.logger.error(
+                f"Error getting combined data for {ticker_symbol}/{period}: {e}",
+                exc_info=True,
+            )
+            return {"error": "Failed to get combined data"}, 500
+
+    def _compute_trading_stats_from_stock_data(
+        self, ticker_symbol: str, period: str, stock_data: Dict[str, Any]
+    ) -> Tuple[Dict[str, Any], int]:
+        """
+        Compute trading stats from already-processed stock data.
+
+        This method avoids duplicate data processing by reusing the stock data
+        that was already computed for the charts.
+
+        Args:
+            ticker_symbol: Stock ticker symbol
+            period: Time period
+            stock_data: Already-processed stock data dictionary
+
+        Returns:
+            Tuple of (stats_dict, status_code)
+        """
+        try:
+            # Extract data from the already-processed stock data
+            dates = stock_data["dates"]
+            prices = [p for p in stock_data["prices"] if p is not None]
+            pct_diff = [p for p in stock_data["pct_diff"] if p is not None]
+            percentiles = stock_data["percentiles"]
+
+            if not prices or not pct_diff:
+                return {"error": "Insufficient data for trading analysis"}, 400
+
+            # Calculate trading intelligence metrics
+            p16 = percentiles["p16"]
+            p84 = percentiles["p84"]
+            current_price = prices[-1] if prices else 0
+
+            # 1. Alert Analysis - Count extreme movements
+            extreme_fear_count = sum(1 for p in pct_diff if p <= p16)
+            extreme_greed_count = sum(1 for p in pct_diff if p >= p84)
+            total_alerts = extreme_fear_count + extreme_greed_count
+
+            # 2. Fear/Greed Zone Analysis
+            total_days = len(pct_diff)
+            fear_days = extreme_fear_count
+            greed_days = extreme_greed_count
+            neutral_days = total_days - fear_days - greed_days
+
+            fear_percentage = (fear_days / total_days * 100) if total_days > 0 else 0
+            greed_percentage = (greed_days / total_days * 100) if total_days > 0 else 0
+
+            # 3. Average Prices in Different Zones
+            fear_prices = []
+            greed_prices = []
+            neutral_prices = []
+
+            for i, p in enumerate(pct_diff):
+                if i < len(prices):
+                    price = prices[i]
+                    if p <= p16:
+                        fear_prices.append(price)
+                    elif p >= p84:
+                        greed_prices.append(price)
+                    else:
+                        neutral_prices.append(price)
+
+            avg_fear_price = np.mean(fear_prices) if fear_prices else 0
+            avg_greed_price = np.mean(greed_prices) if greed_prices else 0
+            avg_neutral_price = np.mean(neutral_prices) if neutral_prices else 0
+
+            # 4. Streak Analysis
+            fear_streaks = self._calculate_streaks(pct_diff, lambda x: x <= p16)
+            greed_streaks = self._calculate_streaks(pct_diff, lambda x: x >= p84)
+
+            max_fear_streak = int(max(fear_streaks)) if fear_streaks else 0
+            max_greed_streak = int(max(greed_streaks)) if greed_streaks else 0
+            avg_fear_streak = float(np.mean(fear_streaks)) if fear_streaks else 0.0
+            avg_greed_streak = float(np.mean(greed_streaks)) if greed_streaks else 0.0
+
+            # 5. Build the result
+            result = {
+                "alert_analysis": {
+                    "total_alerts": total_alerts,
+                    "fear_alerts": extreme_fear_count,
+                    "greed_alerts": extreme_greed_count,
+                },
+                "zone_analysis": {
+                    "fear_zone": {
+                        "days": fear_days,
+                        "percentage": f"{fear_percentage:.1f}%",
+                        "avg_price": round(avg_fear_price, 2),
+                    },
+                    "greed_zone": {
+                        "days": greed_days,
+                        "percentage": f"{greed_percentage:.1f}%",
+                        "avg_price": round(avg_greed_price, 2),
+                    },
+                    "neutral_zone": {
+                        "days": neutral_days,
+                        "percentage": f"{100 - fear_percentage - greed_percentage:.1f}%",
+                        "avg_price": round(avg_neutral_price, 2),
+                    },
+                },
+                "streak_analysis": {
+                    "fear_streaks": {
+                        "max": max_fear_streak,
+                        "avg": round(avg_fear_streak, 1),
+                        "count": len(fear_streaks),
+                    },
+                    "greed_streaks": {
+                        "max": max_greed_streak,
+                        "avg": round(avg_greed_streak, 1),
+                        "count": len(greed_streaks),
+                    },
+                },
+                "current_analysis": {
+                    "price": current_price,
+                    "pct_diff": pct_diff[-1] if pct_diff else 0,
+                    "percentile_16": p16,
+                    "percentile_84": p84,
+                },
+                "opportunity_insights": {
+                    "vs_fear_avg": (
+                        round(
+                            (current_price - avg_fear_price) / avg_fear_price * 100, 1
+                        )
+                        if avg_fear_price > 0
+                        else None
+                    ),
+                    "vs_greed_avg": (
+                        round(
+                            (current_price - avg_greed_price) / avg_greed_price * 100, 1
+                        )
+                        if avg_greed_price > 0
+                        else None
+                    ),
+                    "vs_neutral_avg": (
+                        round(
+                            (current_price - avg_neutral_price)
+                            / avg_neutral_price
+                            * 100,
+                            1,
+                        )
+                        if avg_neutral_price > 0
+                        else None
+                    ),
+                },
+            }
+
+            return result, 200
+
+        except Exception as e:
+            self.logger.error(
+                f"Error computing trading stats from stock data for {ticker_symbol}/{period}: {e}",
+                exc_info=True,
+            )
+            return {"error": "Failed to compute trading statistics"}, 500

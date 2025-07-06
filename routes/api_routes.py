@@ -17,19 +17,21 @@ api_bp = Blueprint("api", __name__)
 @api_bp.route("/data/<ticker>/<period>")
 def get_stock_data(ticker: str, period: str) -> Any:
     """
-    Get stock data for a specific ticker and period with enhanced validation.
+    Get complete stock data and trading stats for a specific ticker and period.
+
+    This endpoint now combines chart data and trading intelligence to reduce API calls.
 
     Args:
         ticker: Stock ticker symbol (e.g., AAPL, TSLA)
         period: Time period (1y, 3y, 5y, max)
 
     Returns:
-        JSON response with stock data or error message
+        JSON response with combined stock data and trading stats or error message
     """
     # Log request with client info for security monitoring
     client_ip = request.environ.get("HTTP_X_FORWARDED_FOR", request.remote_addr)
     logger.info(
-        f"Stock data request from {client_ip}: ticker={ticker}, period={period}"
+        f"Combined stock data request from {client_ip}: ticker={ticker}, period={period}"
     )
 
     try:
@@ -55,15 +57,15 @@ def get_stock_data(ticker: str, period: str) -> Any:
             logger.error("Stock service not available")
             return jsonify({"error": "Stock service not available"}), 500
 
-        # Process request with validated inputs
-        result, status_code = stock_service.calculate_metrics(
+        # Get combined data (chart + trading stats)
+        result, status_code = stock_service.get_combined_data(
             validated_ticker, validated_period
         )
 
         # Log successful request
         if status_code == 200:
             logger.info(
-                f"Successful data request for {validated_ticker}/{validated_period} from {client_ip}"
+                f"Successful combined data request for {validated_ticker}/{validated_period} from {client_ip}"
             )
         else:
             logger.warning(
