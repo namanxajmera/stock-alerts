@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Bot · Stock Alerts</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- Simple centered view like homepage -->
+        <div class="telegram-view">
+            
+            <!-- Back link -->
+            <div class="back-link-container">
+                <a href="/" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+
+            <!-- Main content -->
+            <div class="telegram-content">
+                <h1>Get Stock Alerts in Telegram</h1>
+                <p>Receive instant notifications when your stocks hit extreme levels.</p>
+                
+                <!-- Simple message preview -->
+                <div class="message-preview">
+                    <div class="preview-header">Example Alert:</div>
+                    <div class="preview-message">
+                        🚨 <strong>Stock Alerts (2 stocks)</strong><br><br>
+                        <strong>AAPL</strong><br>
+                        Price: $150.25 · Deviation: -18.5%<br>
+                        📉 <strong>SIGNIFICANTLY LOW</strong><br><br>
+                        <strong>TSLA</strong><br>
+                        Price: $220.50 · Deviation: +22.1%<br>
+                        📈 <strong>SIGNIFICANTLY HIGH</strong>
+                    </div>
+                </div>
+
+                <!-- Simple steps -->
+                <div class="simple-steps">
+                    <div class="step">1. Start the bot</div>
+                    <div class="step">2. Add stocks with <code>/add AAPL</code></div>
+                    <div class="step">3. Get smart alerts</div>
+                </div>
+
+                <!-- CTA Button -->
+                <div class="telegram-cta">
+                    <a href="https://t.me/kathy_wood_bot" target="_blank" class="telegram-button">
+                        <i class="fab fa-telegram"></i>
+                        Start Bot
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

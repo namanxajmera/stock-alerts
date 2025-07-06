@@ -90,8 +90,6 @@ const StockAnalyzer = (() => {
         // Momentum Value
         momentumValue: document.getElementById('momentum-value'),
 
-        // Telegram link
-        telegramLink: document.getElementById('telegram-link'),
 
         customTooltip: document.getElementById('custom-tooltip'),
     };
@@ -192,13 +190,6 @@ const StockAnalyzer = (() => {
         DOM.periodButtons.forEach(btn => {
             btn.addEventListener('click', handlePeriodChange);
         });
-        DOM.telegramLink.addEventListener('click', handleTelegramClick);
-    }
-
-    function handleTelegramClick(event) {
-        event.preventDefault();
-        // Open the Telegram bot in a new tab
-        window.open('https://t.me/kathy_wood_bot', '_blank');
     }
 
     // Activates the main dashboard view after the first search

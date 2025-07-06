@@ -11,7 +11,7 @@ import os
 import time
 import traceback
 from collections import defaultdict
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from db_manager import DatabaseManager
 from type_definitions.stock_types import DataFrameType
@@ -54,10 +54,19 @@ class PeriodicChecker:
                 f"Found {len(watchlists)} total watchlist items for {len(symbol_user_map)} unique symbols."
             )
 
+            # Collect all alerts by user instead of sending immediately
+            user_alerts = defaultdict(list)
+
             for symbol, user_ids in symbol_user_map.items():
-                self._process_symbol(str(symbol), user_ids)
+                alert_data = self._process_symbol(str(symbol), user_ids)
+                if alert_data:  # If this symbol triggered an alert
+                    for user_id in user_ids:
+                        user_alerts[user_id].append(alert_data)
                 # Longer delay between symbols to be more respectful
                 time.sleep(config.YF_REQUEST_DELAY)
+
+            # Send combined alerts to each user
+            self._send_batched_alerts(user_alerts)
 
             logger.info("Watchlist check completed")
 
@@ -72,7 +81,9 @@ class PeriodicChecker:
         """Fetch symbol data from Tiingo API using the centralized client."""
         return self.tiingo_client.fetch_historical_data(symbol, "2y", max_retries)
 
-    def _process_symbol(self, symbol: str, user_ids: List[str]) -> None:
+    def _process_symbol(
+        self, symbol: str, user_ids: List[str]
+    ) -> Optional[Dict[str, Any]]:
         """Process a single symbol for all interested users."""
         logger.info(f"Processing {symbol} for {len(user_ids)} user(s)")
         try:
@@ -172,25 +183,35 @@ class PeriodicChecker:
             # Check if an alert should be sent
             if current_pct_diff <= percentile_16 or current_pct_diff >= percentile_84:
                 logger.info(f"ALERT TRIGGERED for {symbol} at {current_pct_diff:.2f}%")
-                for user_id in user_ids:
-                    logger.info(f"Sending alert for {symbol} to user {user_id}")
-                    self.webhook_handler.send_alert(
-                        user_id=user_id,
-                        symbol=symbol,
-                        price=current_price,
-                        percentile=current_pct_diff,
-                        percentile_16=percentile_16,
-                        percentile_84=percentile_84,
-                    )
+                return {
+                    "symbol": symbol,
+                    "price": current_price,
+                    "percentile": current_pct_diff,
+                    "percentile_16": percentile_16,
+                    "percentile_84": percentile_84,
+                }
             else:
                 logger.info(
                     f"No alert for {symbol} (current diff: {current_pct_diff:.2f}%)"
                 )
+                return None
 
         except Exception as e:
             error_msg = f"Error processing symbol {symbol}: {e}"
             logger.error(error_msg, exc_info=True)
             self.db.log_event("error", error_msg, symbol=symbol)
+            return None
+
+    def _send_batched_alerts(
+        self, user_alerts: Dict[str, List[Dict[str, Any]]]
+    ) -> None:
+        """Send combined alerts to each user."""
+        for user_id, alerts in user_alerts.items():
+            if alerts:  # Only send if user has alerts
+                logger.info(
+                    f"Sending batched alerts to user {user_id} for {len(alerts)} stocks"
+                )
+                self.webhook_handler.send_batched_alert(user_id, alerts)
 
 
 def main() -> None:

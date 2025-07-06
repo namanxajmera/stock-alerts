@@ -330,6 +330,81 @@ class WebhookHandler:
             )
             return False
 
+    def send_batched_alert(self, user_id: str, alerts: List[Dict[str, Any]]) -> bool:
+        """Send a combined alert message for multiple stocks to a user."""
+        try:
+            if not alerts:
+                return True
+
+            # Header for the combined message
+            message = f"🚨 <b>Stock Alerts ({len(alerts)} stock{'s' if len(alerts) > 1 else ''})</b>\n\n"
+
+            # Add each stock alert
+            for i, alert in enumerate(alerts):
+                symbol = alert["symbol"]
+                price = alert["price"]
+                percentile = alert["percentile"]
+                percentile_16 = alert["percentile_16"]
+                percentile_84 = alert["percentile_84"]
+
+                # Add separator between stocks (not before the first one)
+                if i > 0:
+                    message += "\n" + "─" * 25 + "\n\n"
+
+                message += (
+                    f"<b>{symbol.upper()}</b>\n"
+                    f"Price: ${price:.2f}\n"
+                    f"Deviation: {percentile:.1f}%\n"
+                )
+
+                # Add alert type
+                if percentile <= percentile_16:
+                    message += f"📉 <b>SIGNIFICANTLY LOW</b>\n"
+                elif percentile >= percentile_84:
+                    message += f"📈 <b>SIGNIFICANTLY HIGH</b>\n"
+
+            # Add footer with general explanation
+            message += (
+                f"\n\n💡 <i>These stocks are outside their normal trading ranges "
+                f"based on 200-day moving average analysis.</i>"
+            )
+
+            success = self._send_message(user_id, message)
+
+            # Log each alert to history
+            for alert in alerts:
+                self.db.add_alert_history(
+                    user_id=user_id,
+                    symbol=alert["symbol"],
+                    price=alert["price"],
+                    percentile=alert["percentile"],
+                    status="sent" if success else "failed",
+                    error_message=(
+                        None if success else "Failed to send batched Telegram message"
+                    ),
+                )
+
+            if success:
+                self.db.update_user_notification_time(user_id)
+
+            return success
+
+        except Exception as e:
+            logger.error(
+                f"Error composing or sending batched alert: {e}", exc_info=True
+            )
+            # Log all alerts as failed
+            for alert in alerts:
+                self.db.add_alert_history(
+                    user_id=user_id,
+                    symbol=alert["symbol"],
+                    price=alert["price"],
+                    percentile=alert["percentile"],
+                    status="failed",
+                    error_message=str(e),
+                )
+            return False
+
     def _handle_list_command(self, user_id: str) -> None:
         """Handle the /list command."""
         watchlist = self.db.get_watchlist(user_id)

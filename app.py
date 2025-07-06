@@ -128,6 +128,12 @@ def index() -> str:
     return render_template("index.html")
 
 
+@app.route("/telegram")
+def telegram() -> str:
+    """Render the Telegram bot page."""
+    return render_template("telegram.html")
+
+
 @app.route("/static/js/<path:filename>")
 def serve_js(filename: str) -> Any:
     """Serve JavaScript files with correct MIME type."""
