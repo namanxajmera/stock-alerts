@@ -113,20 +113,7 @@ class DatabaseManager:
                 logger.info("Database connection successful")
                 cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-                # Check if database needs migration by looking for users table
-                cursor.execute(
-                    """
-                    SELECT EXISTS (
-                        SELECT FROM information_schema.tables
-                        WHERE table_schema = 'public'
-                        AND table_name = 'users'
-                    )
-                """
-                )
-                result = cursor.fetchone()
-                if result and result["exists"]:
-                    logger.info("Database already initialized, skipping.")
-                    return
+                # Always check for pending migrations (don't skip based on users table)
 
                 cursor.execute(
                     """

@@ -3,7 +3,7 @@
 -- to eliminate the need for recalculating complex stats on each request
 
 CREATE TABLE IF NOT EXISTS trading_stats_cache (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id SERIAL PRIMARY KEY,
     symbol TEXT NOT NULL,
     period TEXT NOT NULL,
     stats_json TEXT NOT NULL,

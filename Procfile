@@ -1,1 +1,1 @@
-web: gunicorn --bind 0.0.0.0:$PORT app:app
+web: python run_migrations.py && gunicorn --bind 0.0.0.0:$PORT app:app
