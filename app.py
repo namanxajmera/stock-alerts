@@ -134,6 +134,12 @@ def telegram() -> str:
     return render_template("telegram.html")
 
 
+@app.route("/about")
+def about() -> str:
+    """Render the About page."""
+    return render_template("about.html")
+
+
 @app.route("/static/js/<path:filename>")
 def serve_js(filename: str) -> Any:
     """Serve JavaScript files with correct MIME type."""

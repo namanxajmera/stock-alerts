@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About · Stock Alerts</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- Simple centered view like homepage -->
+        <div class="telegram-view">
+            
+            <!-- Back link -->
+            <div class="back-link-container">
+                <a href="/" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+
+            <!-- Main content -->
+            <div class="telegram-content">
+                <h1>The Math Behind Stock Alerts</h1>
+                <p>Understanding the statistical significance of our deviation thresholds.</p>
+                
+                <!-- Math explanation -->
+                <div class="math-explanation">
+                    <div class="math-section">
+                        <h3>📊 200-Day Moving Average</h3>
+                        <p>The foundation of our analysis. We calculate the simple moving average over 200 trading days:</p>
+                        <div class="formula">
+                            MA₂₀₀ = (P₁ + P₂ + ... + P₂₀₀) ÷ 200
+                        </div>
+                        <p>This creates our baseline for measuring statistical deviations.</p>
+                    </div>
+
+                    <div class="math-section">
+                        <h3>⚡ Momentum Deviation</h3>
+                        <p>We measure how far the current price deviates from its 200-day average:</p>
+                        <div class="formula">
+                            Deviation = ((Current Price - MA₂₀₀) ÷ MA₂₀₀) × 100
+                        </div>
+                        <p>This percentage forms the basis for our percentile analysis.</p>
+                    </div>
+
+                    <div class="math-section">
+                        <h3>🎯 Statistical Significance (1-Sigma)</h3>
+                        <p>Our extreme thresholds correspond to statistically significant percentiles:</p>
+                        <div class="formula">
+                            16th Percentile ≈ -1σ (1 standard deviation below mean)<br>
+                            84th Percentile ≈ +1σ (1 standard deviation above mean)
+                        </div>
+                        <p>In a normal distribution, ~68% of values fall within ±1σ, meaning only 32% of observations are "extreme" (16% below, 16% above).</p>
+                    </div>
+
+                    <div class="math-section">
+                        <h3>📈 Why These Percentiles Matter</h3>
+                        <p>The 16th and 84th percentiles represent statistically significant deviations:</p>
+                        <div class="formula">
+                            P(X ≤ 16th percentile) = 0.16 (16% probability)<br>
+                            P(X ≥ 84th percentile) = 0.16 (16% probability)
+                        </div>
+                        <p>When a stock hits these levels, it's experiencing a rare event that occurs only ~16% of the time historically.</p>
+                    </div>
+                </div>
+
+                <!-- Simple note -->
+                <div class="simple-note">
+                    <p><strong>Why 1-Sigma?</strong> One standard deviation captures meaningful but not extreme outliers. It's frequent enough to be actionable (~16% of the time) but rare enough to be statistically significant.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html> 
