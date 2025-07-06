@@ -245,6 +245,34 @@ body {
     font-size: 20px;
 }
 
+.rate-limit-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    padding: 0 var(--space-3);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    background-color: var(--background-secondary);
+    border-radius: var(--border-radius-sm);
+    margin-right: var(--space-2);
+    border: 1px solid var(--border-primary);
+    min-width: 80px;
+}
+
+.rate-limit-status.warning {
+    color: #FF8C00;
+    background-color: rgba(255, 140, 0, 0.1);
+    border-color: rgba(255, 140, 0, 0.3);
+}
+
+.rate-limit-status.critical {
+    color: var(--red-primary);
+    background-color: rgba(255, 80, 0, 0.1);
+    border-color: rgba(255, 80, 0, 0.3);
+}
+
 
 /* --- DASHBOARD VIEW --- */
 .dashboard {
@@ -582,6 +610,13 @@ body {
 
     .telegram-link i {
         font-size: 18px;
+    }
+
+    .rate-limit-status {
+        height: 40px;
+        font-size: 0.75rem;
+        padding: 0 var(--space-2);
+        min-width: 60px;
     }
 }
 

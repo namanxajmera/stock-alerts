@@ -90,6 +90,8 @@ const StockAnalyzer = (() => {
         // Momentum Value
         momentumValue: document.getElementById('momentum-value'),
 
+        // Rate Limit Status
+        rateLimitStatus: document.getElementById('rate-limit-status'),
 
         customTooltip: document.getElementById('custom-tooltip'),
     };
@@ -130,6 +132,7 @@ const StockAnalyzer = (() => {
         DOM.tickerInput.focus();
         setupEventListeners();
         setupMobileOptimizations();
+        updateRateLimitStatus();
     }
 
     // Mobile-specific optimizations
@@ -540,6 +543,9 @@ const StockAnalyzer = (() => {
                 updateCharts(result, state.currentTicker);
                 fetchTradingStats();
             }
+            
+            // Update rate limit status after successful API call
+            updateRateLimitStatus();
 
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -639,6 +645,36 @@ const StockAnalyzer = (() => {
         // Restore the header to show the latest data
         updateStockInfo(state.currentTicker, state.lastPrice, state.firstPrice);
         updateMomentumInfo(state.lastDiffValue);
+    }
+
+    // Update rate limit status display
+    async function updateRateLimitStatus() {
+        try {
+            const response = await fetch('/api-usage');
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                const usage = data.tiingo_api_usage;
+                const hourlyUsed = usage.hourly_used;
+                const hourlyLimit = usage.hourly_limit;
+                const hourlyPercent = (hourlyUsed / hourlyLimit) * 100;
+                
+                DOM.rateLimitStatus.textContent = `${hourlyUsed}/${hourlyLimit}`;
+                DOM.rateLimitStatus.title = `API Usage: ${hourlyUsed}/${hourlyLimit} requests this hour (${Math.round(hourlyPercent)}%)`;
+                
+                // Update status color based on usage
+                DOM.rateLimitStatus.classList.remove('warning', 'critical');
+                if (hourlyPercent >= 90) {
+                    DOM.rateLimitStatus.classList.add('critical');
+                } else if (hourlyPercent >= 70) {
+                    DOM.rateLimitStatus.classList.add('warning');
+                }
+            }
+        } catch (error) {
+            console.warn('Could not fetch rate limit status:', error);
+            DOM.rateLimitStatus.textContent = '--/--';
+            DOM.rateLimitStatus.title = 'API usage status unavailable';
+        }
     }
 
     // Initialize on page load

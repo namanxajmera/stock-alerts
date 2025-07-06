@@ -16,6 +16,10 @@ import requests
 from requests.exceptions import ConnectionError, HTTPError, RequestException, Timeout
 
 from utils.config import config
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from utils.rate_limiter import RateLimiter
 
 logger = logging.getLogger("StockAlerts.TiingoClient")
 
@@ -23,10 +27,11 @@ logger = logging.getLogger("StockAlerts.TiingoClient")
 class TiingoClient:
     """Centralized client for Tiingo API operations."""
 
-    def __init__(self) -> None:
+    def __init__(self, rate_limiter: Optional['RateLimiter'] = None) -> None:
         """Initialize the Tiingo client."""
         self.logger = logging.getLogger("StockAlerts.TiingoClient")
         self.api_token = config.TIINGO_API_TOKEN
+        self.rate_limiter = rate_limiter
 
         if not self.api_token:
             raise ValueError("TIINGO_API_TOKEN not configured")
@@ -69,6 +74,13 @@ class TiingoClient:
             "endDate": end_date.strftime("%Y-%m-%d"),
         }
 
+        # Check rate limit before making request
+        if self.rate_limiter:
+            can_proceed, reason = self.rate_limiter.can_make_request("tiingo")
+            if not can_proceed:
+                self.logger.warning(f"Rate limit exceeded for Tiingo API: {reason}")
+                raise HTTPError(f"Rate limit exceeded: {reason}")
+
         # Retry logic with exponential backoff
         for attempt in range(max_retries):
             try:
@@ -77,6 +89,11 @@ class TiingoClient:
                 )
 
                 response = requests.get(url, headers=headers, params=params, timeout=30)
+                
+                # Record the API request
+                if self.rate_limiter:
+                    self.rate_limiter.record_request("tiingo", response.status_code < 400)
+                
                 response.raise_for_status()
 
                 data = response.json()

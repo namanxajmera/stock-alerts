@@ -5,6 +5,7 @@ from typing import Any
 
 from flask import Blueprint, current_app, jsonify, request
 
+from utils.rate_limiter import UserRateLimiter
 from utils.validators import ValidationError, validate_period, validate_ticker_symbol
 
 logger = logging.getLogger("StockAlerts.API")
@@ -33,6 +34,17 @@ def get_stock_data(ticker: str, period: str) -> Any:
     logger.info(
         f"Combined stock data request from {client_ip}: ticker={ticker}, period={period}"
     )
+
+    # Check user rate limit
+    user_rate_limiter = UserRateLimiter(current_app.stock_service.db_manager)
+    can_proceed, rate_limit_reason = user_rate_limiter.can_user_make_request(client_ip)
+    
+    if not can_proceed:
+        logger.warning(f"Rate limit exceeded for {client_ip}: {rate_limit_reason}")
+        return jsonify({"error": rate_limit_reason}), 429
+    
+    # Record the user request
+    user_rate_limiter.record_user_request(client_ip, f"/data/{ticker}/{period}")
 
     try:
         # Validate ticker symbol with enhanced security checks
@@ -152,3 +164,38 @@ def get_trading_stats(ticker: str, period: str) -> Any:
             exc_info=True,
         )
         return jsonify({"error": "Internal server error"}), 500
+
+
+@api_bp.route("/api-usage")
+def get_api_usage() -> Any:
+    """
+    Get API usage statistics for monitoring rate limits.
+    
+    Returns:
+        JSON response with current API usage statistics
+    """
+    try:
+        # Get rate limiter instance
+        stock_service = getattr(current_app, "stock_service", None)
+        if stock_service is None:
+            return jsonify({"error": "Stock service not available"}), 500
+            
+        rate_limiter = stock_service.rate_limiter
+        
+        # Get usage statistics
+        usage_stats = rate_limiter.get_usage_stats("tiingo")
+        
+        return jsonify({
+            "status": "success",
+            "tiingo_api_usage": usage_stats,
+            "limits": {
+                "hourly_limit": 50,
+                "daily_limit": 1000,
+                "safe_hourly_limit": 48,
+                "safe_daily_limit": 980
+            }
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting API usage stats: {e}", exc_info=True)
+        return jsonify({"error": "Failed to get usage statistics"}), 500

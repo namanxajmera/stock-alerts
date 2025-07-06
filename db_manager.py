@@ -14,6 +14,7 @@ import psycopg2
 import psycopg2.extras
 import psycopg2.pool
 
+from datetime import datetime
 from type_definitions.stock_types import StockCacheRow
 from type_definitions.user_types import WatchlistItemWithPrice
 
@@ -449,3 +450,76 @@ class DatabaseManager:
                 f"Error updating trading stats cache for {symbol}/{period}: {e}"
             )
             return False
+
+    # Rate Limiting Methods
+    def record_api_request(self, api_name: str, success: bool = True) -> bool:
+        """Record an API request for rate limiting."""
+        sql = """
+            INSERT INTO api_requests (api_name, request_time, success)
+            VALUES (%s, NOW(), %s)
+        """
+        
+        try:
+            with self._managed_cursor(commit=True) as cursor:
+                cursor.execute(sql, (api_name, success))
+                return True
+        except Exception as e:
+            logger.error(f"Error recording API request: {e}")
+            return False
+
+    def get_api_request_count(
+        self, api_name: str, start_time: datetime, end_time: datetime
+    ) -> int:
+        """Get the number of API requests in a time period."""
+        sql = """
+            SELECT COUNT(*) as count
+            FROM api_requests
+            WHERE api_name = %s
+            AND request_time >= %s
+            AND request_time <= %s
+        """
+        
+        try:
+            with self._managed_cursor() as cursor:
+                cursor.execute(sql, (api_name, start_time, end_time))
+                row = cursor.fetchone()
+                return row["count"] if row else 0
+        except Exception as e:
+            logger.error(f"Error getting API request count: {e}")
+            return 0
+
+    def record_user_request(self, user_identifier: str, endpoint: str) -> bool:
+        """Record a user request for rate limiting."""
+        sql = """
+            INSERT INTO user_requests (user_identifier, endpoint, request_time)
+            VALUES (%s, %s, NOW())
+        """
+        
+        try:
+            with self._managed_cursor(commit=True) as cursor:
+                cursor.execute(sql, (user_identifier, endpoint))
+                return True
+        except Exception as e:
+            logger.error(f"Error recording user request: {e}")
+            return False
+
+    def get_user_request_count(
+        self, user_identifier: str, start_time: datetime, end_time: datetime
+    ) -> int:
+        """Get the number of user requests in a time period."""
+        sql = """
+            SELECT COUNT(*) as count
+            FROM user_requests
+            WHERE user_identifier = %s
+            AND request_time >= %s
+            AND request_time <= %s
+        """
+        
+        try:
+            with self._managed_cursor() as cursor:
+                cursor.execute(sql, (user_identifier, start_time, end_time))
+                row = cursor.fetchone()
+                return row["count"] if row else 0
+        except Exception as e:
+            logger.error(f"Error getting user request count: {e}")
+            return 0

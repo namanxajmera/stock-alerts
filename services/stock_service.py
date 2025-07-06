@@ -20,6 +20,7 @@ import pytz
 
 from db_manager import DatabaseManager
 from utils.config import config
+from utils.rate_limiter import RateLimiter
 from utils.tiingo_client import TiingoClient
 
 
@@ -35,7 +36,10 @@ class StockService:
         """
         self.db_manager = db_manager
         self.logger = logging.getLogger("StockAlerts.StockService")
-        self.tiingo_client = TiingoClient()
+        
+        # Initialize rate limiter and Tiingo client with rate limiting
+        self.rate_limiter = RateLimiter(db_manager)
+        self.tiingo_client = TiingoClient(self.rate_limiter)
 
     def get_stock_data(
         self, symbol: str, period: str
