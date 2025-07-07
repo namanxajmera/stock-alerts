@@ -226,8 +226,6 @@ class WebhookHandler:
                 self._handle_own_command(validated_user_id, validated_args)
             elif command == "unown":
                 self._handle_unown_command(validated_user_id, validated_args)
-            elif command == "portfolio":
-                self._handle_portfolio_command(validated_user_id)
             else:
                 # This shouldn't happen due to validation, but handle it gracefully
                 logger.warning(f"Unhandled validated command: {command}")
@@ -265,8 +263,7 @@ class WebhookHandler:
             "/own TICKER [TICKER...] - Mark stocks as owned positions\n"
             "/unown TICKER [TICKER...] - Mark stocks as watchlist only\n"
             "/remove TICKER [TICKER...] - Remove stock(s)\n"
-            "/list - Show your watchlist\n"
-            "/portfolio - Show positions vs watchlist\n\n"
+            "/list - Show your stocks with commands\n\n"
             "💡 <b>Tip:</b> Mark stocks you own with /own to get position-specific alerts!"
         )
 
@@ -499,7 +496,11 @@ class WebhookHandler:
                 message_lines.append(f" • {item['symbol'].upper()} - {status}")
             message_lines.append("")
 
-        message_lines.append("💡 Use /own or /unown to change position status")
+        message_lines.append("💡 <b>Commands:</b>")
+        message_lines.append("/own TICKER - Mark as owned position")
+        message_lines.append("/unown TICKER - Mark as watchlist only")
+        message_lines.append("/add TICKER - Add new stock")
+        message_lines.append("/remove TICKER - Remove stock")
 
         self._send_message(user_id, "\n".join(message_lines))
 
@@ -667,43 +668,6 @@ class WebhookHandler:
         response = "\n".join(response_parts)
         self._send_message(user_id, response)
 
-    def _handle_portfolio_command(self, user_id: str) -> None:
-        """Handle the /portfolio command to show owned vs watched stocks."""
-        try:
-            positions = self.db.get_positions(user_id)
-            watchlist = self.db.get_watchlist_only(user_id)
-
-            message_lines = ["📊 <b>Your Portfolio:</b>\n"]
-
-            if positions:
-                message_lines.append("💼 <b>POSITIONS</b> (stocks you own):")
-                for item in positions:
-                    status = self._get_stock_status(item)
-                    message_lines.append(f" • {item['symbol']} - {status}")
-                message_lines.append("")
-
-            if watchlist:
-                message_lines.append("👁️ <b>WATCHLIST</b> (stocks you're watching):")
-                for item in watchlist:
-                    status = self._get_stock_status(item)
-                    message_lines.append(f" • {item['symbol']} - {status}")
-                message_lines.append("")
-
-            if not positions and not watchlist:
-                message_lines.append("Your portfolio is empty. Add stocks using /add <TICKER>")
-                message_lines.append("")
-
-            message_lines.append("💡 <b>Commands:</b>")
-            message_lines.append("/own TICKER - Mark as owned position")
-            message_lines.append("/unown TICKER - Mark as watchlist only")
-            message_lines.append("/add TICKER - Add new stock")
-            message_lines.append("/remove TICKER - Remove stock")
-
-            self._send_message(user_id, "\n".join(message_lines))
-
-        except Exception as e:
-            logger.error(f"Error handling portfolio command for user {user_id}: {e}")
-            self._send_message(user_id, "❌ Error retrieving portfolio information.")
 
     def _get_stock_status(self, item: Union[Dict[str, Any], Any]) -> str:
         """Get current status text for a stock."""

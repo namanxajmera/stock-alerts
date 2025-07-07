@@ -336,7 +336,7 @@ def validate_command_args(
             # Validate ticker symbols
             return validate_ticker_list(args)
 
-        elif command in ["list", "start", "portfolio"]:
+        elif command in ["list", "start"]:
             if args:
                 return False, f"Command /{command} does not accept arguments"
             return True, []
