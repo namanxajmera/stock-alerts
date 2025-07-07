@@ -233,10 +233,10 @@ class DatabaseManager:
     def get_watchlist(self, user_id: str) -> List[WatchlistItemWithPrice]:
         """Get user's watchlist with current prices."""
         sql = """
-            SELECT w.symbol, w.alert_threshold_low, w.alert_threshold_high, sc.last_price, sc.ma_200
+            SELECT w.symbol, w.is_owned, w.alert_threshold_low, w.alert_threshold_high, sc.last_price, sc.ma_200
             FROM watchlist_items w
             LEFT JOIN stock_cache sc ON w.symbol = sc.symbol
-            WHERE w.user_id = %s ORDER BY w.symbol
+            WHERE w.user_id = %s ORDER BY w.is_owned DESC, w.symbol
         """
         try:
             with self._managed_cursor() as cursor:
@@ -245,6 +245,77 @@ class DatabaseManager:
                 return [
                     WatchlistItemWithPrice(
                         symbol=row["symbol"],
+                        is_owned=row["is_owned"],
+                        alert_threshold_low=row["alert_threshold_low"],
+                        alert_threshold_high=row["alert_threshold_high"],
+                        last_price=row["last_price"],
+                        ma_200=row["ma_200"],
+                    )
+                    for row in rows
+                ]
+        except Exception:
+            logger.error(f"Error getting watchlist for user {user_id}")
+            return []
+
+    def set_position_owned(self, user_id: str, symbol: str, is_owned: bool = True) -> bool:
+        """Mark a stock as owned or not owned in user's watchlist."""
+        try:
+            with self._managed_cursor(commit=True) as cursor:
+                cursor.execute(
+                    "UPDATE watchlist_items SET is_owned = %s WHERE user_id = %s AND symbol = %s",
+                    (is_owned, user_id, symbol.upper()),
+                )
+                if cursor.rowcount == 0:
+                    return False  # Stock not found in watchlist
+            logger.info(f"Set {symbol} as {'owned' if is_owned else 'watched'} for user {user_id}")
+            return True
+        except Exception as e:
+            logger.error(f"Error setting position for {symbol} for user {user_id}: {e}")
+            return False
+
+    def get_positions(self, user_id: str) -> List[WatchlistItemWithPrice]:
+        """Get user's owned positions."""
+        sql = """
+            SELECT w.symbol, w.is_owned, w.alert_threshold_low, w.alert_threshold_high, sc.last_price, sc.ma_200
+            FROM watchlist_items w
+            LEFT JOIN stock_cache sc ON w.symbol = sc.symbol
+            WHERE w.user_id = %s AND w.is_owned = TRUE ORDER BY w.symbol
+        """
+        try:
+            with self._managed_cursor() as cursor:
+                cursor.execute(sql, (user_id,))
+                rows = cursor.fetchall()
+                return [
+                    WatchlistItemWithPrice(
+                        symbol=row["symbol"],
+                        is_owned=row["is_owned"],
+                        alert_threshold_low=row["alert_threshold_low"],
+                        alert_threshold_high=row["alert_threshold_high"],
+                        last_price=row["last_price"],
+                        ma_200=row["ma_200"],
+                    )
+                    for row in rows
+                ]
+        except Exception:
+            logger.error(f"Error getting positions for user {user_id}")
+            return []
+
+    def get_watchlist_only(self, user_id: str) -> List[WatchlistItemWithPrice]:
+        """Get user's watched stocks (not owned)."""
+        sql = """
+            SELECT w.symbol, w.is_owned, w.alert_threshold_low, w.alert_threshold_high, sc.last_price, sc.ma_200
+            FROM watchlist_items w
+            LEFT JOIN stock_cache sc ON w.symbol = sc.symbol
+            WHERE w.user_id = %s AND w.is_owned = FALSE ORDER BY w.symbol
+        """
+        try:
+            with self._managed_cursor() as cursor:
+                cursor.execute(sql, (user_id,))
+                rows = cursor.fetchall()
+                return [
+                    WatchlistItemWithPrice(
+                        symbol=row["symbol"],
+                        is_owned=row["is_owned"],
                         alert_threshold_low=row["alert_threshold_low"],
                         alert_threshold_high=row["alert_threshold_high"],
                         last_price=row["last_price"],

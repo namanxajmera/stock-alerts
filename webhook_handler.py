@@ -222,6 +222,12 @@ class WebhookHandler:
                 self._handle_add_command(validated_user_id, validated_args)
             elif command == "remove":
                 self._handle_remove_command(validated_user_id, validated_args)
+            elif command == "own":
+                self._handle_own_command(validated_user_id, validated_args)
+            elif command == "unown":
+                self._handle_unown_command(validated_user_id, validated_args)
+            elif command == "portfolio":
+                self._handle_portfolio_command(validated_user_id)
             else:
                 # This shouldn't happen due to validation, but handle it gracefully
                 logger.warning(f"Unhandled validated command: {command}")
@@ -255,9 +261,13 @@ class WebhookHandler:
             "Welcome to Stock Alerts Bot! 📈\n\n"
             "I will alert you when your stocks reach historically high or low prices compared to their 200-day moving average.\n\n"
             "<b>Available commands:</b>\n"
-            "/add TICKER [TICKER...] - Add one or more stocks to track\n"
+            "/add TICKER [TICKER...] - Add stocks to track\n"
+            "/own TICKER [TICKER...] - Mark stocks as owned positions\n"
+            "/unown TICKER [TICKER...] - Mark stocks as watchlist only\n"
             "/remove TICKER [TICKER...] - Remove stock(s)\n"
             "/list - Show your watchlist\n"
+            "/portfolio - Show positions vs watchlist\n\n"
+            "💡 <b>Tip:</b> Mark stocks you own with /own to get position-specific alerts!"
         )
 
     def _send_message(
@@ -375,38 +385,54 @@ class WebhookHandler:
                     )
                 return False
 
-            # Header for the combined message
-            message = f"🚨 <b>Stock Alerts ({len(alerts)} stock{'s' if len(alerts) > 1 else ''})</b>\n\n"
+            # Separate alerts by ownership
+            position_alerts = [alert for alert in alerts if alert.get("is_owned", False)]
+            watchlist_alerts = [alert for alert in alerts if not alert.get("is_owned", False)]
 
-            # Add each stock alert
-            for i, alert in enumerate(alerts):
-                symbol = alert["symbol"]
-                price = alert["price"]
-                percentile = alert["percentile"]
-                percentile_16 = alert["percentile_16"]
-                percentile_84 = alert["percentile_84"]
+            # Build header
+            total_count = len(alerts)
+            message = f"📊 <b>Daily Stock Alerts ({total_count} item{'s' if total_count > 1 else ''} need attention)</b>\n\n"
 
-                # Add separator between stocks (not before the first one)
-                if i > 0:
-                    message += "\n" + "─" * 25 + "\n\n"
+            # Add position alerts first (higher priority)
+            if position_alerts:
+                message += f"🔴 <b>YOUR POSITIONS ({len(position_alerts)}):</b>\n"
+                for alert in position_alerts:
+                    symbol = alert["symbol"]
+                    percentile = alert["percentile"]
+                    percentile_16 = alert["percentile_16"]
+                    percentile_84 = alert["percentile_84"]
+                    
+                    if percentile <= percentile_16:
+                        status = "Unusually low"
+                    elif percentile >= percentile_84:
+                        status = "Unusually high"
+                    else:
+                        status = "Alert"
+                    
+                    message += f"• {symbol.upper()} - {status} ({percentile:+.1f}%)\n"
+                message += "\n"
 
-                message += (
-                    f"<b>{symbol.upper()}</b>\n"
-                    f"Price: ${price:.2f}\n"
-                    f"Deviation: {percentile:.1f}%\n"
-                )
+            # Add watchlist alerts
+            if watchlist_alerts:
+                message += f"🟡 <b>WATCHLIST ({len(watchlist_alerts)}):</b>\n"
+                for alert in watchlist_alerts:
+                    symbol = alert["symbol"]
+                    percentile = alert["percentile"]
+                    percentile_16 = alert["percentile_16"]
+                    percentile_84 = alert["percentile_84"]
+                    
+                    if percentile <= percentile_16:
+                        status = "Unusually low"
+                    elif percentile >= percentile_84:
+                        status = "Unusually high"
+                    else:
+                        status = "Alert"
+                    
+                    message += f"• {symbol.upper()} - {status} ({percentile:+.1f}%)\n"
+                message += "\n"
 
-                # Add alert type
-                if percentile <= percentile_16:
-                    message += f"📉 <b>SIGNIFICANTLY LOW</b>\n"
-                elif percentile >= percentile_84:
-                    message += f"📈 <b>SIGNIFICANTLY HIGH</b>\n"
-
-            # Add footer with general explanation
-            message += (
-                f"\n\n💡 <i>These stocks are outside their normal trading ranges "
-                f"based on 200-day moving average analysis.</i>"
-            )
+            # Add footer
+            message += "💡 <i>These stocks are outside their normal trading ranges.</i>"
 
             success = self._send_message(user_id, message)
 
@@ -453,9 +479,27 @@ class WebhookHandler:
             )
             return
 
-        message_lines = ["📋 <b>Your Watchlist:</b>"]
-        for item in watchlist:
-            message_lines.append(f" • {item['symbol'].upper()}")
+        # Separate owned positions from watchlist
+        positions = [item for item in watchlist if item.get('is_owned', False)]
+        watched = [item for item in watchlist if not item.get('is_owned', False)]
+
+        message_lines = ["📋 <b>Your Stocks:</b>\n"]
+
+        if positions:
+            message_lines.append("💼 <b>POSITIONS</b> (stocks you own):")
+            for item in positions:
+                status = self._get_stock_status(item)
+                message_lines.append(f" • {item['symbol'].upper()} - {status}")
+            message_lines.append("")
+
+        if watched:
+            message_lines.append("👁️ <b>WATCHLIST</b> (stocks you're watching):")
+            for item in watched:
+                status = self._get_stock_status(item)
+                message_lines.append(f" • {item['symbol'].upper()} - {status}")
+            message_lines.append("")
+
+        message_lines.append("💡 Use /own or /unown to change position status")
 
         self._send_message(user_id, "\n".join(message_lines))
 
@@ -551,3 +595,128 @@ class WebhookHandler:
 
         response = "\n".join(response_parts)
         self._send_message(user_id, response)
+
+    def _handle_own_command(self, user_id: str, validated_tickers: List[str]) -> None:
+        """Handle the /own command to mark stocks as owned positions."""
+        marked_owned = []
+        not_found = []
+        errors = []
+
+        for ticker in validated_tickers:
+            try:
+                success = self.db.set_position_owned(user_id, ticker, True)
+                if success:
+                    marked_owned.append(ticker)
+                    logger.info(f"Marked {ticker} as owned for user {user_id}")
+                else:
+                    not_found.append(ticker)
+                    logger.info(f"Ticker {ticker} not found in watchlist for user {user_id}")
+            except Exception as e:
+                logger.error(f"Database error marking {ticker} as owned for user {user_id}: {e}")
+                errors.append(f"{ticker}: Database error")
+
+        # Build response message
+        response_parts = []
+        if marked_owned:
+            response_parts.append(f"💼 Marked {', '.join(marked_owned)} as owned positions.")
+        if not_found:
+            response_parts.append(f"ℹ️ Not found in watchlist: {', '.join(not_found)}")
+            response_parts.append("💡 Use /add to add stocks to your watchlist first.")
+        if errors:
+            response_parts.append("❌ Errors occurred:")
+            response_parts.extend(f"  • {error}" for error in errors)
+
+        if not response_parts:
+            response_parts.append("ℹ️ No changes made.")
+
+        response = "\n".join(response_parts)
+        self._send_message(user_id, response)
+
+    def _handle_unown_command(self, user_id: str, validated_tickers: List[str]) -> None:
+        """Handle the /unown command to mark stocks as watchlist only."""
+        marked_watchlist = []
+        not_found = []
+        errors = []
+
+        for ticker in validated_tickers:
+            try:
+                success = self.db.set_position_owned(user_id, ticker, False)
+                if success:
+                    marked_watchlist.append(ticker)
+                    logger.info(f"Marked {ticker} as watchlist only for user {user_id}")
+                else:
+                    not_found.append(ticker)
+                    logger.info(f"Ticker {ticker} not found in watchlist for user {user_id}")
+            except Exception as e:
+                logger.error(f"Database error marking {ticker} as watchlist for user {user_id}: {e}")
+                errors.append(f"{ticker}: Database error")
+
+        # Build response message
+        response_parts = []
+        if marked_watchlist:
+            response_parts.append(f"👁️ Marked {', '.join(marked_watchlist)} as watchlist only.")
+        if not_found:
+            response_parts.append(f"ℹ️ Not found in watchlist: {', '.join(not_found)}")
+        if errors:
+            response_parts.append("❌ Errors occurred:")
+            response_parts.extend(f"  • {error}" for error in errors)
+
+        if not response_parts:
+            response_parts.append("ℹ️ No changes made.")
+
+        response = "\n".join(response_parts)
+        self._send_message(user_id, response)
+
+    def _handle_portfolio_command(self, user_id: str) -> None:
+        """Handle the /portfolio command to show owned vs watched stocks."""
+        try:
+            positions = self.db.get_positions(user_id)
+            watchlist = self.db.get_watchlist_only(user_id)
+
+            message_lines = ["📊 <b>Your Portfolio:</b>\n"]
+
+            if positions:
+                message_lines.append("💼 <b>POSITIONS</b> (stocks you own):")
+                for item in positions:
+                    status = self._get_stock_status(item)
+                    message_lines.append(f" • {item['symbol']} - {status}")
+                message_lines.append("")
+
+            if watchlist:
+                message_lines.append("👁️ <b>WATCHLIST</b> (stocks you're watching):")
+                for item in watchlist:
+                    status = self._get_stock_status(item)
+                    message_lines.append(f" • {item['symbol']} - {status}")
+                message_lines.append("")
+
+            if not positions and not watchlist:
+                message_lines.append("Your portfolio is empty. Add stocks using /add <TICKER>")
+                message_lines.append("")
+
+            message_lines.append("💡 <b>Commands:</b>")
+            message_lines.append("/own TICKER - Mark as owned position")
+            message_lines.append("/unown TICKER - Mark as watchlist only")
+            message_lines.append("/add TICKER - Add new stock")
+            message_lines.append("/remove TICKER - Remove stock")
+
+            self._send_message(user_id, "\n".join(message_lines))
+
+        except Exception as e:
+            logger.error(f"Error handling portfolio command for user {user_id}: {e}")
+            self._send_message(user_id, "❌ Error retrieving portfolio information.")
+
+    def _get_stock_status(self, item: Union[Dict[str, Any], Any]) -> str:
+        """Get current status text for a stock."""
+        if not item.get('last_price') or not item.get('ma_200'):
+            return "No data"
+        
+        price = float(item['last_price'])
+        ma_200 = float(item['ma_200'])
+        pct_diff = ((price - ma_200) / ma_200) * 100
+        
+        if pct_diff >= 8:  # Rough threshold for "high"
+            return "Unusually high"
+        elif pct_diff <= -8:  # Rough threshold for "low"
+            return "Unusually low"
+        else:
+            return "Normal range"

@@ -329,21 +329,16 @@ def validate_command_args(
         # Sanitize command
         command = sanitize_string(command, 50).lower().strip()
 
-        if command in ["add", "remove"]:
+        if command in ["add", "remove", "own", "unown"]:
             if not args:
                 return False, f"Command /{command} requires at least one ticker symbol"
 
             # Validate ticker symbols
             return validate_ticker_list(args)
 
-        elif command == "list":
+        elif command in ["list", "start", "portfolio"]:
             if args:
-                return False, "Command /list does not accept arguments"
-            return True, []
-
-        elif command == "start":
-            if args:
-                return False, "Command /start does not accept arguments"
+                return False, f"Command /{command} does not accept arguments"
             return True, []
 
         else:

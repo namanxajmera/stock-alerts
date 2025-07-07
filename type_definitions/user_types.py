@@ -72,6 +72,7 @@ class WatchlistItemWithPrice(TypedDict):
     """Watchlist item with current price information."""
 
     symbol: str
+    is_owned: bool
     alert_threshold_low: Optional[float]
     alert_threshold_high: Optional[float]
     last_price: Optional[float]

@@ -55,23 +55,30 @@ class PeriodicChecker:
                 logger.info("No active watchlists to check.")
                 return
 
-            # Group users by symbol to fetch data only once per symbol
+            # Group users by symbol with ownership info
             symbol_user_map = defaultdict(list)
             for item in watchlists:
-                symbol_user_map[item["symbol"]].append(str(item["user_id"]))
+                symbol_user_map[item["symbol"]].append({
+                    "user_id": str(item["user_id"]),
+                    "is_owned": item.get("is_owned", False)
+                })
 
             logger.info(
                 f"Found {len(watchlists)} total watchlist items for {len(symbol_user_map)} unique symbols."
             )
 
             # Collect all alerts by user instead of sending immediately
-            user_alerts = defaultdict(list)
+            user_alerts: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
 
-            for symbol, user_ids in symbol_user_map.items():
-                alert_data = self._process_symbol(str(symbol), user_ids)
+            for symbol, user_data_list in symbol_user_map.items():
+                alert_data = self._process_symbol(str(symbol), user_data_list)
                 if alert_data:  # If this symbol triggered an alert
-                    for user_id in user_ids:
-                        user_alerts[user_id].append(alert_data)
+                    for user_data in user_data_list:
+                        # Add ownership info to alert data
+                        alert_with_ownership = alert_data.copy()
+                        alert_with_ownership["is_owned"] = user_data["is_owned"]
+                        user_id = str(user_data["user_id"])
+                        user_alerts[user_id].append(alert_with_ownership)
                 # Longer delay between symbols to be more respectful
                 time.sleep(config.YF_REQUEST_DELAY)
 
@@ -92,10 +99,10 @@ class PeriodicChecker:
         return self.tiingo_client.fetch_historical_data(symbol, "2y", max_retries)
 
     def _process_symbol(
-        self, symbol: str, user_ids: List[str]
+        self, symbol: str, user_data_list: List[Dict[str, Any]]
     ) -> Optional[Dict[str, Any]]:
         """Process a single symbol for all interested users."""
-        logger.info(f"Processing {symbol} for {len(user_ids)} user(s)")
+        logger.info(f"Processing {symbol} for {len(user_data_list)} user(s)")
         try:
             # Check cache first
             cached_data = self.db.get_fresh_cache(
