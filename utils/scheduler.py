@@ -33,12 +33,12 @@ def setup_scheduler() -> Optional[BackgroundScheduler]:
     # Initialize APScheduler
     scheduler = BackgroundScheduler()
 
-    # Add the scheduled job - runs daily at 1 AM UTC (same as GitHub Actions)
+    # Add the scheduled job - runs at 1 AM UTC on Mon-Thu and Sunday only
     scheduler.add_job(
         func=scheduled_stock_check,
-        trigger=CronTrigger(hour=1, minute=0, timezone=pytz.UTC),
+        trigger=CronTrigger(hour=1, minute=0, day_of_week="mon,tue,wed,thu,sun", timezone=pytz.UTC),
         id="stock_check",
-        name="Daily Stock Check",
+        name="Weekly Stock Check (Mon-Thu, Sun)",
         replace_existing=True,
     )
 
@@ -46,7 +46,7 @@ def setup_scheduler() -> Optional[BackgroundScheduler]:
     try:
         scheduler.start()
         logger.info(
-            "APScheduler started successfully - daily stock checks scheduled for 1 AM UTC"
+            "APScheduler started successfully - stock checks scheduled for 1 AM UTC on Mon-Thu and Sunday"
         )
 
         # Ensure scheduler stops when the app shuts down

@@ -9,6 +9,7 @@ import hmac
 import json
 import logging
 import secrets
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
 import requests
@@ -289,6 +290,24 @@ class WebhookHandler:
     ) -> bool:
         """Send a stock alert to a user."""
         try:
+            # Check if today is a valid alert day (Mon-Thu, Sun)
+            today = datetime.now().weekday()  # 0=Monday, 6=Sunday
+            valid_days = [0, 1, 2, 3, 6]  # Monday-Thursday, Sunday
+            
+            if today not in valid_days:
+                day_name = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][today]
+                logger.info(f"Skipping alert for {symbol} - today is {day_name}. Alerts only sent Mon-Thu and Sunday.")
+                
+                # Still log to history but mark as skipped
+                self.db.add_alert_history(
+                    user_id=user_id,
+                    symbol=symbol,
+                    price=price,
+                    percentile=percentile,
+                    status="skipped",
+                    error_message=f"Alert skipped - {day_name} is not a valid alert day",
+                )
+                return False
             message = (
                 f"🚨 <b>Stock Alert for {symbol.upper()}</b>\n\n"
                 f"Current Price: ${price:.2f}\n"
@@ -335,6 +354,26 @@ class WebhookHandler:
         try:
             if not alerts:
                 return True
+                
+            # Check if today is a valid alert day (Mon-Thu, Sun)
+            today = datetime.now().weekday()  # 0=Monday, 6=Sunday
+            valid_days = [0, 1, 2, 3, 6]  # Monday-Thursday, Sunday
+            
+            if today not in valid_days:
+                day_name = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][today]
+                logger.info(f"Skipping batched alerts - today is {day_name}. Alerts only sent Mon-Thu and Sunday.")
+                
+                # Log all alerts as skipped
+                for alert in alerts:
+                    self.db.add_alert_history(
+                        user_id=user_id,
+                        symbol=alert["symbol"],
+                        price=alert["price"],
+                        percentile=alert["percentile"],
+                        status="skipped",
+                        error_message=f"Alert skipped - {day_name} is not a valid alert day",
+                    )
+                return False
 
             # Header for the combined message
             message = f"🚨 <b>Stock Alerts ({len(alerts)} stock{'s' if len(alerts) > 1 else ''})</b>\n\n"

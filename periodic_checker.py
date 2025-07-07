@@ -11,6 +11,7 @@ import os
 import time
 import traceback
 from collections import defaultdict
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from db_manager import DatabaseManager
@@ -38,6 +39,15 @@ class PeriodicChecker:
     def check_watchlists(self) -> None:
         """Check all active watchlists for alerts efficiently."""
         try:
+            # Check if today is a valid alert day (Mon-Thu, Sun)
+            today = datetime.now().weekday()  # 0=Monday, 6=Sunday
+            valid_days = [0, 1, 2, 3, 6]  # Monday-Thursday, Sunday
+            
+            if today not in valid_days:
+                day_name = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][today]
+                logger.info(f"Skipping watchlist check - today is {day_name}. Alerts only run Mon-Thu and Sunday.")
+                return
+                
             logger.info("Starting watchlist check")
 
             watchlists = self.db.get_active_watchlists()
@@ -114,16 +124,14 @@ class PeriodicChecker:
                             logger.info(
                                 f"ALERT TRIGGERED for {symbol} at {current_pct_diff:.2f}% (cached data)"
                             )
-                            for user_id in user_ids:
-                                self.webhook_handler.send_alert(
-                                    user_id=user_id,
-                                    symbol=symbol,
-                                    price=current_price,
-                                    percentile=current_pct_diff,
-                                    percentile_16=percentile_16,
-                                    percentile_84=percentile_84,
-                                )
-                        return
+                            return {
+                                "symbol": symbol,
+                                "price": current_price,
+                                "percentile": current_pct_diff,
+                                "percentile_16": percentile_16,
+                                "percentile_84": percentile_84,
+                            }
+                        return None
                 except (json.JSONDecodeError, KeyError) as e:
                     logger.warning(f"Invalid cached data for {symbol}: {e}")
 
@@ -132,7 +140,7 @@ class PeriodicChecker:
 
             if historical_data is None:
                 logger.error(f"Failed to fetch data for {symbol} after retries")
-                return
+                return None
 
             current_price = float(historical_data["Close"].iloc[-1])
 
@@ -148,7 +156,7 @@ class PeriodicChecker:
 
             if valid_diffs.empty:
                 logger.warning(f"Not enough data to calculate MA for {symbol}")
-                return
+                return None
 
             current_ma_200 = float(historical_data["ma_200"].iloc[-1])
             current_pct_diff = ((current_price - current_ma_200) / current_ma_200) * 100
