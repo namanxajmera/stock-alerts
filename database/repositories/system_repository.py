@@ -59,7 +59,7 @@ class SystemRepository:
     def record_api_request(self, api_name: str, success: bool = True) -> bool:
         """Record an API request for rate limiting."""
         sql = """
-            INSERT INTO api_requests (api_name, request_time, success)
+            INSERT INTO api_requests (api_name, timestamp, success)
             VALUES (%s, NOW(), %s)
         """
         
@@ -79,8 +79,8 @@ class SystemRepository:
             SELECT COUNT(*) as count
             FROM api_requests
             WHERE api_name = %s
-            AND request_time >= %s
-            AND request_time <= %s
+            AND timestamp >= %s
+            AND timestamp <= %s
         """
         
         try:
@@ -95,7 +95,7 @@ class SystemRepository:
     def record_user_request(self, user_identifier: str, endpoint: str) -> bool:
         """Record a user request for rate limiting."""
         sql = """
-            INSERT INTO user_requests (user_identifier, endpoint, request_time)
+            INSERT INTO user_requests (user_identifier, endpoint, timestamp)
             VALUES (%s, %s, NOW())
         """
         
@@ -115,8 +115,8 @@ class SystemRepository:
             SELECT COUNT(*) as count
             FROM user_requests
             WHERE user_identifier = %s
-            AND request_time >= %s
-            AND request_time <= %s
+            AND timestamp >= %s
+            AND timestamp <= %s
         """
         
         try:
@@ -152,7 +152,7 @@ class SystemRepository:
                 alerts = cursor.fetchall()
 
                 # Stock cache
-                cursor.execute("SELECT * FROM stock_cache ORDER BY last_check DESC")
+                cursor.execute("SELECT * FROM stock_cache ORDER BY last_updated DESC")
                 cache = cursor.fetchall()
 
                 # Config (filter out sensitive data)

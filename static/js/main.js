@@ -101,7 +101,7 @@ const StockAnalyzer = (() => {
         }
     };
 
-    const debouncedFetchAllData = debounce(fetchAllData, 200);
+    const debouncedFetchAllData = debounce(fetchAllData, 500);
 
     function debounce(func, delay) {
         return function(...args) {

@@ -33,10 +33,10 @@ class StockRepository:
     ) -> bool:
         """Update or insert stock data in cache."""
         sql = """
-            INSERT INTO stock_cache (symbol, last_check, last_price, ma_200, data_json)
+            INSERT INTO stock_cache (symbol, last_updated, last_price, ma_200, data_json)
             VALUES (%s, NOW(), %s, %s, %s)
             ON CONFLICT(symbol) DO UPDATE SET
-                last_check = NOW(),
+                last_updated = NOW(),
                 last_price = excluded.last_price,
                 ma_200 = excluded.ma_200,
                 data_json = excluded.data_json
@@ -54,10 +54,10 @@ class StockRepository:
     ) -> Optional[StockCacheRow]:
         """Get cached stock data if it's recent enough."""
         sql = """
-            SELECT symbol, last_check, last_price, ma_200, data_json
+            SELECT symbol, last_updated, last_price, ma_200, data_json
             FROM stock_cache
             WHERE symbol = %s
-            AND last_check > NOW() - INTERVAL '%s hours'
+            AND last_updated > NOW() - INTERVAL '%s hours'
         """
 
         try:
@@ -66,7 +66,7 @@ class StockRepository:
                 row = cursor.fetchone()
                 if row:
                     logger.info(
-                        f"Using cached data for {symbol} (age: {row['last_check']})"
+                        f"Using cached data for {symbol} (age: {row['last_updated']})"
                     )
                     return dict(row)
                 return None
