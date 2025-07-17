@@ -73,13 +73,32 @@ class AlertRepository:
         """Fix the alert_history sequence to be in sync with the table data."""
         try:
             with self.connection_manager.get_cursor(commit=True) as cursor:
+                # Check if sequence exists first
                 cursor.execute("""
-                    SELECT setval('alert_history_id_seq', 
-                                 COALESCE((SELECT MAX(id) FROM alert_history), 1), 
-                                 true);
+                    SELECT EXISTS (
+                        SELECT 1 FROM pg_class WHERE relname = 'alert_history_id_seq'
+                    );
                 """)
-                new_value = cursor.fetchone()[0]
-                logger.info(f"Fixed alert_history sequence, set to {new_value}")
+                sequence_exists = cursor.fetchone()[0]
+                
+                if sequence_exists:
+                    cursor.execute("""
+                        SELECT setval('alert_history_id_seq', 
+                                     COALESCE((SELECT MAX(id) FROM alert_history), 1), 
+                                     true);
+                    """)
+                    new_value = cursor.fetchone()[0]
+                    logger.info(f"Fixed alert_history sequence, set to {new_value}")
+                else:
+                    logger.warning("alert_history_id_seq sequence does not exist, cannot fix")
+                    # This might indicate the table uses a different primary key setup
+                    # We should investigate the table structure
+                    cursor.execute("SELECT column_name, column_default FROM information_schema.columns WHERE table_name = 'alert_history' AND column_name = 'id';")
+                    id_info = cursor.fetchone()
+                    if id_info:
+                        logger.info(f"alert_history.id column info: {id_info}")
+                    else:
+                        logger.warning("alert_history table does not have an 'id' column")
         except Exception as e:
             logger.error(f"Failed to fix alert_history sequence: {e}")
             raise
