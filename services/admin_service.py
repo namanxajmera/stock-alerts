@@ -7,18 +7,19 @@ This service provides admin-related functionality including:
 """
 
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, TYPE_CHECKING
 
 import psycopg2.extras
 
-from features import PeriodicChecker
+if TYPE_CHECKING:
+    from features import PeriodicChecker
 
 
 class AdminService:
     """Service class for admin operations."""
 
     def __init__(
-        self, db_manager: Any, notification_service: Any, periodic_checker: PeriodicChecker
+        self, db_manager: Any, notification_service: Any, periodic_checker: "PeriodicChecker"
     ) -> None:
         """
         Initialize the AdminService.

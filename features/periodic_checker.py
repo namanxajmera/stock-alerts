@@ -228,13 +228,14 @@ class PeriodicChecker:
 
 
 from features.webhook_handler import WebhookHandler
-from services.notification_service import NotificationService
 
 
 def main() -> None:
     """Main function to run the periodic checker."""
     # This script is intended to be run by a scheduler like cron.
     # The infinite loop is removed in favor of single-run execution.
+    from services.notification_service import NotificationService
+    
     logger.info("Starting periodic checker run...")
     db_manager = DatabaseManager(config.DATABASE_URL)
     if not config.TELEGRAM_BOT_TOKEN:
