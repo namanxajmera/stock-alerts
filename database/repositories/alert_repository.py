@@ -48,9 +48,41 @@ class AlertRepository:
                 )
             logger.info(f"Added alert history for {symbol} for user {user_id}")
             return True
-        except Exception:
-            logger.error(f"Error adding alert history for {symbol} user {user_id}")
-            return False
+        except Exception as e:
+            # Check if it's a sequence issue and try to fix it
+            if "duplicate key value violates unique constraint" in str(e) and "alert_history" in str(e):
+                logger.warning(f"Sequence issue detected for alert_history, attempting to fix...")
+                try:
+                    self._fix_alert_history_sequence()
+                    # Retry the insert
+                    with self.connection_manager.get_cursor(commit=True) as cursor:
+                        cursor.execute(
+                            sql,
+                            (user_id, symbol.upper(), price, percentile, status, error_message),
+                        )
+                    logger.info(f"Added alert history for {symbol} for user {user_id} after sequence fix")
+                    return True
+                except Exception as retry_error:
+                    logger.error(f"Failed to add alert history even after sequence fix: {retry_error}")
+                    return False
+            else:
+                logger.error(f"Error adding alert history for {symbol} user {user_id}: {e}")
+                return False
+
+    def _fix_alert_history_sequence(self) -> None:
+        """Fix the alert_history sequence to be in sync with the table data."""
+        try:
+            with self.connection_manager.get_cursor(commit=True) as cursor:
+                cursor.execute("""
+                    SELECT setval('alert_history_id_seq', 
+                                 COALESCE((SELECT MAX(id) FROM alert_history), 1), 
+                                 true);
+                """)
+                new_value = cursor.fetchone()[0]
+                logger.info(f"Fixed alert_history sequence, set to {new_value}")
+        except Exception as e:
+            logger.error(f"Failed to fix alert_history sequence: {e}")
+            raise
 
     def get_active_watchlists(self) -> List[Dict[str, Union[str, int]]]:
         """Get all active watchlists."""
