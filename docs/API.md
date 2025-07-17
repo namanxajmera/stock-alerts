@@ -56,10 +56,10 @@ Retrieves historical stock price data with 200-day moving average analysis and s
 ```
 
 #### Data Processing
-1. **Cache Check:** [`db_manager.py:get_fresh_cache()`](../db_manager.py) (1-hour TTL)
+1. **Cache Check:** [`database/database_manager.py:get_fresh_cache()`](../database/database_manager.py) (1-hour TTL)
 2. **API Fetch:** [`utils/tiingo_client.py`](../utils/tiingo_client.py) if cache miss
 3. **Calculations:** 200-day MA, percentage deviation, 16th/84th percentiles
-4. **Cache Update:** [`db_manager.py:update_stock_cache()`](../db_manager.py)
+4. **Cache Update:** [`database/database_manager.py:update_stock_cache()`](../database/database_manager.py)
 
 #### Usage Example
 ```javascript
@@ -175,8 +175,8 @@ Webhook endpoint for processing Telegram bot interactions and commands.
 Receives and processes updates from Telegram Bot API when users interact with the bot.
 
 **Implementation:** [`routes/webhook_routes.py:telegram_webhook()`](../routes/webhook_routes.py)  
-**Business Logic:** [`webhook_handler.py:WebhookHandler`](../webhook_handler.py)  
-**Command Processing:** [`webhook_handler.py:process_update()`](../webhook_handler.py)
+**Business Logic:** [`features/webhook_handler.py:WebhookHandler`](../features/webhook_handler.py)  
+**Command Processing:** [`features/webhook_handler.py:process_update()`](../features/webhook_handler.py)
 
 #### Request Format
 
@@ -209,7 +209,7 @@ X-Telegram-Bot-Api-Secret-Token: <webhook_secret>
 
 #### Authentication & Security
 
-**Webhook Validation:** [`webhook_handler.py:validate_webhook()`](../webhook_handler.py)
+**Webhook Validation:** [`features/webhook_handler.py:validate_webhook()`](../features/webhook_handler.py)
 - **HMAC Verification**: Timing-safe comparison of `X-Telegram-Bot-Api-Secret-Token`
 - **JSON Validation**: Ensures valid Telegram update structure
 - **Required Fields**: Validates presence of `update_id` and message data
@@ -224,14 +224,16 @@ X-Telegram-Bot-Api-Secret-Token: <webhook_secret>
 
 #### Supported Bot Commands
 
-Processed by [`webhook_handler.py:_handle_command()`](../webhook_handler.py):
+Processed by [`features/webhook_handler.py:_handle_command()`](../features/webhook_handler.py):
 
 | Command | Description | Database Operation |
 |---------|-------------|-------------------|
-| `/start` | Initialize user account | [`db_manager.py:add_user()`](../db_manager.py) |
-| `/add <ticker>` | Add stock to watchlist | [`db_manager.py:add_to_watchlist()`](../db_manager.py) |
-| `/remove <ticker>` | Remove stock from watchlist | [`db_manager.py:remove_from_watchlist()`](../db_manager.py) |
-| `/list` | Show current watchlist | [`db_manager.py:get_watchlist()`](../db_manager.py) |
+| `/start` | Initialize user account | [`database/database_manager.py:add_user()`](../database/database_manager.py) |
+| `/add <ticker>` | Add stock to watchlist | [`database/database_manager.py:add_to_watchlist()`](../database/database_manager.py) |
+| `/remove <ticker>` | Remove stock from watchlist | [`database/database_manager.py:remove_from_watchlist()`](../database/database_manager.py) |
+| `/list` | Show current watchlist | [`database/database_manager.py:get_watchlist()`](../database/database_manager.py) |
+| `/own <ticker>` | Mark stock as owned position | [`database/database_manager.py:set_position_owned()`](../database/database_manager.py) |
+| `/unown <ticker>` | Mark stock as watchlist only | [`database/database_manager.py:set_position_owned()`](../database/database_manager.py) |
 | `/help` | Display available commands | No database operation |
 
 #### Command Validation
@@ -416,7 +418,7 @@ curl -X POST http://localhost:5001/admin/check \
 #### Security Considerations
 - **API Key Storage**: Store in environment variables, never in code
 - **Rate Limiting**: Manual triggers should be throttled to prevent abuse
-- **Logging**: All admin operations are logged via [`db_manager.py:log_event()`](../db_manager.py)
+- **Logging**: All admin operations are logged via [`database/database_manager.py:log_event()`](../database/database_manager.py)
 
 ---
 
@@ -439,7 +441,7 @@ curl -X POST http://localhost:5001/admin/check \
 - **Cache Duration**: 1 hour (configurable via `CACHE_HOURS`)
 - **Cache Storage**: PostgreSQL `stock_cache` table
 - **Cache Key**: Stock symbol
-- **Implementation**: [`db_manager.py:get_fresh_cache()`](../db_manager.py)
+- **Implementation**: [`database/database_manager.py:get_fresh_cache()`](../database/database_manager.py)
 
 ### API Rate Limiting
 - **Tiingo API**: Respects provider rate limits with delay

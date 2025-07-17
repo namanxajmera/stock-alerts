@@ -93,6 +93,8 @@ TIINGO_REQUEST_DELAY=3.0
 | `TELEGRAM_WEBHOOK_SECRET` | ⚠️ | Webhook security token | Auto-generated if omitted |
 | `ADMIN_USERNAME` | ❌ | Admin panel username | `admin` |
 | `ADMIN_PASSWORD` | ❌ | Admin panel password | Strong password |
+| `ADMIN_API_KEY` | ❌ | Admin API key for secure endpoints | `your_admin_api_key` |
+| `API_SECRET_KEY` | ❌ | Additional API security key | `your_api_secret_key` |
 | `PORT` | ❌ | Server port (default: 5001) | `5001` |
 
 **Note:** The application uses `psycopg2-binary` (see [`requirements.txt`](../requirements.txt)) and requires PostgreSQL - SQLite is not supported.

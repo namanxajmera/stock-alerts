@@ -107,7 +107,7 @@ The data flow for automated alerts is now more robust and reliable.
 4.  **Data Retrieval:** The checker fetches all active watchlists from the database via its injected `DatabaseManager`.
 5.  **Data Processing Loop:** For each unique stock, it fetches data (from cache or the Tiingo API) and calculates metrics.
 6.  **Alert Logic:** It checks if the current price deviation meets the alert criteria.
-7.  **Notification Dispatch:** If an alert is triggered, the `PeriodicChecker` **does not** call the `WebhookHandler` directly. Instead, it calls `self.notification_service.send_batched_alerts()`.
+7.  **Notification Dispatch:** If an alert is triggered, the `PeriodicChecker` calls `self.notification_service.send_batched_alerts()`.
 8.  **Decoupled Sending:** The `NotificationService` receives the alert data and is responsible for formatting it and sending it to the appropriate channel. Currently, it calls the `WebhookHandler` to send a Telegram message.
 9.  **Logging:** The `NotificationService` or `WebhookHandler` logs the alert in the database.
 
