@@ -18,16 +18,17 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, send_from_directory
 from flask_cors import CORS
 
-from db_manager import DatabaseManager
+from database import DatabaseManager
+from features import PeriodicChecker, WebhookHandler
 from routes.admin_routes import admin_bp
 from routes.api_routes import api_bp
 from routes.health_routes import health_bp
 from routes.webhook_routes import webhook_bp
 from services import AdminService, AuthService, StockService
+from services.notification_service import NotificationService
 from utils.config import config
 from utils.json_encoder import CustomJSONEncoder
 from utils.scheduler import setup_scheduler
-from webhook_handler import WebhookHandler
 
 # Load environment variables from .env file
 load_dotenv(".env")
@@ -53,6 +54,24 @@ def setup_logging() -> Any:
             logging.StreamHandler(),
         ],
     )
+
+    # Filter out SSL handshake errors and other noisy werkzeug logs
+    werkzeug_logger = logging.getLogger('werkzeug')
+
+    class SSLHandshakeFilter(logging.Filter):
+        def filter(self, record: logging.LogRecord) -> bool:
+            message = record.getMessage()
+            # Filter out SSL handshake errors and bad request versions
+            if any(phrase in message for phrase in [
+                'Bad request version',
+                'Bad HTTP/0.9 request type',
+                'code 400, message Bad'
+            ]):
+                return False
+            return True
+
+    werkzeug_logger.addFilter(SSLHandshakeFilter())
+
     return logging.getLogger("StockAlerts.App")
 
 
@@ -71,6 +90,7 @@ webhook_handler = None
 stock_service = None
 auth_service = None
 admin_service = None
+periodic_checker = None
 
 logger.info("Starting application initialization...")
 
@@ -100,7 +120,13 @@ logger.info("Webhook handler initialized successfully")
 logger.info("Initializing service layer...")
 stock_service = StockService(db_manager)
 auth_service = AuthService()
-admin_service = AdminService(db_manager)
+notification_service = NotificationService(db_manager, webhook_handler)
+
+logger.info("Initializing periodic checker...")
+periodic_checker = PeriodicChecker(db_manager, notification_service)
+logger.info("Periodic checker initialized successfully")
+
+admin_service = AdminService(db_manager, notification_service, periodic_checker)
 logger.info("Service layer initialized successfully")
 
 logger.info("Application initialization completed successfully")
@@ -111,9 +137,10 @@ app.webhook_handler = webhook_handler  # type: ignore
 app.stock_service = stock_service  # type: ignore
 app.auth_service = auth_service  # type: ignore
 app.admin_service = admin_service  # type: ignore
+app.periodic_checker = periodic_checker  # type: ignore
 
 # Setup scheduler
-scheduler = setup_scheduler()
+scheduler = setup_scheduler(app)
 
 # Register blueprints
 app.register_blueprint(api_bp)

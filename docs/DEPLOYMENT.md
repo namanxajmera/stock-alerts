@@ -346,7 +346,7 @@ Optional configuration with sensible defaults:
 | `PORT` | `5001` | Application port | Any valid port |
 | `DEBUG` | `False` | Debug mode | `True`/`False` |
 | `CACHE_HOURS` | `1` | Stock data cache TTL | Integer hours |
-| `YF_REQUEST_DELAY` | `3.0` | API request delay | Float seconds |
+| `TIINGO_REQUEST_DELAY` | `3.0` | API request delay | Float seconds |
 
 ### Configuration Loading
 All variables are loaded and validated by [`utils/config.py:Config`](../utils/config.py):

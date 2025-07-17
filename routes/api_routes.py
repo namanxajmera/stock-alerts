@@ -35,16 +35,24 @@ def get_stock_data(ticker: str, period: str) -> Any:
         f"Combined stock data request from {client_ip}: ticker={ticker}, period={period}"
     )
 
-    # Check user rate limit
-    user_rate_limiter = UserRateLimiter(current_app.stock_service.db_manager)
-    can_proceed, rate_limit_reason = user_rate_limiter.can_user_make_request(client_ip)
+    stock_service = getattr(current_app, "stock_service", None)
+    if not stock_service:
+        logger.error("Stock service not available")
+        return jsonify({"error": "Stock service not available"}), 500
+
+    user_rate_limiter = UserRateLimiter(stock_service.db_manager)
+    if client_ip:
+        can_proceed, rate_limit_reason = user_rate_limiter.can_user_make_request(client_ip)
+    else:
+        can_proceed, rate_limit_reason = False, "Could not determine client IP"
     
     if not can_proceed:
         logger.warning(f"Rate limit exceeded for {client_ip}: {rate_limit_reason}")
         return jsonify({"error": rate_limit_reason}), 429
     
     # Record the user request
-    user_rate_limiter.record_user_request(client_ip, f"/data/{ticker}/{period}")
+    if client_ip:
+        user_rate_limiter.record_user_request(client_ip, f"/data/{ticker}/{period}")
 
     try:
         # Validate ticker symbol with enhanced security checks
@@ -96,74 +104,7 @@ def get_stock_data(ticker: str, period: str) -> Any:
         return jsonify({"error": "Internal server error"}), 500
 
 
-@api_bp.route("/trading-stats/<ticker>/<period>")
-def get_trading_stats(ticker: str, period: str) -> Any:
-    """
-    Get trading intelligence stats for a specific ticker and period.
-
-    Returns historical alert patterns, fear/greed metrics, and opportunity analysis.
-
-    Args:
-        ticker: Stock ticker symbol (e.g., AAPL, TSLA)
-        period: Time period (1y, 3y, 5y, max)
-
-    Returns:
-        JSON response with trading intelligence data or error message
-    """
-    # Log request with client info
-    client_ip = request.environ.get("HTTP_X_FORWARDED_FOR", request.remote_addr)
-    logger.info(
-        f"Trading stats request from {client_ip}: ticker={ticker}, period={period}"
-    )
-
-    try:
-        # Validate inputs using same validation logic
-        is_valid_ticker, validated_ticker = validate_ticker_symbol(ticker)
-        if not is_valid_ticker:
-            logger.warning(
-                f"Invalid ticker from {client_ip}: {ticker} - {validated_ticker}"
-            )
-            return jsonify({"error": f"Invalid ticker symbol: {validated_ticker}"}), 400
-
-        is_valid_period, validated_period = validate_period(period)
-        if not is_valid_period:
-            logger.warning(
-                f"Invalid period from {client_ip}: {period} - {validated_period}"
-            )
-            return jsonify({"error": f"Invalid period: {validated_period}"}), 400
-
-        # Get stock service from app context
-        stock_service = getattr(current_app, "stock_service", None)
-        if stock_service is None:
-            logger.error("Stock service not available")
-            return jsonify({"error": "Stock service not available"}), 500
-
-        # Calculate trading intelligence stats
-        result, status_code = stock_service.calculate_trading_stats(
-            validated_ticker, validated_period
-        )
-
-        # Log result
-        if status_code == 200:
-            logger.info(
-                f"Successful trading stats for {validated_ticker}/{validated_period} from {client_ip}"
-            )
-        else:
-            logger.warning(
-                f"Trading stats error for {validated_ticker}/{validated_period}: {result.get('error', 'Unknown error')}"
-            )
-
-        return jsonify(result), status_code
-
-    except ValidationError as e:
-        logger.warning(f"Validation error from {client_ip}: {e.message}")
-        return jsonify({"error": f"Validation error: {e.message}"}), 400
-    except Exception as e:
-        logger.error(
-            f"Unexpected error processing trading stats from {client_ip}: {e}",
-            exc_info=True,
-        )
-        return jsonify({"error": "Internal server error"}), 500
+# Removed redundant /trading-stats endpoint - functionality now integrated into /data endpoint
 
 
 @api_bp.route("/api-usage")

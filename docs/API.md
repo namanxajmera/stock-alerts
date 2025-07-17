@@ -443,7 +443,7 @@ curl -X POST http://localhost:5001/admin/check \
 
 ### API Rate Limiting
 - **Tiingo API**: Respects provider rate limits with delay
-- **Request Delay**: 3 seconds (configurable via `YF_REQUEST_DELAY`)
+- **Request Delay**: 3 seconds (configurable via `TIINGO_REQUEST_DELAY`)
 - **Implementation**: [`utils/tiingo_client.py`](../utils/tiingo_client.py)
 
 ### Request Logging

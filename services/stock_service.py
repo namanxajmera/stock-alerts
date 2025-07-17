@@ -18,7 +18,7 @@ import numpy as np
 import pandas as pd
 import pytz
 
-from db_manager import DatabaseManager
+from database import DatabaseManager
 from utils.config import config
 from utils.rate_limiter import RateLimiter
 from utils.tiingo_client import TiingoClient
@@ -271,7 +271,7 @@ class StockService:
 
             # Prepare result - convert NaN to None for valid JSON
             def clean_for_json(series: Any) -> List[Any]:
-                """Convert pandas series to list with NaN/inf converted to None"""
+                """Convert pandas series to list with NaN/inf converted to None."""
                 # Replace inf/-inf with NaN, then convert to list and replace NaN with None
                 cleaned = series.replace([np.inf, -np.inf], np.nan)
                 result = cleaned.tolist()
@@ -712,7 +712,6 @@ class StockService:
         """
         try:
             # Extract data from the already-processed stock data
-            dates = stock_data["dates"]
             prices = [p for p in stock_data["prices"] if p is not None]
             pct_diff = [p for p in stock_data["pct_diff"] if p is not None]
             percentiles = stock_data["percentiles"]

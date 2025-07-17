@@ -14,11 +14,10 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from db_manager import DatabaseManager
+from database import DatabaseManager
 from type_definitions.stock_types import DataFrameType
 from utils.config import config
 from utils.tiingo_client import TiingoClient
-from webhook_handler import WebhookHandler
 
 # from type_definitions.api_types import TiingoResponse  # Not needed for type hints
 
@@ -28,24 +27,23 @@ logger = logging.getLogger("StockAlerts.PeriodicChecker")
 class PeriodicChecker:
     """Periodic checker for stock prices and alert generation."""
 
-    def __init__(self) -> None:
-        """Initialize the periodic checker."""
-        self.db = DatabaseManager()
-        bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
-        self.webhook_handler = WebhookHandler(self.db, bot_token or "")
+    def __init__(self, db_manager: DatabaseManager, notification_service: Any) -> None:
+        """Initialize the periodic checker with required dependencies."""
+        self.db = db_manager
+        self.notification_service = notification_service
         self.tiingo_client = TiingoClient()
         logger.info("Periodic checker initialized")
 
     def check_watchlists(self) -> None:
         """Check all active watchlists for alerts efficiently."""
         try:
-            # Check if today is a valid alert day (Mon-Thu, Sun)
-            today = datetime.now().weekday()  # 0=Monday, 6=Sunday
+            # Check if today is a valid alert day (Mon-Thu, Sun) using UTC
+            today = datetime.utcnow().weekday()  # 0=Monday, 6=Sunday
             valid_days = [0, 1, 2, 3, 6]  # Monday-Thursday, Sunday
             
             if today not in valid_days:
                 day_name = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][today]
-                logger.info(f"Skipping watchlist check - today is {day_name}. Alerts only run Mon-Thu and Sunday.")
+                logger.info(f"Skipping watchlist check - today is {day_name} (UTC). Alerts only run Mon-Thu and Sunday.")
                 return
                 
             logger.info("Starting watchlist check")
@@ -80,7 +78,7 @@ class PeriodicChecker:
                         user_id = str(user_data["user_id"])
                         user_alerts[user_id].append(alert_with_ownership)
                 # Longer delay between symbols to be more respectful
-                time.sleep(config.YF_REQUEST_DELAY)
+                time.sleep(config.TIINGO_REQUEST_DELAY)
 
             # Send combined alerts to each user
             self._send_batched_alerts(user_alerts)
@@ -226,7 +224,11 @@ class PeriodicChecker:
                 logger.info(
                     f"Sending batched alerts to user {user_id} for {len(alerts)} stocks"
                 )
-                self.webhook_handler.send_batched_alert(user_id, alerts)
+                self.notification_service.send_batched_alerts(user_id, alerts)
+
+
+from features.webhook_handler import WebhookHandler
+from services.notification_service import NotificationService
 
 
 def main() -> None:
@@ -234,7 +236,16 @@ def main() -> None:
     # This script is intended to be run by a scheduler like cron.
     # The infinite loop is removed in favor of single-run execution.
     logger.info("Starting periodic checker run...")
-    checker = PeriodicChecker()
+    db_manager = DatabaseManager(config.DATABASE_URL)
+    if not config.TELEGRAM_BOT_TOKEN:
+        raise ValueError("TELEGRAM_BOT_TOKEN not configured")
+    webhook_handler = WebhookHandler(
+        db_manager,
+        config.TELEGRAM_BOT_TOKEN,
+        config.TELEGRAM_WEBHOOK_SECRET,
+    )
+    notification_service = NotificationService(db_manager, webhook_handler)
+    checker = PeriodicChecker(db_manager, notification_service)
     checker.check_watchlists()
     logger.info("Periodic checker run finished.")
 

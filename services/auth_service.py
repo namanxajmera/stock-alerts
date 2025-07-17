@@ -121,3 +121,45 @@ class AuthService:
 
         self.logger.info("Valid admin access key provided")
         return True, "Authorized"
+
+    def check_admin_auth(self) -> Any:
+        """
+        Check admin authentication without decorator pattern.
+
+        Returns:
+            True if authenticated, otherwise returns Flask Response for authentication error
+        """
+        auth = request.authorization
+
+        if not auth:
+            self.logger.warning("Admin access attempt without credentials")
+            return Response(
+                "Access denied. Authentication required.",
+                401,
+                {"WWW-Authenticate": 'Basic realm="Admin"'},
+            )
+
+        admin_username = config.ADMIN_USERNAME
+        admin_password = config.ADMIN_PASSWORD
+
+        if not admin_username or not admin_password:
+            self.logger.error("Admin credentials not configured")
+            return Response(
+                "Admin authentication not properly configured",
+                503,
+            )
+
+        if auth.username != admin_username or auth.password != admin_password:
+            self.logger.warning(
+                f"Failed admin login attempt for username: {auth.username}"
+            )
+            return Response(
+                "Access denied. Invalid credentials.",
+                401,
+                {"WWW-Authenticate": 'Basic realm="Admin"'},
+            )
+
+        self.logger.info(
+            f"Successful admin authentication for user: {auth.username}"
+        )
+        return True

@@ -19,12 +19,15 @@
             <h1>Intelligent Stock Analytics</h1>
             <p>Enter any stock symbol to reveal market patterns and trends.</p>
             <div class="search-controls">
-                <input type="text" id="ticker-input" placeholder="Try AAPL, TSLA, or NVDA" />
-                <div class="period-selector">
-                    <button class="period-btn" data-period="1y">1Y</button>
-                    <button class="period-btn" data-period="3y">3Y</button>
-                    <button class="period-btn selected" data-period="5y">5Y</button>
-                    <button class="period-btn" data-period="max">MAX</button>
+                <div class="input-group">
+                    <label for="ticker-input" class="visually-hidden">Stock ticker symbol</label>
+                    <input type="text" id="ticker-input" placeholder="Try AAPL, TSLA, or NVDA" aria-label="Enter stock ticker symbol" />
+                </div>
+                <div class="period-selector" role="group" aria-label="Time period selection">
+                    <button class="period-btn" data-period="1y" aria-label="1 year period">1Y</button>
+                    <button class="period-btn" data-period="3y" aria-label="3 year period">3Y</button>
+                    <button class="period-btn selected" data-period="5y" aria-label="5 year period" aria-pressed="true">5Y</button>
+                    <button class="period-btn" data-period="max" aria-label="Maximum period">MAX</button>
                 </div>
             </div>
             <div class="status-container">
@@ -106,6 +109,6 @@
 
     </div>
 
-    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script type="module" src="/static/js/main.js"></script>
 </body>
 </html> 

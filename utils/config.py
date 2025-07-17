@@ -45,7 +45,7 @@ class Config:
 
         # Application settings with defaults
         self.CACHE_HOURS = int(os.getenv("CACHE_HOURS", "1"))
-        self.YF_REQUEST_DELAY = float(os.getenv("YF_REQUEST_DELAY", "3.0"))
+        self.TIINGO_REQUEST_DELAY = float(os.getenv("TIINGO_REQUEST_DELAY", "3.0"))
         self.PORT = int(os.getenv("PORT", "5001"))
 
         # Optional settings
@@ -85,7 +85,7 @@ class Config:
             "ADMIN_API_KEY": bool(self.ADMIN_API_KEY),
             "API_SECRET_KEY": bool(self.API_SECRET_KEY),
             "CACHE_HOURS": self.CACHE_HOURS,
-            "YF_REQUEST_DELAY": self.YF_REQUEST_DELAY,
+            "TIINGO_REQUEST_DELAY": self.TIINGO_REQUEST_DELAY,
             "PORT": self.PORT,
             "DEBUG": self.DEBUG,
             "LOG_LEVEL": self.LOG_LEVEL,

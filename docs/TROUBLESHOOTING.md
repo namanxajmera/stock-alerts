@@ -206,7 +206,7 @@ curl -u admin:password "http://localhost:5001/admin"
 echo "CACHE_HOURS=24" >> .env
 
 # Check API request delay setting
-echo "YF_REQUEST_DELAY=5.0" >> .env
+echo "TIINGO_REQUEST_DELAY=5.0" >> .env
 ```
 
 #### JavaScript/Frontend Issues
@@ -744,7 +744,7 @@ psql "$DATABASE_URL" -c "SELECT count(*) FROM pg_stat_activity;"
    # Railway.json: already configured optimally
    
    # Adjust API request delays
-   echo "YF_REQUEST_DELAY=1.0" >> .env
+   echo "TIINGO_REQUEST_DELAY=1.0" >> .env
    ```
 
 ---

@@ -14,7 +14,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import requests
 
-from db_manager import DatabaseManager
+from database import DatabaseManager
 
 logger = logging.getLogger("StockAlerts.WebhookHandler")
 
@@ -127,7 +127,7 @@ class WebhookHandler:
                 return True
 
             message = update["message"]
-            user_id = str(message["from"]["id"])
+            user_id = int(message["from"]["id"])
             username = message["from"].get("username") or message["from"].get(
                 "first_name"
             )
@@ -170,11 +170,12 @@ class WebhookHandler:
                 validate_user_id,
             )
 
-            # Validate user ID
-            is_valid_user, validated_user_id = validate_user_id(str(user_id_raw))
+            # Validate user ID (returns validated int)
+            is_valid_user, validated_user_id_str = validate_user_id(str(user_id_raw))
             if not is_valid_user:
-                logger.warning(f"Invalid user ID: {user_id_raw} - {validated_user_id}")
+                logger.warning(f"Invalid user ID: {user_id_raw} - {validated_user_id_str}")
                 return
+            validated_user_id = int(validated_user_id_str)
 
             # Extract and validate command text
             command_text = message.get("text", "").strip()
@@ -234,24 +235,24 @@ class WebhookHandler:
                 )
 
         except ValidationError as e:
-            # Handle validation errors gracefully
-            user_id = str(message.get("from", {}).get("id", "unknown"))
+            user_id = int(message.get("from", {}).get("id", 0))
             logger.warning(f"Command validation error from user {user_id}: {e.message}")
-            self._send_message(user_id, f"❌ {e.message}")
+            if user_id:
+                self._send_message(user_id, f"❌ {e.message}")
         except Exception as e:
-            # Handle unexpected errors
-            user_id = str(message.get("from", {}).get("id", "unknown"))
-            command = message.get("text", "unknown")[:50]  # Limit log length
+            user_id = int(message.get("from", {}).get("id", 0))
+            command = message.get("text", "unknown")[:50]
             logger.error(
                 f"Error handling command '{command}' from user {user_id}: {e}",
                 exc_info=True,
             )
-            self.db.log_event(
-                "error", f"Error handling command '{command}': {e}", user_id=user_id
-            )
-            self._send_message(
-                user_id, "⚠️ An internal error occurred. Please try again later."
-            )
+            if user_id:
+                self.db.log_event(
+                    "error", f"Error handling command '{command}': {e}", user_id=user_id
+                )
+                self._send_message(
+                    user_id, "⚠️ An internal error occurred. Please try again later."
+                )
 
     def _get_welcome_message(self) -> str:
         """Get the welcome message text."""
@@ -288,33 +289,15 @@ class WebhookHandler:
 
     def send_alert(
         self,
-        user_id: str,
+        user_id: int,
         symbol: str,
         price: float,
         percentile: float,
         percentile_16: float,
         percentile_84: float,
     ) -> bool:
-        """Send a stock alert to a user."""
+        """Send a stock alert to a user. Assumes caller has already checked if it's a valid alert day."""
         try:
-            # Check if today is a valid alert day (Mon-Thu, Sun)
-            today = datetime.now().weekday()  # 0=Monday, 6=Sunday
-            valid_days = [0, 1, 2, 3, 6]  # Monday-Thursday, Sunday
-            
-            if today not in valid_days:
-                day_name = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][today]
-                logger.info(f"Skipping alert for {symbol} - today is {day_name}. Alerts only sent Mon-Thu and Sunday.")
-                
-                # Still log to history but mark as skipped
-                self.db.add_alert_history(
-                    user_id=user_id,
-                    symbol=symbol,
-                    price=price,
-                    percentile=percentile,
-                    status="skipped",
-                    error_message=f"Alert skipped - {day_name} is not a valid alert day",
-                )
-                return False
             message = (
                 f"🚨 <b>Stock Alert for {symbol.upper()}</b>\n\n"
                 f"Current Price: ${price:.2f}\n"
@@ -356,31 +339,11 @@ class WebhookHandler:
             )
             return False
 
-    def send_batched_alert(self, user_id: str, alerts: List[Dict[str, Any]]) -> bool:
-        """Send a combined alert message for multiple stocks to a user."""
+    def send_batched_alert(self, user_id: int, alerts: List[Dict[str, Any]]) -> bool:
+        """Send a combined alert message for multiple stocks to a user. Assumes caller has already checked if it's a valid alert day."""
         try:
             if not alerts:
                 return True
-                
-            # Check if today is a valid alert day (Mon-Thu, Sun)
-            today = datetime.now().weekday()  # 0=Monday, 6=Sunday
-            valid_days = [0, 1, 2, 3, 6]  # Monday-Thursday, Sunday
-            
-            if today not in valid_days:
-                day_name = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][today]
-                logger.info(f"Skipping batched alerts - today is {day_name}. Alerts only sent Mon-Thu and Sunday.")
-                
-                # Log all alerts as skipped
-                for alert in alerts:
-                    self.db.add_alert_history(
-                        user_id=user_id,
-                        symbol=alert["symbol"],
-                        price=alert["price"],
-                        percentile=alert["percentile"],
-                        status="skipped",
-                        error_message=f"Alert skipped - {day_name} is not a valid alert day",
-                    )
-                return False
 
             # Separate alerts by ownership
             position_alerts = [alert for alert in alerts if alert.get("is_owned", False)]
@@ -467,7 +430,7 @@ class WebhookHandler:
                 )
             return False
 
-    def _handle_list_command(self, user_id: str) -> None:
+    def _handle_list_command(self, user_id: int) -> None:
         """Handle the /list command."""
         watchlist = self.db.get_watchlist(user_id)
         if not watchlist:
@@ -504,7 +467,7 @@ class WebhookHandler:
 
         self._send_message(user_id, "\n".join(message_lines))
 
-    def _handle_add_command(self, user_id: str, validated_tickers: List[str]) -> None:
+    def _handle_add_command(self, user_id: int, validated_tickers: List[str]) -> None:
         """
         Handle the /add command with pre-validated ticker symbols.
 
@@ -547,7 +510,7 @@ class WebhookHandler:
         self._send_message(user_id, response)
 
     def _handle_remove_command(
-        self, user_id: str, validated_tickers: List[str]
+        self, user_id: int, validated_tickers: List[str]
     ) -> None:
         """
         Handle the /remove command with pre-validated ticker symbols.
@@ -597,7 +560,7 @@ class WebhookHandler:
         response = "\n".join(response_parts)
         self._send_message(user_id, response)
 
-    def _handle_own_command(self, user_id: str, validated_tickers: List[str]) -> None:
+    def _handle_own_command(self, user_id: int, validated_tickers: List[str]) -> None:
         """Handle the /own command to mark stocks as owned positions."""
         marked_owned = []
         not_found = []
@@ -633,7 +596,7 @@ class WebhookHandler:
         response = "\n".join(response_parts)
         self._send_message(user_id, response)
 
-    def _handle_unown_command(self, user_id: str, validated_tickers: List[str]) -> None:
+    def _handle_unown_command(self, user_id: int, validated_tickers: List[str]) -> None:
         """Handle the /unown command to mark stocks as watchlist only."""
         marked_watchlist = []
         not_found = []

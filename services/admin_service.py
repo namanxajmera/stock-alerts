@@ -11,18 +11,26 @@ from typing import Any, Dict, List
 
 import psycopg2.extras
 
+from features import PeriodicChecker
+
 
 class AdminService:
     """Service class for admin operations."""
 
-    def __init__(self, db_manager: Any) -> None:
+    def __init__(
+        self, db_manager: Any, notification_service: Any, periodic_checker: PeriodicChecker
+    ) -> None:
         """
         Initialize the AdminService.
 
         Args:
             db_manager: Database manager instance for database operations
+            notification_service: Notification service for sending alerts
+            periodic_checker: PeriodicChecker instance for triggering checks
         """
         self.db_manager = db_manager
+        self.notification_service = notification_service
+        self.periodic_checker = periodic_checker
         self.logger = logging.getLogger("StockAlerts.AdminService")
 
     def get_admin_data(self) -> Dict[str, List[Dict[str, Any]]]:
@@ -36,39 +44,8 @@ class AdminService:
             Exception: If database operations fail
         """
         try:
-            with self.db_manager._get_connection() as conn:
-                cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-
-                # Users
-                cursor.execute("SELECT * FROM users")
-                users = cursor.fetchall()
-
-                # Watchlist items
-                cursor.execute("SELECT * FROM watchlist_items ORDER BY user_id, symbol")
-                watchlist = cursor.fetchall()
-
-                # Alert history (last 50)
-                cursor.execute(
-                    "SELECT * FROM alert_history ORDER BY sent_at DESC LIMIT 50"
-                )
-                alerts = cursor.fetchall()
-
-                # Stock cache
-                cursor.execute("SELECT * FROM stock_cache ORDER BY last_check DESC")
-                cache = cursor.fetchall()
-
-                # Config (filter out sensitive data)
-                cursor.execute("SELECT * FROM config WHERE key != 'telegram_token'")
-                config = cursor.fetchall()
-
-                return {
-                    "users": users,
-                    "watchlist": watchlist,
-                    "alerts": alerts,
-                    "cache": cache,
-                    "config": config,
-                }
-
+            # Use the new repository pattern method
+            return dict(self.db_manager.get_admin_data())
         except Exception as e:
             self.logger.error(f"Error retrieving admin data: {e}", exc_info=True)
             raise
@@ -82,13 +59,7 @@ class AdminService:
         """
         try:
             self.logger.info("Triggering manual stock check...")
-
-            # Import and run the periodic checker
-            from periodic_checker import PeriodicChecker
-
-            checker = PeriodicChecker()
-            checker.check_watchlists()
-
+            self.periodic_checker.check_watchlists()
             self.logger.info("Manual stock check completed successfully")
 
         except Exception as e:

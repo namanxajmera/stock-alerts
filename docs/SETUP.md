@@ -80,7 +80,7 @@ ADMIN_API_KEY=your_admin_api_key_here
 PORT=5001
 DEBUG=False
 CACHE_HOURS=1
-YF_REQUEST_DELAY=3.0
+TIINGO_REQUEST_DELAY=3.0
 ```
 
 #### Environment Variable Details

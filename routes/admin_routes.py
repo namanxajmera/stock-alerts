@@ -1,7 +1,7 @@
 """Admin routes for database management and manual operations."""
 
 import logging
-from typing import Tuple, Union
+from typing import Any, Tuple, Union
 
 from flask import Blueprint, Response, current_app, jsonify, render_template, request
 
@@ -15,32 +15,32 @@ admin_bp = Blueprint("admin", __name__)
 
 
 @admin_bp.route("/admin", methods=["GET"])
-def admin_panel() -> Union[str, Tuple[str, int]]:
+def admin_panel() -> Any:
     """Admin panel endpoint with authentication."""
     # Get auth service from app context
     auth_service = getattr(current_app, "auth_service", None)
     if auth_service is None:
         return "<h1>Error</h1><p>Authentication service not available</p>", 500
 
-    # Apply authentication using the service
-    @auth_service.require_admin_auth  # type: ignore
-    def _admin_panel() -> Union[str, Tuple[str, int]]:
-        admin_service = getattr(current_app, "admin_service", None)
-        if admin_service is None:
-            return "<h1>Error</h1><p>Admin service not available</p>", 500
+    # Check authentication
+    auth_result = auth_service.check_admin_auth()
+    if auth_result is not True:
+        return auth_result  # Return the authentication error response
 
-        try:
-            # Get admin data using the service
-            admin_data = admin_service.get_admin_data()
+    admin_service = getattr(current_app, "admin_service", None)
+    if admin_service is None:
+        return "<h1>Error</h1><p>Admin service not available</p>", 500
 
-            # Render template with admin data (secure HTML escaping)
-            return render_template("admin.html", **admin_data)
+    try:
+        # Get admin data using the service
+        admin_data = admin_service.get_admin_data()
 
-        except Exception as e:
-            logger.error(f"Admin panel error: {e}", exc_info=True)
-            return f"<h1>Error</h1><p>{e}</p>", 500
+        # Render template with admin data (secure HTML escaping)
+        return render_template("admin.html", **admin_data)
 
-    return _admin_panel()  # type: ignore
+    except Exception as e:
+        logger.error(f"Admin panel error: {e}", exc_info=True)
+        return f"<h1>Error</h1><p>{e}</p>", 500
 
 
 @admin_bp.route("/admin/check", methods=["POST"])

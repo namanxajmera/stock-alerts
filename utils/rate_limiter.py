@@ -10,7 +10,7 @@ import time
 from datetime import datetime, timedelta
 from typing import Dict, Optional, Tuple
 
-from db_manager import DatabaseManager
+from database import DatabaseManager
 
 
 class RateLimiter:
@@ -121,7 +121,7 @@ class RateLimiter:
         """Get the number of API calls made in the current hour."""
         try:
             hour_start = current_time.replace(minute=0, second=0, microsecond=0)
-            return self.db_manager.get_api_request_count(api_name, hour_start, current_time)
+            return int(self.db_manager.get_api_request_count(api_name, hour_start, current_time))
         except Exception as e:
             self.logger.error(f"Error getting hourly count: {e}")
             return 0
@@ -130,7 +130,7 @@ class RateLimiter:
         """Get the number of API calls made in the current day."""
         try:
             day_start = current_time.replace(hour=0, minute=0, second=0, microsecond=0)
-            return self.db_manager.get_api_request_count(api_name, day_start, current_time)
+            return int(self.db_manager.get_api_request_count(api_name, day_start, current_time))
         except Exception as e:
             self.logger.error(f"Error getting daily count: {e}")
             return 0
@@ -219,7 +219,7 @@ class UserRateLimiter:
         """Get the number of requests made by a user in the current hour."""
         try:
             hour_start = current_time.replace(minute=0, second=0, microsecond=0)
-            return self.db_manager.get_user_request_count(user_identifier, hour_start, current_time)
+            return int(self.db_manager.get_user_request_count(user_identifier, hour_start, current_time))
         except Exception as e:
             self.logger.error(f"Error getting user hourly count: {e}")
             return 0
@@ -228,7 +228,7 @@ class UserRateLimiter:
         """Get the number of requests made by a user in the current day."""
         try:
             day_start = current_time.replace(hour=0, minute=0, second=0, microsecond=0)
-            return self.db_manager.get_user_request_count(user_identifier, day_start, current_time)
+            return int(self.db_manager.get_user_request_count(user_identifier, day_start, current_time))
         except Exception as e:
             self.logger.error(f"Error getting user daily count: {e}")
             return 0
